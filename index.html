@@ -386,7 +386,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--cream);col
 
       <!-- CONFIRMAÇÕES -->
       <div class="page" id="page-conf">
-        <div class="auto-tag"><div class="pulse"></div>Envio automático ativo — 24h antes</div>
+        <div id="confWebhookStatus" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);color:var(--muted);border-radius:6px;padding:5px 13px;font-size:11px;margin-bottom:11px;border:0.5px solid var(--border)"><span id="confWebhookDot" style="width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0"></span><span id="confWebhookLabel">Webhook não configurado — vá em Config para configurar</span></div>
         <div class="conf-strip">
           <div class="cs-card"><div class="cs-val" style="color:var(--rose-deep)" id="csTot">8</div><div class="cs-label">hoje</div></div>
           <div class="cs-card"><div class="cs-val" style="color:#8a6520" id="csPend">3</div><div class="cs-label">pendentes</div></div>
@@ -1345,6 +1345,8 @@ function goTo(page,el){
   if(page==='agenda'){renderCal();renderTimeline();renderUpcoming()}
   if(page==='crm'){filterCRM();if(crmView==='kanban')renderKanban()}
   if(page==='conf'){
+    // Atualiza indicador de webhook
+    updateWebhookStatusBadge();
     // Recarrega agendamentos do Supabase para garantir dados atualizados
     sbLoadAppts().then(()=>{
       syncConfAppts();renderConfList();updateConfStats();
@@ -1376,7 +1378,7 @@ function topAction(){
     setTimeout(()=>document.getElementById('mName').focus(),100);
   }
   else if(curPage==='crm') document.getElementById('clientModal').classList.add('open');
-  else if(curPage==='conf'){ syncConfAppts(); confAppts.filter(a=>a.status==='pending').forEach(a=>sendWpp(a.id)); }
+  else if(curPage==='conf'){ syncConfAppts(); renderConfList(); updateConfStats(); }
   else if(curPage==='fin') toggleAddForm();
 }
 function topAction2(){if(curPage==='fin') setFinSection('centros',document.querySelectorAll('.stab')[2])}
@@ -1912,10 +1914,39 @@ function selConf(id){
 // URL do webhook do n8n (configurável pela tela de Configurações)
 let N8N_WEBHOOK_URL = load('n8n_webhook_url', '');
 
+function updateWebhookStatusBadge(){
+  const dot = document.getElementById('confWebhookDot');
+  const lbl = document.getElementById('confWebhookLabel');
+  if(!dot||!lbl) return;
+  if(N8N_WEBHOOK_URL){
+    dot.style.background='#25d366';
+    lbl.textContent='Webhook configurado — clique em "Enviar msg" para enviar via WhatsApp';
+    document.getElementById('confWebhookStatus').style.background='#f0faf3';
+    document.getElementById('confWebhookStatus').style.color='#2e7d4f';
+    document.getElementById('confWebhookStatus').style.borderColor='#a8d8b5';
+  } else {
+    dot.style.background='#f0b050';
+    lbl.textContent='Webhook não configurado — configure em ⚙ Config para habilitar o WhatsApp';
+    document.getElementById('confWebhookStatus').style.background='#fdf4e3';
+    document.getElementById('confWebhookStatus').style.color='#8a6520';
+    document.getElementById('confWebhookStatus').style.borderColor='#d4b87a';
+  }
+}
+
 function sendWpp(id){
+  if(!N8N_WEBHOOK_URL){
+    alert('Webhook não configurado.\nVá em ⚙ Config → cole a URL do webhook do n8n → Salvar configurações.');
+    return;
+  }
   const a=confAppts.find(x=>x.id===id);
+  if(!a) return;
+  if(!a.phone||a.phone==='—'||a.phone==='(00) 00000-0000'){
+    alert('Este cliente não tem telefone cadastrado.\nAdicione o telefone na ficha do CRM antes de enviar.');
+    return;
+  }
   const now=new Date(),t='Hoje '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  a.msgs.push({out:'Ola '+a.name.split(' ')[0]+'! Lembrete: '+a.svc+' hoje as '+a.time+'. Confirma presenca?',t});
+  const msg='Olá '+a.name.split(' ')[0]+'! Lembrete do seu agendamento de '+a.svc+' '+a.dateLabel+' às '+a.time+'. Confirma presença?';
+  a.msgs.push({out:msg,t});
   confMsgsStore[a.id] = a.msgs;
   if(a.status==='pending') a.status='sent';
   syncConfBack();
@@ -1941,6 +1972,10 @@ function sendWpp(id){
 }
 function sendMsgConf(id){
   const ta=document.getElementById('wppTa');const txt=ta.value.trim();if(!txt)return;
+  if(!N8N_WEBHOOK_URL){
+    alert('Webhook não configurado.\nVá em ⚙ Config → cole a URL do webhook do n8n → Salvar configurações.');
+    return;
+  }
   const a=confAppts.find(x=>x.id===id);const now=new Date(),t='Hoje '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
   a.msgs.push({out:txt,t});if(a.status==='pending') a.status='sent';
   confMsgsStore[a.id] = a.msgs;
@@ -2234,6 +2269,7 @@ function saveConfig(){
   const n8nUrl = document.getElementById('cfgN8nUrl').value.trim();
   N8N_WEBHOOK_URL = n8nUrl;
   save('n8n_webhook_url', n8nUrl);
+  updateWebhookStatusBadge();
   alert('Configurações salvas!');
 }
 
