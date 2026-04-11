@@ -1112,19 +1112,39 @@ let confAppts = [];
 let confMsgsStore = {}; // armazena mensagens por {apptId}
 
 function syncConfAppts(){
-  const hoje = agendaSelDate;
-  const arr = getApptDay(hoje) || [];
-  // Mapeia status: confirmed, sent, pending, canceled
-  confAppts = arr.map((a, i) => ({
-    id: a.id || i+1,
-    name: a.name || 'Cliente',
-    phone: a.phone || '(00) 00000-0000',
-    svc: SVC_NAMES[a.svc] || a.svc || 'Serviço',
-    time: a.time || '00:00',
-    status: a.status === 'confirmed' ? 'confirmed' : (a.status === 'cancelled' ? 'canceled' : (a.confirmationSent ? 'sent' : 'pending')),
-    av: a.av || ['av-rose','av-gold','av-purple','av-green'][i % 4],
-    msgs: confMsgsStore[a.id] || []
-  }));
+  // Pega todos os agendamentos de hoje em diante (não só o dia selecionado)
+  const todayStr = fmtDateKey(new Date());
+  const all = [];
+  Object.entries(apptsByDate).sort().forEach(([date, arr]) => {
+    if(date >= todayStr){
+      arr.filter(a => a.name && a.status !== 'cancelled').forEach(a => {
+        all.push({...a, _date: date});
+      });
+    }
+  });
+  // Ordena por data e horário
+  all.sort((a,b) => a._date.localeCompare(b._date) || a.time.localeCompare(b.time));
+
+  confAppts = all.map((a, i) => {
+    // Busca telefone do cliente vinculado
+    const client = a.clientId ? clients.find(x => x.id === a.clientId || String(x.id) === String(a.clientId)) : null;
+    const phone = client ? client.phone : (a.phone || '—');
+    const av = client ? client.av : ['av-rose','av-gold','av-purple','av-green'][i % 4];
+    const dateLabel = a._date === todayStr ? 'Hoje' : fmtDateBR(a._date);
+    return {
+      id: a.id || i+1,
+      name: a.name,
+      phone,
+      svc: SVC_NAMES[a.svc_key] || a.svc || 'Serviço',
+      time: a.time,
+      dateLabel,
+      _date: a._date,
+      status: a.status === 'confirmed' ? 'confirmed' : (a.status === 'cancelled' ? 'canceled' : (a.confirmationSent ? 'sent' : 'pending')),
+      av,
+      msgs: confMsgsStore[a.id] || [],
+      clientId: a.clientId
+    };
+  });
 }
 // Dados estáticos de períodos removidos — KPIs calculados ao vivo via calcPeriod()
 const svcs=[{n:'Remoção micropig.',p:68,c:'#9b7fa6'},{n:'Remoção tatuagem',p:22,c:'#5c4470'},{n:'Aluguel sala',p:7,c:'#8a7a6a'},{n:'Outros',p:3,c:'#c2b8cc'}];
@@ -1324,7 +1344,14 @@ function goTo(page,el){
   curPage=page;
   if(page==='agenda'){renderCal();renderTimeline();renderUpcoming()}
   if(page==='crm'){filterCRM();if(crmView==='kanban')renderKanban()}
-  if(page==='conf'){renderConfList();updateConfStats()}
+  if(page==='conf'){
+    // Recarrega agendamentos do Supabase para garantir dados atualizados
+    sbLoadAppts().then(()=>{
+      syncConfAppts();renderConfList();updateConfStats();
+    }).catch(()=>{
+      syncConfAppts();renderConfList();updateConfStats();
+    });
+  }
   if(page==='fin'){
     // Renderiza imediatamente com dados já em memória
     setPeriod(curPeriod, document.querySelector('.ptab.active'));
@@ -1868,7 +1895,7 @@ function renderConfList(){
   document.getElementById('confList').innerHTML=confAppts.map(a=>
     '<div class="conf-card'+(selConfId===a.id?' sel':'')+((a.status==='confirmed'||a.status==='canceled')?' done':'')+'" onclick="selConf('+a.id+')">'+
     '<div class="cc-top"><div class="avatar '+a.av+'" style="width:33px;height:33px;font-size:11px">'+getIn(a.name)+'</div><div><div class="cc-name">'+a.name+'</div><div class="cc-svc">'+a.svc+'</div></div><div class="cc-meta"><span class="badge '+sm[a.status]+'">'+sl[a.status]+'</span></div></div>'+
-    '<div class="cc-bot"><span style="color:var(--dark);font-weight:500">Hoje às '+a.time+'</span><span style="color:var(--muted)">'+a.phone+'</span></div>'+
+    '<div class="cc-bot"><span style="color:var(--dark);font-weight:500">'+(a.dateLabel||'Hoje')+' às '+a.time+'</span><span style="color:var(--muted)">'+a.phone+'</span></div>'+
     (a.status==='pending'?'<div class="cc-acts"><button class="ca-btn ca-confirm" onclick="event.stopPropagation();var x=confAppts.find(y=>y.id==='+a.id+');x.status=\'confirmed\';syncConfBack();updateConfStats();renderConfList()">Confirmar</button><button class="ca-btn ca-wpp" onclick="event.stopPropagation();sendWpp('+a.id+')">Enviar msg</button><button class="ca-btn ca-cancel" onclick="event.stopPropagation();var x=confAppts.find(y=>y.id==='+a.id+');x.status=\'canceled\';syncConfBack();updateConfStats();renderConfList()">Cancelar</button></div>':'')+
     '</div>').join('');
 }
@@ -2277,6 +2304,7 @@ setInterval(async ()=>{
   // Recarrega agendamentos
   const ok=await sbLoadAppts();
   if(ok&&curPage==='agenda'){renderTimeline();renderUpcoming();renderCal();}
+  if(ok&&curPage==='conf'){syncConfAppts();renderConfList();updateConfStats();}
   // Recarrega clientes
   const ck=await sbLoadClientes();
   if(ck&&curPage==='crm'){filterCRM();if(crmView==='kanban')renderKanban();}
