@@ -1519,8 +1519,10 @@ function saveAppt(){
 
   const arr=getApptDay(dt);
   if(editId){
-    const idx=arr.findIndex(x=>x.id===editId);
-    if(idx>=0){ arr[idx]={...arr[idx],time,svc:svcLabel,svc_key,obs,name:n,clientId:apptLinkedClientId||arr[idx].clientId}; }
+    const idx=arr.findIndex(x=>String(x.id)===String(editId));
+    if(idx>=0){
+      arr[idx]={...arr[idx],time,svc:svcLabel,svc_key,obs,valor,fpag,name:n,clientId:apptLinkedClientId||arr[idx].clientId};
+    }
     delete document.getElementById('apptModal').dataset.editId;
   } else {
     arr.push({id:Date.now(),time,name:n,svc:svcLabel,svc_key,obs,valor,fpag,status:'pending',clientId:apptLinkedClientId});
@@ -1528,8 +1530,10 @@ function saveAppt(){
   // Se o agendamento é para outra data, muda para ela
   agendaSelDate=dt;
   setApptDay(dt, arr);
-  // Persiste agendamento no Supabase
-  const savedAppt=arr.find(x=>x.time===time&&x.name===n);
+  // Persiste no Supabase — usa id para encontrar o objeto correto
+  const savedAppt=editId
+    ? arr.find(x=>String(x.id)===String(editId))
+    : arr.find(x=>x.time===time&&x.name===n);
   if(savedAppt) sbUpsertAppt(dt, savedAppt);
   // Se cliente foi modificado, persiste também
   if(apptLinkedClientId){
