@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Morgana Pires Laser Removal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rose:#9b7fa6;--rose-light:#f2eef5;--rose-mid:#7d6090;--rose-deep:#5c4470;--gold:#8a7a6a;--gold-light:#f0ece8;--cream:#f8f7f9;--dark:#1a1a1a;--muted:#888;--border:rgba(0,0,0,0.08);--surface:#f4f2f6;--green:#25d366;--green-light:#dcf8c6;--wpp:#128c7e}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--cream);color:var(--dark);overflow:hidden}
+.shell{display:flex;height:100vh}
+.sidenav{width:74px;background:var(--rose-deep);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px;flex-shrink:0}
+.nav-logo{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#fff;margin-bottom:14px;text-align:center;line-height:1.4;letter-spacing:.02em;padding:0 6px}
+.nav-logo span{color:rgba(255,255,255,.5);display:block;font-size:8px;margin-top:2px;font-family:'Inter',sans-serif;font-weight:300;letter-spacing:.08em}
+.nav-item{width:52px;height:52px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;gap:3px;position:relative}
+.nav-item:hover{background:rgba(255,255,255,.15)}
+.nav-item.active{background:rgba(255,255,255,.22)}
+.nav-icon{font-size:19px;line-height:1}
+.nav-label{font-size:8px;color:rgba(255,255,255,.75);letter-spacing:.03em;text-transform:uppercase}
+.nav-item.active .nav-label{color:#fff}
+.nav-badge{position:absolute;top:6px;right:6px;width:15px;height:15px;border-radius:50%;background:var(--gold);font-size:8px;font-weight:500;color:#fff;display:flex;align-items:center;justify-content:center}
+.nav-sep{width:38px;height:0.5px;background:rgba(255,255,255,.2);margin:6px 0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;border-bottom:0.5px solid var(--border);background:#fff;flex-shrink:0}
+.page-title{font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:var(--dark);letter-spacing:-.01em}
+.page-title em{color:var(--rose-deep);font-style:normal}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-date{font-size:11px;color:var(--muted)}
+.btn-primary{background:var(--rose-deep);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s}
+.btn-primary:hover{background:var(--rose-mid)}
+.btn-ghost{background:transparent;color:var(--rose-deep);border:0.5px solid var(--rose);border-radius:6px;padding:8px 18px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-ghost:hover{background:var(--rose-light)}
+.content{flex:1;overflow-y:auto;padding:18px 22px}
+.page{display:none}
+.page.active{display:block}
+.section-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500;margin-bottom:10px}
+.card{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:15px 17px}
+.card-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--dark);margin-bottom:13px;letter-spacing:-.01em}
+.badge{font-size:10px;padding:2px 9px;border-radius:4px;font-weight:500}
+.badge-vip{background:#fce8ee;color:var(--rose-deep)}
+.badge-regular{background:#eaf5ee;color:#2e7d4f}
+.badge-new{background:#f0eafe;color:#6b4fa0}
+.badge-inactive{background:#f5f0eb;color:#8a7060}
+.badge-confirmed{background:#eaf5ee;color:#2e7d4f}
+.badge-pending{background:#faefd4;color:#8a6520}
+.badge-sent{background:#e8f5e9;color:var(--wpp)}
+.badge-canceled{background:var(--rose-light);color:var(--rose-deep)}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;font-family:'Inter',sans-serif}
+.av-rose{background:var(--rose-light);color:var(--rose-deep)}
+.av-gold{background:var(--gold-light);color:#8a6520}
+.av-green{background:#eaf5ee;color:#2e7d4f}
+.av-purple{background:#f0eafe;color:#6b4fa0}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(45,32,32,.4);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:10px;padding:1.5rem;width:360px;max-width:95vw;border:0.5px solid var(--border);max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--rose-deep);margin-bottom:1rem}
+.form-group{margin-bottom:10px}
+.form-label{font-size:11px;color:var(--muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.07em}
+.form-input,.form-select{width:100%;padding:8px 12px;border-radius:6px;border:0.5px solid var(--border);font-size:13px;font-family:'Inter',sans-serif;color:var(--dark);background:var(--surface);outline:none;transition:border .15s}
+.form-input:focus,.form-select:focus{border-color:var(--rose)}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:8px;margin-top:1rem}
+.btn-cancel{flex:1;padding:9px;border-radius:6px;border:0.5px solid var(--border);background:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-save{flex:2;padding:9px;border-radius:6px;background:var(--rose-deep);color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+
+/* AGENDA */
+.agenda-grid{display:grid;grid-template-columns:240px 1fr;gap:15px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.cal-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--rose-deep);letter-spacing:-.01em}
+.cal-nav{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 7px;border-radius:4px}
+.cal-nav:hover{background:var(--rose-light)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-day-name{font-size:9px;color:var(--muted);padding:3px 0;text-transform:uppercase}
+.cal-day{font-size:11px;border-radius:50%;cursor:pointer;color:var(--dark);width:27px;height:27px;display:flex;align-items:center;justify-content:center;margin:1px auto;transition:all .15s;position:relative}
+.cal-day:hover{background:var(--rose-light)}
+.cal-day.today{background:var(--rose-deep);color:#fff;font-weight:500}
+.cal-day.sel{background:var(--rose-light);color:var(--rose-deep);font-weight:500}
+.cal-day.other{color:var(--muted);opacity:.4}
+.cal-day.has::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);position:absolute;bottom:1px;left:50%;transform:translateX(-50%)}
+.tl-panel{background:#fff;border-radius:8px;border:0.5px solid var(--border);overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 200px)}
+.tl-header{padding:12px 15px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tl-day-label{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;letter-spacing:-.01em}
+.tl-day-label em{color:var(--rose-deep);font-style:normal}
+.tl-body{padding:12px 15px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.tl-row{display:flex;gap:11px;min-height:48px}
+.tl-time{width:40px;font-size:10px;color:var(--muted);padding-top:3px;text-align:right;flex-shrink:0}
+.tl-slot{flex:1;border-left:0.5px solid var(--border);padding-left:11px}
+.appt-card{border-radius:6px;padding:7px 11px;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden;margin-bottom:3px}
+.appt-card:hover{transform:translateX(3px)}
+.appt-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.appt-card.confirmed{background:#f0faf3;border:0.5px solid #a8d8b5}.appt-card.confirmed::before{background:#7cbf8e}
+.appt-card.pending{background:var(--gold-light);border:0.5px solid #c8bbb0}.appt-card.pending::before{background:var(--gold)}
+.appt-card.vip{background:var(--rose-light);border:0.5px solid var(--rose)}.appt-card.vip::before{background:var(--rose-deep)}
+.appt-top{display:flex;align-items:center;justify-content:space-between}
+.appt-name{font-size:12px;font-weight:500}
+.appt-svc{font-size:11px;color:var(--muted);margin-top:1px}
+.tl-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:11px 15px;border-top:0.5px solid var(--border);background:var(--surface);flex-shrink:0}
+.ts-card{text-align:center;padding:9px;background:#fff;border-radius:6px;border:0.5px solid var(--border)}
+.ts-val{font-family:'Inter',sans-serif;font-size:22px;font-weight:300;color:var(--rose-deep);line-height:1;letter-spacing:-.02em}
+.ts-label{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.up-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;background:var(--surface);cursor:pointer;margin-bottom:5px;transition:background .15s}
+.up-item:hover{background:var(--rose-light)}
+.up-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* CRM */
+.crm-layout{display:grid;grid-template-columns:1fr 300px;gap:15px}
+.toolbar{display:flex;gap:9px;margin-bottom:13px;align-items:center;flex-wrap:wrap}
+.search-box{flex:1;min-width:160px;display:flex;align-items:center;background:#fff;border:0.5px solid var(--border);border-radius:6px;padding:0 13px;gap:7px}
+.search-box input{border:none;outline:none;font-size:12px;font-family:'Inter',sans-serif;color:var(--dark);width:100%;padding:9px 0;background:transparent}
+.ftabs{display:flex;gap:3px}
+.ftab{padding:6px 13px;border-radius:4px;font-size:11px;cursor:pointer;border:0.5px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all .15s}
+.ftab:hover{background:var(--rose-light);color:var(--rose-deep)}
+.ftab.active{background:var(--rose-light);color:var(--rose-deep);border-color:var(--rose)}
+.client-list{display:flex;flex-direction:column;gap:7px}
+.client-card{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:12px 15px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.client-card:hover{border-color:var(--rose);transform:translateX(2px)}
+.client-card.active{border-color:var(--rose-mid);background:var(--rose-light)}
+.detail-panel{background:#fff;border-radius:8px;border:0.5px solid var(--border);overflow:hidden}
+.dp-top{padding:15px;border-bottom:0.5px solid var(--border);text-align:center;background:var(--surface)}
+.dp-avatar{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;margin:0 auto 9px;font-family:'Inter',sans-serif}
+.dp-name{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;letter-spacing:-.01em}
+.dp-since{font-size:11px;color:var(--muted);margin-top:2px}
+.dp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:11px;border-bottom:0.5px solid var(--border)}
+.dps{text-align:center;padding:8px;background:var(--surface);border-radius:6px}
+.dps-val{font-family:'Inter',sans-serif;font-size:18px;font-weight:300;color:var(--rose-deep);line-height:1;letter-spacing:-.02em}
+.dps-label{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.dp-section{padding:11px 13px}
+.info-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px}
+.info-row:last-child{border:none}
+.info-label{color:var(--muted)}
+.pref-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pref-tag{background:var(--rose-light);color:var(--rose-deep);border-radius:20px;padding:3px 11px;font-size:10px}
+.bday-chip{display:flex;align-items:center;gap:5px;background:var(--gold-light);border-radius:9px;padding:6px 11px;font-size:11px;color:#8a6520;margin-top:7px}
+.hist-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:11px}
+.hist-item:last-child{border:none}
+.hist-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);flex-shrink:0}
+.hist-svc{flex:1}
+.hist-val{color:var(--rose-deep);font-weight:500}
+.dp-actions{padding:0 11px 11px;display:flex;gap:6px}
+.dp-actions button{flex:1;padding:8px;border-radius:4px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer}
+.no-sel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;text-align:center;color:var(--muted)}
+
+/* CRM toolbar */
+.crm-toolbar{display:flex;gap:9px;margin-bottom:13px;align-items:center;flex-wrap:wrap}
+.view-toggle{display:flex;gap:0;border:0.5px solid var(--border);border-radius:5px;overflow:hidden;flex-shrink:0}
+.vt-btn{background:#fff;border:none;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted);transition:all .15s;white-space:nowrap}
+.vt-btn:hover{background:var(--rose-light);color:var(--rose-deep)}
+.vt-btn.active{background:var(--rose-deep);color:#fff}
+
+/* Kanban */
+.kanban-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;min-height:60vh;align-items:flex-start}
+.kb-col{flex:0 0 220px;background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:6px}
+.kb-col-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;margin-bottom:4px;border-bottom:0.5px solid var(--border)}
+.kb-card{background:var(--surface);border-radius:6px;padding:10px 11px;cursor:pointer;transition:all .15s;border:0.5px solid transparent}
+.kb-card:hover{border-color:var(--rose);background:var(--rose-light)}
+
+/* proc-chip */
+.proc-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:5px;border:0.5px solid var(--border);font-size:12px;cursor:pointer;background:#fff;transition:all .15s}
+.proc-chip:hover{border-color:var(--rose);background:var(--rose-light)}
+.proc-chip input{accent-color:var(--rose-deep)}
+
+/* CONFIRMAÇÕES */
+.conf-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:13px}
+.cs-card{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:11px 13px;text-align:center}
+.cs-val{font-family:'Inter',sans-serif;font-size:26px;font-weight:300;line-height:1;letter-spacing:-.03em}
+.cs-label{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.conf-layout{display:grid;grid-template-columns:1fr 310px;gap:15px}
+.conf-card{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:13px 15px;cursor:pointer;transition:all .2s;margin-bottom:7px}
+.conf-card:hover{border-color:var(--rose)}
+.conf-card.sel{border-color:var(--rose-mid);background:var(--rose-light)}
+.conf-card.done{opacity:.55}
+.cc-top{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.cc-name{font-size:13px;font-weight:500}
+.cc-svc{font-size:11px;color:var(--muted)}
+.cc-meta{margin-left:auto;flex-shrink:0}
+.cc-bot{display:flex;justify-content:space-between;font-size:11px;padding-top:8px;border-top:0.5px solid var(--border)}
+.cc-acts{display:flex;gap:5px;margin-top:9px}
+.ca-btn{flex:1;padding:6px;border-radius:4px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;border:0.5px solid;transition:all .15s}
+.ca-confirm{background:#eaf5ee;color:#2e7d4f;border-color:#a8d8b5}.ca-confirm:hover{background:#d4f0dc}
+.ca-wpp{background:var(--green);color:#fff;border-color:var(--green)}.ca-wpp:hover{background:#1db954}
+.ca-cancel{background:var(--rose-light);color:var(--rose-deep);border-color:var(--rose)}.ca-cancel:hover{background:#e8e0ed}
+.wpp-panel{background:#fff;border-radius:8px;border:0.5px solid var(--border);overflow:hidden;display:flex;flex-direction:column}
+.wpp-head{background:var(--wpp);padding:11px 15px;display:flex;align-items:center;gap:9px}
+.wpp-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#fff;font-family:'Inter',sans-serif;flex-shrink:0}
+.wpp-n{font-size:13px;font-weight:500;color:#fff}
+.wpp-s{font-size:10px;color:rgba(255,255,255,.75)}
+.wpp-chat{flex:1;padding:11px;background:#ece5dd;display:flex;flex-direction:column;gap:5px;min-height:180px;overflow-y:auto}
+.msg-out{background:var(--green-light);border-radius:11px 11px 2px 11px;padding:8px 11px;max-width:85%;margin-left:auto;font-size:11px;color:#1a1a1a;line-height:1.5}
+.msg-in{background:#fff;border-radius:11px 11px 11px 2px;padding:8px 11px;max-width:85%;font-size:11px;color:#1a1a1a;line-height:1.5}
+.msg-t{font-size:9px;color:rgba(0,0,0,.4);margin-top:2px;text-align:right}
+.wpp-tmpls{padding:9px 11px;border-top:0.5px solid var(--border);background:var(--surface)}
+.tmpl-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.tmpl-chip{background:#fff;border:0.5px solid var(--border);border-radius:4px;padding:6px 10px;font-size:10px;color:var(--dark);cursor:pointer;margin-bottom:4px;display:block;text-align:left;width:100%;font-family:'Inter',sans-serif;transition:all .15s}
+.tmpl-chip:hover{border-color:var(--rose);background:var(--rose-light);color:var(--rose-deep)}
+.wpp-input-bar{display:flex;gap:7px;padding:9px 11px;border-top:0.5px solid var(--border);align-items:flex-end}
+.wpp-ta{flex:1;border:0.5px solid var(--border);border-radius:4px;padding:7px 10px;font-size:11px;font-family:'Inter',sans-serif;resize:none;outline:none;min-height:34px;background:var(--surface)}
+.wpp-ta:focus{border-color:var(--rose)}
+.wpp-send{background:var(--wpp);color:#fff;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.auto-tag{display:inline-flex;align-items:center;gap:6px;background:var(--gold-light);color:#8a6520;border-radius:20px;padding:5px 13px;font-size:11px;margin-bottom:11px}
+.pulse{width:7px;height:7px;border-radius:50%;background:#c9a96e;animation:pulse 1.5s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* FINANCEIRO */
+.ptabs{display:flex;gap:4px;margin-bottom:13px;flex-wrap:wrap}
+.ptab{padding:6px 15px;border-radius:4px;font-size:11px;cursor:pointer;border:0.5px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all .15s}
+.ptab:hover{background:var(--rose-light);color:var(--rose-deep)}
+.ptab.active{background:var(--rose-light);color:var(--rose-deep);border-color:var(--rose)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:13px}
+.kpi{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:13px 15px}
+.kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.kpi-val{font-family:'Inter',sans-serif;font-size:22px;font-weight:300;line-height:1;letter-spacing:-.02em}
+.kpi-i .kpi-val{color:var(--rose-deep)}.kpi-e .kpi-val{color:#b85050}.kpi-p .kpi-val{color:#2e7d4f}.kpi-t .kpi-val{color:#8a6520}
+.kpi-delta{font-size:10px;margin-top:3px;color:#2e7d4f}.kpi-delta.dn{color:#b85050}
+.stabs{display:flex;margin-bottom:13px;border-bottom:0.5px solid var(--border)}
+.stab{padding:8px 19px;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;font-family:'Inter',sans-serif}
+.stab:hover{color:var(--rose-deep)}
+.stab.active{color:var(--rose-deep);border-bottom-color:var(--rose-deep);font-weight:500}
+.fin-section{display:none}.fin-section.active{display:block}
+.fin-grid{display:grid;grid-template-columns:1fr 270px;gap:13px;margin-bottom:13px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:110px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px}
+.bar{border-radius:2px 2px 0 0;min-height:2px}.bi{background:var(--rose)}.be{background:#c9bbd4}
+.bar-lbl{font-size:9px;color:var(--muted)}
+.legend-row{display:flex;gap:14px;margin-top:9px;font-size:10px;color:var(--muted)}
+.legend-row span{display:flex;align-items:center;gap:4px}
+.ldot{width:9px;height:9px;border-radius:2px;display:inline-block}
+.svc-item{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:8px}
+.svc-bg{flex:1;background:var(--surface);border-radius:2px;height:6px;overflow:hidden}
+.svc-fill{height:100%;border-radius:2px}
+.svc-name{width:105px;color:var(--dark);flex-shrink:0;font-size:10px}
+.svc-pct{width:28px;text-align:right;color:var(--muted);flex-shrink:0;font-size:10px}
+.add-form{background:var(--surface);border-radius:8px;border:0.5px solid var(--border);padding:15px;margin-bottom:13px;display:none}
+.add-form.open{display:block}
+.type-toggle{display:flex;gap:6px;margin-bottom:11px}
+.type-btn{flex:1;padding:8px;border-radius:4px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;border:0.5px solid var(--border);background:#fff;color:var(--muted);transition:all .15s}
+.type-btn.ti{background:#eaf5ee;color:#2e7d4f;border-color:#a8d8b5}
+.type-btn.te{background:var(--rose-light);color:var(--rose-deep);border-color:var(--rose)}
+.cc-chips,.fp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.cc-chip,.fp-chip{padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .15s}
+.cc-chip.sel,.fp-chip.sel{border-color:rgba(0,0,0,.3);transform:scale(1.04)}
+.fg4{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:9px;margin-bottom:10px}
+.tx-filters{display:flex;gap:6px;margin-bottom:11px;flex-wrap:wrap;align-items:center}
+.tx-filter-chip{padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;border:0.5px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;transition:all .15s;background:#fff}
+.tx-filter-chip:hover{border-color:var(--rose);color:var(--rose-deep)}
+.tx-filter-chip.active{background:var(--rose-light);color:var(--rose-deep);border-color:var(--rose)}
+.tx-item{display:flex;align-items:center;gap:11px;padding:10px 12px;background:var(--surface);border-radius:6px;margin-bottom:6px;cursor:pointer;transition:background .15s}
+.tx-item:hover{background:var(--rose-light)}
+.tx-icon{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ico-i{background:#eaf5ee}.ico-e{background:var(--rose-light)}
+.tx-name{font-size:12px;font-weight:500;color:var(--dark)}
+.tx-sub{display:flex;gap:5px;margin-top:2px;flex-wrap:wrap}
+.mini-badge{padding:1px 7px;border-radius:3px;font-size:9px;font-weight:500}
+.tv-i{font-size:13px;font-weight:500;color:#2e7d4f}.tv-e{font-size:13px;font-weight:500;color:#b85050}
+.tx-date{font-size:10px;color:var(--muted)}
+.cc-cards,.fp-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin-bottom:13px}
+.cc-stat-card,.fp-stat-card{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:13px 15px}
+.cc-stat-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;text-align:center;margin:10px 0}
+.cc-mini{background:var(--surface);border-radius:6px;padding:8px}
+.cc-mini-val{font-family:'Inter',sans-serif;font-size:16px;font-weight:300;line-height:1;letter-spacing:-.02em}
+.cc-mini-lbl{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.cc-hist-item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:11px}
+.cc-hist-item:last-child{border:none}
+.manage-card{background:#fff;border-radius:8px;border:0.5px solid var(--border);padding:13px 15px;margin-bottom:11px}
+.manage-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:6px;margin-bottom:5px;background:var(--surface)}
+.manage-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
+.manage-name{flex:1;font-size:13px}
+.manage-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px 6px;border-radius:4px;transition:color .15s}
+.manage-del:hover{color:var(--rose-deep)}
+.add-inline{display:flex;gap:7px;margin-top:9px}
+.add-inline input[type=text]{flex:1;padding:7px 12px;border-radius:6px;border:0.5px solid var(--border);font-size:12px;font-family:'Inter',sans-serif;outline:none;background:var(--surface)}
+.add-inline input[type=text]:focus{border-color:var(--rose)}
+.color-pick{width:37px;height:34px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer;padding:2px}
+.fp-donut-row{display:flex;align-items:center;gap:13px}
+.fp-legend{display:flex;flex-direction:column;gap:5px}
+.fp-leg-item{display:flex;align-items:center;gap:6px;font-size:11px}
+.fp-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.cc-summary-grid{display:flex;flex-wrap:wrap;gap:10px}
+.cc-sum-card{flex:1;min-width:120px;background:var(--surface);border-radius:6px;padding:11px 13px;border:0.5px solid var(--border)}
+.cc-sum-val{font-family:'Inter',sans-serif;font-size:20px;font-weight:300;color:#b85050;line-height:1;margin:5px 0 2px;letter-spacing:-.02em}
+.cc-sum-pct{font-size:10px;color:var(--muted)}
+.cc-sum-bar{margin-top:8px;background:#e8e4ec;border-radius:2px;height:4px;overflow:hidden}
+.cc-sum-fill{height:100%;border-radius:2px}
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<div class="shell">
+  <div class="sidenav">
+    <div class="nav-logo">Morgana<span>Laser Removal</span></div>
+    <div class="nav-item active" onclick="goTo('agenda',this)" title="Agenda">
+      <div class="nav-icon">📅</div><div class="nav-label">Agenda</div>
+    </div>
+    <div class="nav-item" onclick="goTo('crm',this)" title="Clientes">
+      <div class="nav-icon">👥</div><div class="nav-label">CRM</div>
+    </div>
+    <div class="nav-item" onclick="goTo('conf',this)" title="Confirmações">
+      <div class="nav-icon">💬</div><div class="nav-label">Confirm.</div>
+      <div class="nav-badge" id="confBadge">3</div>
+    </div>
+    <div class="nav-sep"></div>
+    <div class="nav-item" onclick="goTo('fin',this)" title="Financeiro">
+      <div class="nav-icon">💰</div><div class="nav-label">Financ.</div>
+    </div>
+    <div class="nav-sep"></div>
+    <div class="nav-item" onclick="goTo('config',this)" title="Configurações">
+      <div class="nav-icon">⚙</div><div class="nav-label">Config</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="pageTitle">Agenda — <em>Hoje</em></div>
+      <div class="topbar-right">
+        <span id="syncStatus" style="font-size:10px;color:var(--muted);transition:opacity .5s;opacity:0"></span>
+        <span class="topbar-date" id="topDate"></span>
+        <button class="btn-ghost" id="topBtn2" onclick="topAction2()" style="display:none">⚙ Configurar</button>
+        <button class="btn-primary" id="topBtn" onclick="topAction()">+ Novo agendamento</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- AGENDA -->
+      <div class="page active" id="page-agenda">
+        <div class="agenda-grid">
+          <div>
+            <div class="card" style="margin-bottom:13px">
+              <div class="cal-header">
+                <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+                <div class="cal-title" id="calTitle"></div>
+                <button class="cal-nav" onclick="changeMonth(1)">›</button>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+            </div>
+            <div class="card">
+              <div class="section-label">próximos agendamentos</div>
+              <div id="upList"></div>
+            </div>
+          </div>
+          <div class="tl-panel">
+            <div class="tl-header">
+              <div class="tl-day-label"><em id="tlDay"></em></div>
+              <div style="padding:5px 13px;border-radius:20px;font-size:11px;background:var(--rose-light);color:var(--rose-deep);border:0.5px solid var(--rose)">Dia</div>
+            </div>
+            <div class="tl-body" id="tlBody"></div>
+            <div class="tl-stats">
+              <div class="ts-card"><div class="ts-val" id="tlTotal">8</div><div class="ts-label">hoje</div></div>
+              <div class="ts-card"><div class="ts-val" id="tlConf">5</div><div class="ts-label">confirmados</div></div>
+              <div class="ts-card"><div class="ts-val" id="tlPrev">R$0</div><div class="ts-label">previsto</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM -->
+      <div class="page" id="page-crm">
+        <div class="crm-toolbar">
+          <div class="search-box" style="flex:0 0 220px">
+            <span style="font-size:13px;color:var(--muted)">⌕</span>
+            <input type="text" placeholder="Buscar..." id="crmSearch" oninput="filterCRM()"/>
+          </div>
+          <div class="view-toggle">
+            <button class="vt-btn active" id="vtList" onclick="setCRMView('list',this)">☰ Lista</button>
+            <button class="vt-btn" id="vtKanban" onclick="setCRMView('kanban',this)">⊞ Kanban</button>
+          </div>
+          <div class="ftabs" style="flex:1;flex-wrap:wrap">
+            <div class="ftab active" onclick="setStageFilt('all',this)">Todos</div>
+            <div class="ftab" onclick="setStageFilt('novo_lead',this)">Novo lead</div>
+            <div class="ftab" onclick="setStageFilt('nutricao',this)">Nutrição</div>
+            <div class="ftab" onclick="setStageFilt('cliente_ativo',this)">Cliente ativo</div>
+            <div class="ftab" onclick="setStageFilt('cliente_finalizado',this)">Finalizado</div>
+            <div class="ftab" onclick="setStageFilt('descartado',this)">Descartado</div>
+          </div>
+        </div>
+        <div id="crmListView">
+          <div class="crm-layout">
+            <div class="client-list" id="clientList"></div>
+            <div id="detailPanel"><div class="no-sel"><div style="font-size:26px;opacity:.2;margin-bottom:10px">◎</div><div style="font-size:12px;color:var(--muted)">Selecione um cliente<br>para ver a ficha</div></div></div>
+          </div>
+        </div>
+        <div id="crmKanbanView" style="display:none">
+          <div class="kanban-board" id="kanbanBoard"></div>
+        </div>
+      </div>
+
+      <!-- CONFIRMAÇÕES -->
+      <div class="page" id="page-conf">
+        <div class="auto-tag"><div class="pulse"></div>Envio automático ativo — 24h antes</div>
+        <div class="conf-strip">
+          <div class="cs-card"><div class="cs-val" style="color:var(--rose-deep)" id="csTot">8</div><div class="cs-label">hoje</div></div>
+          <div class="cs-card"><div class="cs-val" style="color:#8a6520" id="csPend">3</div><div class="cs-label">pendentes</div></div>
+          <div class="cs-card"><div class="cs-val" style="color:var(--wpp)" id="csSent">3</div><div class="cs-label">enviadas</div></div>
+          <div class="cs-card"><div class="cs-val" style="color:#2e7d4f" id="csConf">2</div><div class="cs-label">confirmadas</div></div>
+        </div>
+        <div class="conf-layout">
+          <div id="confList"></div>
+          <div id="wppPanel"><div class="no-sel" style="min-height:280px"><div style="font-size:28px;opacity:.25;margin-bottom:9px">💬</div><div style="font-size:12px">Selecione uma cliente<br>para ver a conversa</div></div></div>
+        </div>
+      </div>
+
+      <!-- FINANCEIRO -->
+      <div class="page" id="page-fin">
+        <div class="ptabs">
+          <div class="ptab" onclick="setPeriod('jan',this)">Jan</div>
+          <div class="ptab" onclick="setPeriod('fev',this)">Fev</div>
+          <div class="ptab active" onclick="setPeriod('mar',this)">Mar</div>
+          <div class="ptab" onclick="setPeriod('abr',this)">Abr</div>
+          <div class="ptab" onclick="setPeriod('mai',this)">Mai</div>
+          <div class="ptab" onclick="setPeriod('jun',this)">Jun</div>
+          <div class="ptab" onclick="setPeriod('jul',this)">Jul</div>
+          <div class="ptab" onclick="setPeriod('ago',this)">Ago</div>
+          <div class="ptab" onclick="setPeriod('set',this)">Set</div>
+          <div class="ptab" onclick="setPeriod('out',this)">Out</div>
+          <div class="ptab" onclick="setPeriod('nov',this)">Nov</div>
+          <div class="ptab" onclick="setPeriod('dez',this)">Dez</div>
+          <div class="ptab" onclick="setPeriod('ano',this)" style="font-weight:500">2026</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi kpi-i"><div class="kpi-label">Receita total</div><div class="kpi-val" id="kI">R$12.840</div><div class="kpi-delta" id="kId">▲ 18% vs fev</div></div>
+          <div class="kpi kpi-e"><div class="kpi-label">Despesas</div><div class="kpi-val" id="kE">R$3.210</div><div class="kpi-delta dn" id="kEd">▲ 5% vs fev</div></div>
+          <div class="kpi kpi-p"><div class="kpi-label">Lucro líquido</div><div class="kpi-val" id="kP">R$9.630</div><div class="kpi-delta" id="kPd">▲ 23% vs fev</div></div>
+          <div class="kpi kpi-t"><div class="kpi-label">Saldo em caixa</div><div class="kpi-val" id="kT">R$107</div><div class="kpi-delta" id="kTd">▲ 8% vs fev</div></div>
+        </div>
+
+        <div class="add-form" id="addForm">
+          <div style="font-family:'Inter',sans-serif;font-size:15px;font-weight:400;color:var(--dark);margin-bottom:11px">Novo lançamento</div>
+          <div class="type-toggle">
+            <button class="type-btn ti" id="btnI" onclick="setTxType('income')">+ Receita</button>
+            <button class="type-btn" id="btnE" onclick="setTxType('expense')">− Despesa</button>
+          </div>
+          <div class="fg4">
+            <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" id="fDesc" placeholder="Ex: Manicure Juliana"/></div>
+            <div class="form-group"><label class="form-label">Valor R$</label><input class="form-input" type="number" id="fVal" placeholder="0"/></div>
+            <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="fDt"/></div>
+            <div class="form-group"><label class="form-label">Parcelas</label><select class="form-select" id="fParc"><option>À vista</option><option>2x</option><option>3x</option><option>6x</option><option>12x</option></select></div>
+          </div>
+          <div class="form-grid2" style="margin-bottom:11px">
+            <div class="form-group"><label class="form-label">Centro de custo</label><div class="cc-chips" id="formCCChips"></div></div>
+            <div class="form-group"><label class="form-label">Forma de pagamento</label><div class="fp-chips" id="formFPChips"></div></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-ghost" style="font-size:12px;padding:7px 17px" onclick="toggleAddForm()">Cancelar</button>
+            <button class="btn-primary" style="font-size:12px;padding:7px 22px" onclick="addTx()">Salvar lançamento</button>
+          </div>
+        </div>
+
+        <div class="stabs">
+          <div class="stab active" onclick="setFinSection('visao',this)">Visão geral</div>
+          <div class="stab" onclick="setFinSection('lancamentos',this)">Lançamentos</div>
+          <div class="stab" onclick="setFinSection('centros',this)">Centros de custo</div>
+          <div class="stab" onclick="setFinSection('pagamentos',this)">Formas de pagamento</div>
+        </div>
+
+        <div class="fin-section active" id="fsec-visao">
+          <div class="fin-grid">
+            <div class="card">
+              <div class="card-title">Receitas & Despesas — por semana</div>
+              <div class="bar-chart" id="barChart"></div>
+              <div class="legend-row">
+                <span><span class="ldot" style="background:var(--rose)"></span>Receitas</span>
+                <span><span class="ldot" style="background:#f0b8b8"></span>Despesas</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Por serviço</div>
+              <div id="svcList"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px">
+            <div class="card">
+              <div class="card-title">Forma de pagamento</div>
+              <div class="fp-donut-row">
+                <svg width="90" height="90" viewBox="0 0 90 90" id="fpDonut"></svg>
+                <div class="fp-legend" id="fpLegend"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Despesas por centro de custo</div>
+              <div class="cc-summary-grid" id="ccSummary"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fin-section" id="fsec-lancamentos">
+          <div class="tx-filters" id="txFilters">
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Filtrar:</span>
+            <div class="tx-filter-chip active" onclick="setTxFilter('todos',this)">Todos</div>
+            <div class="tx-filter-chip" onclick="setTxFilter('income',this)">Receitas</div>
+            <div class="tx-filter-chip" onclick="setTxFilter('expense',this)">Despesas</div>
+            <div id="ccFilterChips" style="display:contents"></div>
+            <div id="fpFilterChips" style="display:contents"></div>
+          </div>
+          <div id="txList"></div>
+        </div>
+
+        <div class="fin-section" id="fsec-centros">
+          <div class="cc-cards" id="ccDetail"></div>
+          <div class="manage-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+              <div style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;color:var(--dark)">Gerenciar centros de custo</div>
+              <button class="btn-primary" style="font-size:11px;padding:5px 14px" onclick="toggleManageCC()">+ Novo</button>
+            </div>
+            <div id="ccManageList"></div>
+            <div class="add-inline" id="addCCForm" style="display:none">
+              <input type="text" id="newCCName" placeholder="Nome do centro de custo"/>
+              <input type="color" id="newCCColor" class="color-pick" value="#f4a5a5"/>
+              <button class="btn-primary" style="font-size:12px;padding:6px 15px" onclick="addCC()">Adicionar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fin-section" id="fsec-pagamentos">
+          <div class="fp-cards" id="fpDetail"></div>
+          <div class="manage-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+              <div style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;color:var(--dark)">Gerenciar formas de pagamento</div>
+              <button class="btn-primary" style="font-size:11px;padding:5px 14px" onclick="toggleManageFP()">+ Nova</button>
+            </div>
+            <div id="fpManageList"></div>
+            <div class="add-inline" id="addFPForm" style="display:none">
+              <input type="text" id="newFPName" placeholder="Nome da forma de pagamento"/>
+              <input type="color" id="newFPColor" class="color-pick" value="#b8e0c0"/>
+              <button class="btn-primary" style="font-size:12px;padding:6px 15px" onclick="addFP()">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURAÇÕES -->
+      <div class="page" id="page-config">
+        <div class="card" style="max-width:700px">
+          <div class="card-title">Integrações</div>
+
+          <div class="form-group">
+            <label class="form-label">Webhook n8n (WhatsApp)</label>
+            <input class="form-input" id="cfgN8nUrl" placeholder="https://seu-n8n.com/webhook/whatsapp-enviar"/>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px">
+              URL do webhook que recebe os eventos de envio de mensagem do WhatsApp.
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:15px">
+            <button class="btn-ghost" onclick="testWebhook()">Testar webhook</button>
+            <button class="btn-primary" onclick="saveConfig()">Salvar configurações</button>
+          </div>
+        </div>
+
+        <div class="card" style="max-width:700px;margin-top:15px">
+          <div class="card-title">Sobre</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">
+            <div><strong>Versão:</strong> 1.0.0</div>
+            <div><strong>Sistema:</strong> Morgana Pires Laser Removal</div>
+            <div style="margin-top:8px">
+              Sistema de gestão para clínicas de estética com agenda, CRM, confirmações via WhatsApp e financeiro.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGENDAMENTO -->
+<div class="modal-overlay" id="apptModal" onclick="if(event.target===this)closeApptModal()">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">Novo agendamento</div>
+
+    <!-- Busca de cliente -->
+    <div class="form-group">
+      <label class="form-label">Cliente</label>
+      <div style="position:relative">
+        <input class="form-input" id="mName" placeholder="Digite o nome para buscar..." autocomplete="off"
+               oninput="searchApptClient(this.value)" onfocus="searchApptClient(this.value)"/>
+        <div id="apptClientDrop" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:0.5px solid var(--border);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.08);z-index:300;max-height:200px;overflow-y:auto;margin-top:3px"></div>
+      </div>
+      <!-- Badge do cliente vinculado -->
+      <div id="apptClientBadge" style="display:none;margin-top:7px;display:none;align-items:center;gap:8px;padding:8px 11px;background:var(--rose-light);border-radius:6px;border:0.5px solid var(--rose)">
+        <div id="apptClientAv" class="avatar av-rose" style="width:28px;height:28px;font-size:10px"></div>
+        <div style="flex:1;min-width:0">
+          <div id="apptClientName" style="font-size:12px;font-weight:500;color:var(--dark)"></div>
+          <div id="apptClientStage" style="font-size:10px;color:var(--muted);margin-top:1px"></div>
+        </div>
+        <button onclick="clearApptClient()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px 5px">✕</button>
+      </div>
+      <!-- Formulário criar lead (aparece quando não encontrado) -->
+      <div id="apptNoClient" style="display:none;margin-top:7px">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:11px 12px">
+          <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px">Novo lead — não encontrado no CRM</div>
+          <div class="form-grid2" style="margin-bottom:8px">
+            <div><label class="form-label">Nome *</label><input class="form-input" id="leadName" placeholder="Nome completo"/></div>
+            <div><label class="form-label">Telefone *</label><input class="form-input" id="leadPhone" placeholder="(48) 99999-9999"/></div>
+          </div>
+          <button onclick="createLeadFromAppt()" style="width:100%;padding:8px;background:var(--rose-deep);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif">
+            + Criar lead e vincular ao agendamento
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group"><label class="form-label">Procedimento</label>
+      <select class="form-select" id="mSvc">
+        <option value="avaliacao">Avaliação</option>
+        <option value="micropigmentacao">Remoção de micropigmentação</option>
+        <option value="tatuagem">Remoção de tatuagem</option>
+        <option value="microagulhamento">Microagulhamento</option>
+        <option value="locacao">Locação</option>
+      </select>
+    </div>
+    <div class="form-grid2">
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="mDate"/></div>
+      <div class="form-group"><label class="form-label">Horário</label><input class="form-input" type="time" id="mTime" value="09:00"/></div>
+    </div>
+    <div class="form-grid2">
+      <div class="form-group"><label class="form-label">Valor R$ *</label><input class="form-input" type="number" id="mVal" placeholder="0,00" min="0" step="0.01"/></div>
+      <div class="form-group"><label class="form-label">Forma de pagamento</label><select class="form-select" id="mFpag"><option value="pix">Pix</option><option value="cred">Cartão de crédito</option><option value="din">Dinheiro</option><option value="bol">Boleto</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="mObs" placeholder="Número da sessão, região..."/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeApptModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveAppt()">Salvar agendamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-overlay" id="clientModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">Novo lead / cliente</div>
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="cnName" placeholder="Nome"/></div>
+    <div class="form-grid2">
+      <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cnPhone" placeholder="(11) 99999-9999"/></div>
+      <div class="form-group"><label class="form-label">Aniversário</label><input class="form-input" type="date" id="cnBday"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Estágio</label>
+      <select class="form-select" id="cnStage">
+        <option value="novo_lead">Novo lead</option>
+        <option value="nutricao">Nutrição</option>
+        <option value="cliente_ativo">Cliente ativo</option>
+        <option value="cliente_finalizado">Cliente finalizado</option>
+        <option value="descartado">Descartado</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Procedimento de interesse</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="cnProcChips">
+        <label class="proc-chip"><input type="checkbox" value="avaliacao" onchange="syncProcChips()"/> Avaliação</label>
+        <label class="proc-chip"><input type="checkbox" value="micropigmentacao" onchange="syncProcChips()"/> Remoção de micropigmentação</label>
+        <label class="proc-chip"><input type="checkbox" value="tatuagem" onchange="syncProcChips()"/> Remoção de tatuagem</label>
+        <label class="proc-chip"><input type="checkbox" value="microagulhamento" onchange="syncProcChips()"/> Microagulhamento</label>
+        <label class="proc-chip"><input type="checkbox" value="locacao" onchange="syncProcChips()"/> Locação</label>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="cnObs" placeholder="Notas, origem do lead..."/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('clientModal').classList.remove('open')">Cancelar</button>
+      <button class="btn-save" onclick="saveClient()">Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROCEDIMENTO -->
+<div class="modal-overlay" id="procModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title" id="procModalTitle">Adicionar procedimento</div>
+    <div class="form-group"><label class="form-label">Tipo</label>
+      <select class="form-select" id="pmTipo">
+        <option value="avaliacao">Avaliação</option>
+        <option value="micropigmentacao">Remoção de micropigmentação</option>
+        <option value="tatuagem">Remoção de tatuagem</option>
+        <option value="microagulhamento">Microagulhamento</option>
+        <option value="locacao">Locação</option>
+      </select>
+    </div>
+    <div class="form-grid2">
+      <div class="form-group"><label class="form-label">Sessão nº</label><input class="form-input" type="number" id="pmSessao" min="1" value="1"/></div>
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="pmData"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Região / local</label><input class="form-input" id="pmRegiao" placeholder="Ex: sobrancelha esquerda, antebraço..."/></div>
+    <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="pmObs" placeholder="Reação, resultado parcial..."/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('procModal').classList.remove('open')">Cancelar</button>
+      <button class="btn-save" onclick="saveProc()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WDAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const today=new Date();let viewDate=new Date(today);
+// Declaradas cedo para evitar ReferenceError em funções async
+let curPage='agenda';
+let curPeriod='mar';
+// ── DADOS FIXOS DE EXEMPLO (apenas para demo, sobrescritos pelo localStorage) ──
+const APPTS_DEMO = {};
+
+// ── PERSISTÊNCIA ──
+// Agenda: localStorage (pessoal, por dispositivo)
+function save(key, val){ try{localStorage.setItem('mp_'+key, JSON.stringify(val));}catch(e){} }
+function load(key, def){ try{const v=localStorage.getItem('mp_'+key);return v?JSON.parse(v):def;}catch(e){return def;} }
+
+// ── SUPABASE — financeiro compartilhado em nuvem ──
+const SUPA_URL = 'https://tvqbftidjhytnadyayoo.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2cWJmdGlkamh5dG5hZHlheW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTM0MTMsImV4cCI6MjA5MTA2OTQxM30.THkQ8mViDJaT4UEzLafU1yk0ag8KwLBM5uBF-aWgYG0';
+let _sb = null;
+let _finStorageReady = false;
+
+function getSB(){
+  if(!_sb && window.supabase){
+    _sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+  return _sb;
+}
+
+async function finLoad(){
+  // Mostra indicador de sync
+  const syncEl=document.getElementById('syncStatus');
+  if(syncEl){syncEl.textContent='⟳ Sincronizando...';syncEl.style.opacity='1';}
+  try {
+    const sb = getSB();
+    if(!sb) throw new Error('Supabase nao disponivel');
+
+    // Carrega transacoes
+    const {data: txData, error: txErr} = await sb.from('transacoes').select('*').order('data_br', {ascending: true});
+    if(txErr) throw txErr;
+    if(txData && txData.length){
+      transactions = txData.map(r=>({
+        id: r.id, t: r.tipo, d: r.descricao, cc: r.centro_custo,
+        fp: r.forma_pagto, v: parseFloat(r.valor), dt: r.data_br,
+        ic: r.icone||'📋', parc: r.parcelas||'A vista'
+      }));
+    }
+
+    // Carrega centros de custo customizados (se existirem)
+    const {data: ccData} = await sb.from('centros_custo').select('*');
+    if(ccData && ccData.length){
+      centros = ccData.map(r=>({id:r.id,name:r.nome,color:r.cor,tc:r.cor_texto}));
+    }
+
+    // Carrega formas de pagamento customizadas (se existirem)
+    const {data: fpData} = await sb.from('formas_pagamento').select('*');
+    if(fpData && fpData.length){
+      formasPag = fpData.map(r=>({id:r.id,name:r.nome,color:r.cor,tc:r.cor_texto}));
+    }
+
+    // Carrega clientes do Supabase
+    const cliLoaded = await sbLoadClientes();
+    if(cliLoaded){
+      // Clientes carregados da nuvem — atualiza CRM se estiver aberto
+      if(curPage==='crm'){ filterCRM(); if(crmView==='kanban') renderKanban(); }
+    }
+
+    // Carrega agendamentos do Supabase
+    const apptLoaded = await sbLoadAppts();
+    if(apptLoaded && curPage==='agenda'){
+      renderTimeline(); renderUpcoming();
+    }
+
+  } catch(e){
+    console.warn('finLoad Supabase:', e.message);
+  }
+  _finStorageReady = true;
+  if(syncEl){syncEl.textContent='✓ Online';setTimeout(()=>{if(syncEl)syncEl.style.opacity='0';},2000);}
+
+  // Re-renderiza financeiro com dados atualizados
+  const activePtab = document.querySelector('.ptab.active');
+  if(activePtab) setPeriod(curPeriod, activePtab);
+  if(curPage === 'fin'){
+    renderSvcs();renderFPDonut();renderCCSummary();renderTxFilters();renderTxList();
+  }
+}
+
+async function finSave(){
+  // finSave não é mais necessário para transações — cada operação salva individualmente
+  // Mantido para centros e formas de pagamento
+}
+
+async function sbAddTx(tx){
+  try {
+    const sb = getSB(); if(!sb) return;
+    await sb.from('transacoes').insert({
+      id: tx.id, tipo: tx.t, descricao: tx.d, centro_custo: tx.cc,
+      forma_pagto: tx.fp, valor: tx.v, data_br: tx.dt,
+      icone: tx.ic, parcelas: tx.parc
+    });
+  } catch(e){ console.warn('sbAddTx:', e.message); }
+}
+
+async function sbDeleteTx(id){
+  try {
+    const sb = getSB(); if(!sb) return;
+    await sb.from('transacoes').delete().eq('id', id);
+  } catch(e){ console.warn('sbDeleteTx:', e.message); }
+}
+
+async function sbSaveCentros(){
+  try {
+    const sb = getSB(); if(!sb) return;
+    await sb.from('centros_custo').upsert(
+      centros.map(c=>({id:c.id,nome:c.name,cor:c.color,cor_texto:c.tc}))
+    );
+  } catch(e){ console.warn('sbSaveCentros:', e.message); }
+}
+
+async function sbSaveFormas(){
+  try {
+    const sb = getSB(); if(!sb) return;
+    await sb.from('formas_pagamento').upsert(
+      formasPag.map(f=>({id:f.id,nome:f.name,cor:f.color,cor_texto:f.tc}))
+    );
+  } catch(e){ console.warn('sbSaveFormas:', e.message); }
+}
+
+// ── Supabase: clientes ──
+async function sbUpsertCliente(c){
+  try {
+    const sb=getSB();if(!sb)return;
+    await sb.from('clientes').upsert({
+      id:c.id,name:c.name,phone:c.phone,bday:c.bday,since:c.since,
+      stage:c.stage,visits:c.visits,spent:c.spent,last:c.last,
+      procs:c.procs,obs:c.obs,procedimentos:c.procedimentos||[],av:c.av
+    });
+  } catch(e){ console.warn('sbUpsertCliente:',e.message); }
+}
+async function sbDeleteCliente(id){
+  try { const sb=getSB();if(!sb)return;await sb.from('clientes').delete().eq('id',id); }
+  catch(e){ console.warn('sbDeleteCliente:',e.message); }
+}
+async function sbLoadClientes(){
+  try {
+    const sb=getSB();if(!sb)return false;
+    const {data,error}=await sb.from('clientes').select('*').order('name');
+    if(error||!data||!data.length) return false;
+    clients=data.map(r=>({
+      id:r.id,name:r.name,phone:r.phone,bday:r.bday||'—',since:r.since||'Importado',
+      stage:r.stage||'novo_lead',visits:r.visits||0,spent:r.spent||0,last:r.last||'—',
+      procs:r.procs||[],obs:r.obs||'',procedimentos:r.procedimentos||[],av:r.av||'av-rose',
+      history:[]
+    }));
+    return true;
+  } catch(e){ console.warn('sbLoadClientes:',e.message);return false; }
+}
+
+// ── Supabase: agendamentos ──
+async function sbUpsertAppt(dateKey,appt){
+  try {
+    const sb=getSB();if(!sb)return;
+    const id=typeof appt.id==='string'?parseInt(appt.id.replace('a',''))||Date.now():appt.id;
+    await sb.from('agendamentos').upsert({
+      id:id,date_key:dateKey,time:appt.time,name:appt.name,
+      svc:appt.svc,dur:appt.dur||'—',status:appt.status,
+      client_id:appt.clientId||null,obs:appt.obs||'',
+      valor:appt.valor||0,fpag:appt.fpag||'pix'
+    });
+  } catch(e){ console.warn('sbUpsertAppt:',e.message); }
+}
+async function sbDeleteAppt(id){
+  try { const sb=getSB();if(!sb)return;await sb.from('agendamentos').delete().eq('id',id); }
+  catch(e){ console.warn('sbDeleteAppt:',e.message); }
+}
+async function sbLoadAppts(){
+  try {
+    const sb=getSB();if(!sb)return false;
+    const {data,error}=await sb.from('agendamentos').select('*');
+    if(error||!data) return false;
+    apptsByDate={};
+    data.forEach(r=>{
+      if(!apptsByDate[r.date_key]) apptsByDate[r.date_key]=[];
+      apptsByDate[r.date_key].push({
+        id:r.id,time:r.time,name:r.name,svc:r.svc,
+        dur:r.dur||'—',status:r.status||'pending',
+        clientId:r.client_id,obs:r.obs||'',
+        valor:parseFloat(r.valor)||0,fpag:r.fpag||'pix'
+      });
+    });
+    // Ordena cada dia por horário
+    Object.keys(apptsByDate).forEach(k=>{
+      apptsByDate[k].sort((a,b)=>a.time.localeCompare(b.time));
+    });
+    appts=getApptDay(agendaSelDate);
+    return true;
+  } catch(e){ console.warn('sbLoadAppts:',e.message);return false; }
+}
+
+// ── AGENDA: localStorage (pessoal) ──
+let apptsByDate = load('appts', {});
+
+function saveAppts(){ save('appts', apptsByDate); }
+
+// Retorna agendamentos do dia selecionado
+function parseDt(dt){
+  if(!dt||dt==='hoje')return new Date();
+  const p=dt.split('/');
+  if(p.length===2) return new Date(2026,parseInt(p[1])-1,parseInt(p[0]));
+  if(p.length===3) return new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));
+  return new Date();
+}
+function getApptDay(dateStr){
+  return apptsByDate[dateStr] || [];
+}
+function setApptDay(dateStr, arr){
+  apptsByDate[dateStr] = arr;
+  saveAppts();
+}
+
+// Data selecionada na agenda (formato YYYY-MM-DD)
+let agendaSelDate = new Date().toISOString().split('T')[0];
+
+function fmtDateKey(d){ return d.toISOString().split('T')[0]; }
+function fmtDateBR(iso){ const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
+
+let appts = getApptDay(agendaSelDate); // compatibilidade com renderTimeline
+let clients=[
+  {id:7,name:'Helena',phone:'48999265462',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:8,name:'Ju Eloy',phone:'48996745082',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:9,name:'Ayala',phone:'48999184956',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:10,name:'Patrícia Américo',phone:'48996623561',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:11,name:'Felipe Savi',phone:'48999404069',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:12,name:'Nilva Macan',phone:'48999140621',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:13,name:'Alex Zeferino',phone:'48999906533',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:14,name:'Gustavo Fach',phone:'48999948122',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:15,name:'Tais Sartor',phone:'48999128983',bday:'—',since:'Importado',stage:'descartado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:16,name:'Vanilda Wagner',phone:'48984027433',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:17,name:'Karen',phone:'48991814603',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:18,name:'Helena Nazario',phone:'48999446884',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:19,name:'Maria Aparecida',phone:'48988400495',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:20,name:'Neia',phone:'48996905326',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:21,name:'Fernanda Dondossola',phone:'48999245634',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:22,name:'Leila da Rosa',phone:'48991269666',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:23,name:'Loivani Homem',phone:'48996221095',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:24,name:'Marta',phone:'48988422021',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:25,name:'Daiane Fernandes',phone:'48996156636',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:26,name:'Marieli Machado',phone:'48999442433',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:27,name:'Charlene Abreu',phone:'48996746203',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:28,name:'Ana Paula Mafioletti',phone:'48996742625',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:29,name:'Flávia Tomazi',phone:'48999155956',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:30,name:'Edneia  Francisco',phone:'48999315807',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:31,name:'Rose',phone:'48984974765',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:32,name:'Vanilda Porto',phone:'48996850044',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:33,name:'Rubiane Zanatta',phone:'48991085973',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:34,name:'Janaína Pereira',phone:'48991180510',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:35,name:'Lizzi Maia',phone:'48992221858',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:36,name:'Raquel Mandelli',phone:'48999943577',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:37,name:'Edilane',phone:'48996295223',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:38,name:'Karina Roque',phone:'48988490984',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:39,name:'Débora Laurentino',phone:'48991764591',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:40,name:'Camile Coelho',phone:'48998095908',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:41,name:'Karoline Rovaris',phone:'48999739938',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:42,name:'Tamires Oliveira',phone:'48999461872',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:43,name:'Camila Dal Pont',phone:'48996776659',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:44,name:'Simone Costa',phone:'48991303549',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:45,name:'Katiuscia Rodrigues',phone:'51985149083',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:46,name:'Gabriela Marangoni',phone:'48996616711',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:47,name:'Fatima',phone:'5548991162403',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:48,name:'Jaque',phone:'5548996894256',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:49,name:'Nicole',phone:'5548996320912',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:50,name:'Ariane Machado',phone:'5548996043538',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:51,name:'Suelem',phone:'5548998585765',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:52,name:'Valeria',phone:'5548996772911',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:53,name:'Valeria',phone:'5548984243484',bday:'—',since:'Importado',stage:'cliente_finalizado',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:54,name:'Heloisa',phone:'48998230530',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:55,name:'emily',phone:'5548998653895',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:56,name:'Franciele',phone:'5548999713525',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:57,name:'INGRID',phone:'5548998665546',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:58,name:'Francieli',phone:'5548996478075',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:59,name:'KAUÃ',phone:'5548933008542',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:60,name:'Ramona',phone:'5548996008623',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:61,name:'Luh',phone:'5548996812785',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:62,name:'Cassio',phone:'5540991217448',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:63,name:'Tayna Corrêa',phone:'48999344959',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:64,name:'Débora Felisberto',phone:'48996712077',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:65,name:'Andrea',phone:'48988226499',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:66,name:'Luana Luz',phone:'51983496556',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:67,name:'Karol',phone:'48991514197',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:68,name:'Maiara',phone:'48998577807',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:69,name:'Ângela',phone:'48996337709',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:70,name:'Rossana Mondardo',phone:'48999461330',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:71,name:'Leafar Alves',phone:'48991024694',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:72,name:'Sara Bueno',phone:'48988012567',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:73,name:'Lucas Oliveira',phone:'48998340054',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:74,name:'Gisele Silvano',phone:'48999366484',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:75,name:'Eduarda Alves',phone:'48998628370',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:76,name:'Murilo',phone:'48920018293',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:77,name:'Guilherme Mota',phone:'48998177159',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:78,name:'Ana Claudia',phone:'48988233049',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:79,name:'Rochele Cateles',phone:'48999511666',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:80,name:'Laura',phone:'15998470279',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:81,name:'Luciane',phone:'48999778315',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:82,name:'Kelly Tomazi',phone:'48996346823',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:83,name:'Josiane Becker',phone:'48999401844',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:84,name:'Carla',phone:'48988383715',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:85,name:'Vitória',phone:'48996543624',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:86,name:'Paloma',phone:'48999359980',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:87,name:'Laise',phone:'48991775608',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:88,name:'Luzia',phone:'48999250924',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:89,name:'Matheus M.',phone:'82996769520',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:90,name:'Morgana',phone:'48999901307',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:91,name:'Édson Rodrigues',phone:'48988035256',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:92,name:'Raquel',phone:'48998056709',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:93,name:'Daiane Borges',phone:'48991648371',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:94,name:'Bianca',phone:'48988617178',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:95,name:'Cristina Luzia',phone:'48998573148',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:96,name:'Regina Gotuzzo',phone:'48991590912',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:97,name:'Maristela',phone:'48999985136',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:98,name:'Beatriz Borges',phone:'48996466006',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:99,name:'Sandra',phone:'48999952846',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:100,name:'Geovana Nazário',phone:'5548996673559',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:101,name:'Laís',phone:'5548998530315',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:102,name:'Suzi',phone:'5548988219373',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:103,name:'Mariani Costa',phone:'5548998497453',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:104,name:'Tais Duarte',phone:'5548991225262',bday:'—',since:'Importado',stage:'nutricao',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:105,name:'Ana',phone:'48996072206',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:106,name:'Ketlin Sander da Rosa',phone:'5548999822825',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:107,name:'Daniela',phone:'48998637665',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:108,name:'Luiza',phone:'54 981179105',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:109,name:'Tainân',phone:'5548999472875',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:110,name:'Bruno dutra',phone:'5548999648318',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:111,name:'Paula',phone:'5548998454404',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:112,name:'Leticia Costa Vasconcelos',phone:'5548996514515',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:113,name:'Beatriz Silvério',phone:'5548984182210',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:114,name:'Daniely',phone:'5548999176757',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:115,name:'Paula Eduarda',phone:'48998351483',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:116,name:'Gabriele Larangeira',phone:'48999826083',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:117,name:'Adri',phone:'5548998076808',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:118,name:'Ruana Cristiano',phone:'48991921815',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:119,name:'Vinicius',phone:'21997562567',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:120,name:'Edna Custódio',phone:'48999375364',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:121,name:'Cristieli',phone:'48984552249',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:122,name:'Cristiane Carvalho',phone:'48985060553',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:123,name:'Camila Teixeira',phone:'48998654773',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:124,name:'Beth Caetano',phone:'48998383197',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:125,name:'Tailine',phone:'47992761663',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:126,name:'Thai',phone:'48988077809',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:127,name:'Rejane Daixt',phone:'5548999850012',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:128,name:'Ruthi Trevisol',phone:'5548992160957',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:129,name:'Mariana Pereira',phone:'5548999474650',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:130,name:'Fran Daminelli',phone:'5548991287137',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:131,name:'Kellin Mascarello',phone:'5548992077499',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:132,name:'Rubia',phone:'5548996282838',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:133,name:'Mateus Justo',phone:'5548988075558',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:134,name:'Larissa Zeferino',phone:'5548988176520',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:135,name:'Janaina Cardoso',phone:'5548999735631',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:136,name:'Cris',phone:'5548999699233',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:137,name:'Nicole Thomasi',phone:'5548998062854',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:138,name:'Gabriela',phone:'5548996209916',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:139,name:'Rafael',phone:'5548999952537',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:140,name:'Daiane',phone:'5548996138858',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:141,name:'Bruna Daminelli',phone:'5548999152726',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:142,name:'Maria Ximenes',phone:'5548988504848',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:143,name:'Tuani Bianchin',phone:'5548988580855',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:144,name:'Eduarda',phone:'5548996680556',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:145,name:'Janete Ceron',phone:'5548998034517',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:146,name:'Evelyn Machado',phone:'5548991936568',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:147,name:'Morgana',phone:'5548991498344',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:148,name:'Isaias',phone:'5548996898858',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:149,name:'Samara Lumertz',phone:'5548996971220',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:150,name:'Liliane',phone:'5548996865935',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:151,name:'Maria Back',phone:'5548996594251',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:152,name:'Leticia Baes',phone:'5548991707405',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:153,name:'Natalia Colodell',phone:'5548999550837',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:154,name:'Morgana Pires',phone:'5548996690665',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:155,name:'Aline Goulart',phone:'5548988465484',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:156,name:'Juliana Pires',phone:'5548984284180',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:157,name:'Silvana',phone:'5548998636917',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:158,name:'Morgana',phone:'5548999901307',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:159,name:'Meiri',phone:'5548999375214',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:160,name:'Cristieli Porto',phone:'5548996693329',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:161,name:'Alice Dutra',phone:'5548992123827',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:162,name:'Seneia Rosso',phone:'5548998487894',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:163,name:'Barbara Magrim',phone:'5554984147581',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:164,name:'Marineia',phone:'5548998225750',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:165,name:'Nicole Rizzotto',phone:'5548999042958',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:166,name:'Rosane',phone:'5548999241239',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:167,name:'Magda Capela Vieira',phone:'5548988111621',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:168,name:'Fernanda',phone:'5554991061062',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:169,name:'Gabriela de Vargas',phone:'5548999587493',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:170,name:'Sabrina Gomes',phone:'5548999087409',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:171,name:'Suelen Panato Rocha',phone:'5548999000966',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:172,name:'Pablo',phone:'5551996871661',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:173,name:'Jadna',phone:'5548999588968',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:174,name:'Pamela',phone:'5548999714068',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:175,name:'Ana Paula Kuzbik',phone:'5548998589098',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:176,name:'Gabriela Rocha',phone:'5548988378727',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:177,name:'Eliane',phone:'5548999020233',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:178,name:'Ana Carolina Frassetto',phone:'48999621010',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:179,name:'Andreia',phone:'5551974014334',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:180,name:'Gabriela',phone:'48991812050',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:181,name:'Kakau Antonin',phone:'48999005231',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:182,name:'Sheila Camargo',phone:'5548999821348',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:183,name:'Priscila',phone:'48996366700',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:184,name:'Samara Santana',phone:'5548996165498',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:185,name:'Bruna',phone:'5548999948648',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'},
+  {id:186,name:'Tatiane',phone:'5548991225262',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-gold'},
+  {id:187,name:'Veronica',phone:'5548999010169',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-green'},
+  {id:188,name:'Karla',phone:'5548988601703',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-purple'},
+  {id:189,name:'Ana Paula',phone:'5548999317437',bday:'—',since:'Importado',stage:'cliente_ativo',visits:0,spent:0,last:'—',procs:['micropigmentacao'],obs:'',history:[],procedimentos:[],av:'av-rose'}
+];
+
+// ── CLIENTES: localStorage — init APÓS declaração de clients ──
+const CLI_HISTORICO_KEY = 'mp_cli_historico_salvo';
+if(!localStorage.getItem(CLI_HISTORICO_KEY)){
+  save('cli_historico', clients);
+  localStorage.setItem(CLI_HISTORICO_KEY,'1');
+}
+const cliHistorico = load('cli_historico', clients);
+const cliNovos     = load('cli_novos', []);
+clients = [...cliNovos, ...cliHistorico];
+function saveCliNovos(){ save('cli_novos', cliNovos); }
+// Confirmações: gerado automaticamente a partir dos agendamentos da Agenda
+let confAppts = [];
+let confMsgsStore = {}; // armazena mensagens por {apptId}
+
+function syncConfAppts(){
+  const hoje = agendaSelDate;
+  const arr = getApptDay(hoje) || [];
+  // Mapeia status: confirmed, sent, pending, canceled
+  confAppts = arr.map((a, i) => ({
+    id: a.id || i+1,
+    name: a.name || 'Cliente',
+    phone: a.phone || '(00) 00000-0000',
+    svc: SVC_NAMES[a.svc] || a.svc || 'Serviço',
+    time: a.time || '00:00',
+    status: a.status === 'confirmed' ? 'confirmed' : (a.status === 'cancelled' ? 'canceled' : (a.confirmationSent ? 'sent' : 'pending')),
+    av: a.av || ['av-rose','av-gold','av-purple','av-green'][i % 4],
+    msgs: confMsgsStore[a.id] || []
+  }));
+}
+// Dados estáticos de períodos removidos — KPIs calculados ao vivo via calcPeriod()
+const svcs=[{n:'Remoção micropig.',p:68,c:'#9b7fa6'},{n:'Remoção tatuagem',p:22,c:'#5c4470'},{n:'Aluguel sala',p:7,c:'#8a7a6a'},{n:'Outros',p:3,c:'#c2b8cc'}];
+let centros=[
+  {id:'loc',name:'Locações',color:'#f4a5a5',tc:'#8b2020'},
+  {id:'dist',name:'Distribuição de lucros',color:'#a8c8f0',tc:'#1a4a7a'},
+  {id:'est',name:'Estética',color:'#c8b0e0',tc:'#4a2a70'},
+  {id:'diz',name:'Dízimo',color:'#6a3d9a',tc:'#fff'},
+];
+let formasPag=[
+  {id:'pix',name:'Pix',color:'#b8e0c0',tc:'#1a5a2a'},
+  {id:'cred',name:'Cartão de crédito',color:'#c8dff0',tc:'#1a3a5a'},
+  {id:'bol',name:'Boleto',color:'#d0e8d8',tc:'#2a4a32'},
+  {id:'din',name:'Dinheiro',color:'#1a6a50',tc:'#fff'},
+];
+let transactions=[
+  {t:'despesa',d:'Cartão pessoal',cc:'dist',fp:'cred',v:2344.35,dt:'11/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Ring 3/5',cc:'est',fp:'cred',v:64.77,dt:'11/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Gasolina',cc:'est',fp:'cred',v:150.0,dt:'11/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Curso 3/12',cc:'est',fp:'cred',v:20.37,dt:'11/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Ainas',cc:'dist',fp:'pix',v:166.58,dt:'12/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 12/01',cc:'est',fp:'pix',v:1090.02,dt:'12/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Luany',cc:'dist',fp:'pix',v:225.0,dt:'12/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Plano celular',cc:'dist',fp:'pix',v:72.46,dt:'12/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Cesta básica',cc:'dist',fp:'pix',v:60.0,dt:'13/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Assessoria',cc:'dist',fp:'pix',v:550.0,dt:'13/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Balança',cc:'dist',fp:'pix',v:10.0,dt:'13/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Sobrancelha',cc:'dist',fp:'pix',v:45.0,dt:'15/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Unha',cc:'dist',fp:'pix',v:115.0,dt:'15/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 15/01',cc:'est',fp:'pix',v:1330.01,dt:'15/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Consórcio',cc:'dist',fp:'pix',v:203.0,dt:'15/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'MEI',cc:'est',fp:'pix',v:80.9,dt:'15/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Consórcio',cc:'dist',fp:'pix',v:229.59,dt:'15/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Mae',cc:'dist',fp:'pix',v:89.0,dt:'16/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Projeto de vida',cc:'dist',fp:'pix',v:100.0,dt:'16/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Patricia',cc:'loc',fp:'pix',v:330.0,dt:'16/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'João',cc:'dist',fp:'pix',v:9.12,dt:'16/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 17/01',cc:'est',fp:'pix',v:420.0,dt:'17/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Marco',cc:'dist',fp:'pix',v:270.0,dt:'17/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Docinho Brave',cc:'dist',fp:'pix',v:20.0,dt:'17/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Personal',cc:'dist',fp:'pix',v:330.0,dt:'18/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Dízimo',cc:'diz',fp:'pix',v:522.59,dt:'18/01/2026',ic:'🙏',parc:'À vista'},
+  {t:'despesa',d:'Seguro 5/6',cc:'loc',fp:'bol',v:599.92,dt:'19/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Aluguel Camila',cc:'loc',fp:'pix',v:330.0,dt:'19/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Aluguel Fernanda',cc:'loc',fp:'pix',v:330.0,dt:'19/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Estacionamento',cc:'loc',fp:'pix',v:2.0,dt:'19/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento 20/01',cc:'est',fp:'pix',v:630.02,dt:'20/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Aluguel sala',cc:'est',fp:'pix',v:650.0,dt:'21/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Cabelo',cc:'dist',fp:'pix',v:60.0,dt:'21/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Depilação',cc:'est',fp:'pix',v:128.0,dt:'21/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Aluguel Paula',cc:'loc',fp:'pix',v:330.0,dt:'21/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Aluguel Jacinto',cc:'loc',fp:'pix',v:550.0,dt:'23/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Cropped',cc:'dist',fp:'pix',v:63.0,dt:'23/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Mãe',cc:'dist',fp:'pix',v:0.0,dt:'26/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento Inaia',cc:'est',fp:'pix',v:1500.0,dt:'26/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão inaia',cc:'est',fp:'pix',v:375.0,dt:'26/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Atendimento Livia',cc:'est',fp:'pix',v:890.01,dt:'28/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão Livia',cc:'est',fp:'pix',v:132.0,dt:'28/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Máquina 18/36',cc:'loc',fp:'pix',v:3287.99,dt:'29/01/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento 29/01',cc:'est',fp:'pix',v:590.0,dt:'29/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Engenho',cc:'dist',fp:'pix',v:0.0,dt:'30/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Faculdade',cc:'dist',fp:'pix',v:279.0,dt:'30/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 30/01',cc:'est',fp:'pix',v:250.0,dt:'30/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Engenho',cc:'dist',fp:'pix',v:16.25,dt:'30/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Pix Marco',cc:'dist',fp:'pix',v:15.0,dt:'30/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Janta Curitiba',cc:'dist',fp:'pix',v:67.0,dt:'30/01/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Rendimentos',cc:'est',fp:'pix',v:379.13,dt:'31/01/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Empréstimo pai',cc:'dist',fp:'pix',v:2579.49,dt:'31/01/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Café Viagem',cc:'dist',fp:'pix',v:44.94,dt:'01/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento MELEIRO',cc:'est',fp:'pix',v:1500.0,dt:'05/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão meleiro',cc:'est',fp:'pix',v:375.0,dt:'05/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Barrinha Proteína',cc:'dist',fp:'pix',v:10.0,dt:'06/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento Turvo',cc:'est',fp:'pix',v:1370.75,dt:'06/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão Turvo',cc:'est',fp:'pix',v:274.0,dt:'06/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Liberação',cc:'dist',fp:'pix',v:100.0,dt:'09/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 9/2',cc:'est',fp:'pix',v:430.0,dt:'09/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Ring 4/5',cc:'est',fp:'cred',v:64.77,dt:'11/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Agulha',cc:'est',fp:'cred',v:72.58,dt:'11/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Curso 4/12',cc:'est',fp:'cred',v:20.37,dt:'11/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Cartão pessoal',cc:'dist',fp:'cred',v:2435.8,dt:'11/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Cesta básica',cc:'dist',fp:'pix',v:60.0,dt:'11/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Pedagio',cc:'est',fp:'cred',v:4.8,dt:'11/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Facebook',cc:'est',fp:'cred',v:177.95,dt:'11/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Produto Natures',cc:'est',fp:'cred',v:70.4,dt:'11/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Aluguel Keterin',cc:'loc',fp:'pix',v:330.0,dt:'11/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Ainas',cc:'dist',fp:'pix',v:169.92,dt:'12/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Plano celular',cc:'dist',fp:'pix',v:76.99,dt:'12/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Sobrancelha',cc:'dist',fp:'pix',v:45.0,dt:'12/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Unha',cc:'dist',fp:'pix',v:115.0,dt:'12/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'MEI',cc:'est',fp:'pix',v:86.05,dt:'12/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Personal',cc:'dist',fp:'pix',v:370.0,dt:'12/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 12/2',cc:'est',fp:'pix',v:880.0,dt:'12/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Mercado',cc:'dist',fp:'pix',v:13.68,dt:'14/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Consórcio',cc:'dist',fp:'pix',v:229.59,dt:'19/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Tamires',cc:'loc',fp:'din',v:330.0,dt:'19/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Dízimo',cc:'diz',fp:'pix',v:371.42,dt:'24/02/2026',ic:'🙏',parc:'À vista'},
+  {t:'despesa',d:'Fotografo',cc:'dist',fp:'pix',v:464.5,dt:'20/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento dia 20/02',cc:'est',fp:'pix',v:250.0,dt:'20/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Uzzi',cc:'dist',fp:'pix',v:180.0,dt:'24/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Patricia',cc:'loc',fp:'pix',v:100.0,dt:'20/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Aluguel sala',cc:'est',fp:'pix',v:650.0,dt:'24/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Aluguel Camila',cc:'loc',fp:'pix',v:330.0,dt:'21/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento Maô',cc:'est',fp:'pix',v:154.1,dt:'24/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Alameda',cc:'dist',fp:'pix',v:1000.0,dt:'26/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 23/2',cc:'est',fp:'pix',v:1843.98,dt:'23/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Consórcio',cc:'dist',fp:'pix',v:203.0,dt:'24/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Marco',cc:'dist',fp:'pix',v:270.0,dt:'24/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Turvo',cc:'loc',fp:'din',v:410.0,dt:'24/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Seguro 6/6',cc:'loc',fp:'din',v:500.0,dt:'25/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Depilação',cc:'est',fp:'din',v:123.0,dt:'25/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Aluguel Jacinto',cc:'loc',fp:'din',v:330.0,dt:'25/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Faculdade',cc:'dist',fp:'pix',v:277.0,dt:'24/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Paula',cc:'loc',fp:'pix',v:550.0,dt:'26/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento 27/02',cc:'est',fp:'pix',v:1490.0,dt:'27/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Rendimentos',cc:'est',fp:'pix',v:286.76,dt:'28/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Marco',cc:'dist',fp:'pix',v:34.0,dt:'24/02/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Bruna',cc:'loc',fp:'pix',v:330.0,dt:'24/02/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Valor do sinal',cc:'est',fp:'pix',v:60.0,dt:'25/02/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Lavação',cc:'dist',fp:'pix',v:50.0,dt:'26/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Mercado',cc:'dist',fp:'pix',v:25.19,dt:'28/02/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Gasolina',cc:'loc',fp:'pix',v:80.0,dt:'02/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Máquina 19/36',cc:'loc',fp:'pix',v:3287.99,dt:'02/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento Livia',cc:'est',fp:'pix',v:420.0,dt:'04/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão',cc:'est',fp:'pix',v:84.0,dt:'04/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Ainas',cc:'dist',fp:'pix',v:166.58,dt:'05/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Energético',cc:'dist',fp:'pix',v:9.9,dt:'06/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento Inaia',cc:'est',fp:'pix',v:1140.0,dt:'09/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão',cc:'est',fp:'pix',v:285.0,dt:'09/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Pix Marco',cc:'dist',fp:'pix',v:50.0,dt:'09/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'mercado',cc:'dist',fp:'pix',v:18.06,dt:'10/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 10/3',cc:'est',fp:'pix',v:660.01,dt:'10/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Faculdade',cc:'dist',fp:'pix',v:278.0,dt:'10/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Facebook',cc:'est',fp:'cred',v:68.7,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Ring 5/5',cc:'est',fp:'cred',v:64.78,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Agulha',cc:'est',fp:'cred',v:69.19,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Curso 5/12',cc:'est',fp:'cred',v:20.37,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Cartão pessoal',cc:'dist',fp:'cred',v:1995.03,dt:'11/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Luva',cc:'est',fp:'cred',v:40.0,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Gasolina',cc:'est',fp:'cred',v:100.0,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Produto Natures',cc:'est',fp:'cred',v:71.2,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Atendimento dia 11/3',cc:'est',fp:'pix',v:760.0,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Dani ( escovinha )',cc:'est',fp:'pix',v:6.0,dt:'11/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Cesta básica',cc:'dist',fp:'pix',v:62.44,dt:'12/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Keterin',cc:'loc',fp:'pix',v:330.0,dt:'12/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Plano celular',cc:'dist',fp:'pix',v:76.99,dt:'12/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'MEI',cc:'est',fp:'pix',v:86.05,dt:'12/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Consórcio',cc:'dist',fp:'pix',v:229.59,dt:'12/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Unha',cc:'dist',fp:'pix',v:115.0,dt:'13/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Personal',cc:'dist',fp:'pix',v:370.0,dt:'13/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 13/3',cc:'est',fp:'pix',v:650.0,dt:'13/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Mercado',cc:'dist',fp:'pix',v:24.49,dt:'13/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Consórcio',cc:'dist',fp:'pix',v:203.0,dt:'14/03/2026',ic:'💸',parc:'À vista'},
+  {t:'despesa',d:'Marco',cc:'dist',fp:'pix',v:270.0,dt:'14/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Nat',cc:'loc',fp:'pix',v:550.0,dt:'14/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Suporte máquina',cc:'loc',fp:'pix',v:233.19,dt:'16/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Sobrancelha',cc:'dist',fp:'pix',v:45.0,dt:'17/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 17/3',cc:'est',fp:'pix',v:1140.12,dt:'17/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Aluguel sala',cc:'est',fp:'pix',v:650.0,dt:'17/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Fotografo',cc:'dist',fp:'pix',v:364.5,dt:'18/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 19/3',cc:'est',fp:'pix',v:250.0,dt:'19/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Aluguel Carol',cc:'loc',fp:'pix',v:660.0,dt:'20/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Dízimo',cc:'diz',fp:'pix',v:880.27,dt:'20/03/2026',ic:'🙏',parc:'À vista'},
+  {t:'receita',d:'Atendimento Maô',cc:'est',fp:'pix',v:402.5,dt:'21/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Energético',cc:'dist',fp:'pix',v:14.99,dt:'21/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Paula',cc:'loc',fp:'pix',v:440.0,dt:'23/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento MELEIRO',cc:'est',fp:'pix',v:850.0,dt:'24/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Comissão meleiro',cc:'est',fp:'pix',v:170.0,dt:'24/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Gasolina',cc:'dist',fp:'pix',v:50.0,dt:'24/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Valor cliente antecipado',cc:'est',fp:'pix',v:120.0,dt:'24/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Eternização',cc:'dist',fp:'pix',v:150.0,dt:'24/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Tamires',cc:'loc',fp:'pix',v:330.0,dt:'25/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Depilação',cc:'est',fp:'pix',v:110.0,dt:'25/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Pedágio Marco',cc:'dist',fp:'pix',v:75.0,dt:'25/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Atendimento 26/3',cc:'est',fp:'pix',v:1340.02,dt:'26/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'despesa',d:'Madero',cc:'dist',fp:'pix',v:9.0,dt:'27/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Fernanda',cc:'loc',fp:'pix',v:300.0,dt:'28/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Alameda',cc:'dist',fp:'pix',v:500.0,dt:'30/03/2026',ic:'💸',parc:'À vista'},
+  {t:'receita',d:'Aluguel Jacinto',cc:'loc',fp:'pix',v:330.0,dt:'30/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'despesa',d:'Máquina 20/36',cc:'loc',fp:'pix',v:3287.99,dt:'30/03/2026',ic:'🏠',parc:'À vista'},
+  {t:'receita',d:'Atendimento 31/3',cc:'est',fp:'pix',v:840.0,dt:'31/03/2026',ic:'🔆',parc:'À vista'},
+  {t:'receita',d:'Rendimentos',cc:'est',fp:'pix',v:759.25,dt:'31/03/2026',ic:'🔆',parc:'À vista'}
+];
+let txType='income',selCC=null,selFP=null,txFilter='todos';
+
+function getIn(n){return n.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase()}
+function getCC(id){return centros.find(c=>c.id===id)||{name:'—',color:'#eee',tc:'#666'}}
+function getFP(id){return formasPag.find(f=>f.id===id)||{name:'—',color:'#eee',tc:'#666'}}
+
+const titles={agenda:'Agenda — <em>Hoje</em>',crm:'CRM — <em>Clientes</em>',conf:'Confirmações',fin:'Financeiro',config:'Configurações'};
+const topBtns={agenda:'+ Novo agendamento',crm:'+ Novo lead',conf:'Enviar para todas',fin:'+ Lançamento',config:''};
+
+function goTo(page,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('pageTitle').innerHTML=titles[page];document.getElementById('topBtn').textContent=topBtns[page];
+  document.getElementById('topBtn2').style.display=page==='fin'?'inline-block':'none';
+  curPage=page;
+  if(page==='agenda'){renderCal();renderTimeline();renderUpcoming()}
+  if(page==='crm'){filterCRM();if(crmView==='kanban')renderKanban()}
+  if(page==='conf'){renderConfList();updateConfStats()}
+  if(page==='fin'){
+    // Renderiza imediatamente com dados já em memória
+    setPeriod(curPeriod, document.querySelector('.ptab.active'));
+    renderSvcs();renderFPDonut();renderCCSummary();renderTxFilters();renderTxList();
+    // Se cloud ainda não carregou, tenta agora sem bloquear
+    if(!_finStorageReady){
+      finLoad().then(()=>{
+        setPeriod(curPeriod, document.querySelector('.ptab.active'));
+        renderSvcs();renderFPDonut();renderCCSummary();renderTxFilters();renderTxList();
+      });
+    }
+  }
+  if(page==='config'){loadConfigForm()}
+}
+function topAction(){
+  if(curPage==='agenda'){
+    document.getElementById('mDate').value=new Date().toISOString().split('T')[0];
+    clearApptClient();
+    document.getElementById('mName').value='';
+    document.getElementById('mObs').value='';
+    document.getElementById('apptModal').classList.add('open');
+    setTimeout(()=>document.getElementById('mName').focus(),100);
+  }
+  else if(curPage==='crm') document.getElementById('clientModal').classList.add('open');
+  else if(curPage==='conf'){ syncConfAppts(); confAppts.filter(a=>a.status==='pending').forEach(a=>sendWpp(a.id)); }
+  else if(curPage==='fin') toggleAddForm();
+}
+function topAction2(){if(curPage==='fin') setFinSection('centros',document.querySelectorAll('.stab')[2])}
+
+(function(){const d=new Date();const ds=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];document.getElementById('topDate').textContent=ds[d.getDay()]+', '+d.getDate()+' de '+MONTHS[d.getMonth()]+' de '+d.getFullYear()})();
+
+function renderCal(){
+  const y=viewDate.getFullYear(),m=viewDate.getMonth();
+  document.getElementById('calTitle').textContent=MONTHS[m].slice(0,3)+' '+y;
+  const first=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate();
+  const selD=new Date(agendaSelDate+'T12:00:00');
+  let html=WDAYS.map(d=>'<div class="cal-day-name">'+d+'</div>').join('');
+  for(let i=0;i<first;i++) html+='<div class="cal-day other">'+(prev-first+i+1)+'</div>';
+  for(let d=1;d<=dim;d++){
+    const dateStr=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
+    const isSel=dateStr===agendaSelDate;
+    const hasAppt=(apptsByDate[dateStr]||[]).some(a=>a.name&&a.status!=='cancelled');
+    let cls='cal-day';
+    if(isToday) cls+=' today';
+    else if(isSel) cls+=' sel';
+    if(hasAppt) cls+=' has';
+    html+=`<div class="${cls}" onclick="agendaSelDate='${dateStr}';renderCal();renderTimeline();renderUpcoming()">${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+}
+function changeMonth(dir){viewDate.setMonth(viewDate.getMonth()+dir);renderCal()}
+const STAGES=[
+  {id:'novo_lead',    label:'Novo lead',         color:'#7c9cbf', bg:'#edf2f8'},
+  {id:'nutricao',     label:'Nutrição',           color:'#c9a035', bg:'#fdf4e3'},
+  {id:'cliente_ativo',label:'Cliente ativo',      color:'#4a9068', bg:'#eaf5ee'},
+  {id:'cliente_finalizado',label:'Finalizado',    color:'#6b4fa0', bg:'#f0eafe'},
+  {id:'descartado',   label:'Descartado',         color:'#999',    bg:'#f5f5f5'},
+];
+const PROC_LABELS={
+  avaliacao:'Avaliação',
+  micropigmentacao:'Remoção de micropigmentação',
+  tatuagem:'Remoção de tatuagem',
+  microagulhamento:'Microagulhamento',
+  locacao:'Locação'
+};
+function stageInfo(id){return STAGES.find(s=>s.id===id)||{label:id,color:'#888',bg:'#f5f5f5'}}
+
+function renderTimeline(){
+  const dayAppts = getApptDay(agendaSelDate);
+  appts = dayAppts; // sync para compatibilidade
+  const d = new Date(agendaSelDate+'T12:00:00');
+  document.getElementById('tlDay').textContent=d.getDate()+' de '+MONTHS[d.getMonth()]+' de '+d.getFullYear();
+  const bm={confirmed:'badge-confirmed',pending:'badge-pending',cancelled:'badge-canceled'};
+  const bl={confirmed:'Confirmado',pending:'Pendente',cancelled:'Cancelado'};
+
+  if(!dayAppts.length){
+    document.getElementById('tlBody').innerHTML='<div style="text-align:center;padding:2rem 1rem;color:var(--muted);font-size:12px">Nenhum agendamento para este dia.<br><span style="font-size:11px;opacity:.7">Clique em + Novo agendamento para adicionar.</span></div>';
+    document.getElementById('tlTotal').textContent='0';
+    document.getElementById('tlConf').textContent='0';
+    return;
+  }
+
+  const sorted=[...dayAppts].sort((a,b)=>a.time.localeCompare(b.time));
+  document.getElementById('tlTotal').textContent=sorted.length;
+  document.getElementById('tlConf').textContent=sorted.filter(a=>a.status==='confirmed').length;
+  const previsto=sorted.filter(a=>a.status!=='cancelled').reduce((s,a)=>s+(parseFloat(a.valor)||0),0);
+  const prevEl=document.getElementById('tlPrev');
+  if(prevEl) prevEl.textContent='R$'+previsto.toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+  document.getElementById('tlBody').innerHTML=sorted.map(a=>{
+    const linked=a.clientId?clients.find(x=>x.id===a.clientId):null;
+    const clientChip=linked
+      ? `<span onclick="goTo('crm',document.querySelector('[title=Clientes]'));setTimeout(()=>selClient(${linked.id}),80)" style="background:var(--rose-light);color:var(--rose-deep);border-radius:3px;padding:1px 7px;font-size:9px;font-weight:500;cursor:pointer;margin-left:4px" title="Ver ficha">↗ ${linked.name.split(' ')[0]}</span>`
+      : '';
+    const isCancelled = a.status==='cancelled';
+    return `<div class="tl-row" style="${isCancelled?'opacity:.45':''}">
+      <div class="tl-time">${a.time}</div>
+      <div class="tl-slot">
+        <div class="appt-card ${isCancelled?'pending':a.status}" style="${isCancelled?'filter:grayscale(.5)':''}">
+          <div class="appt-top">
+            <div class="appt-name">${a.name}${clientChip}</div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="badge ${bm[a.status]||'badge-pending'}">${bl[a.status]||a.status}</span>
+              ${!isCancelled?`<button onclick="editAppt('${a.id}')" title="Editar" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;padding:2px 4px;border-radius:4px" onmouseover="this.style.color='var(--rose-deep)'" onmouseout="this.style.color='var(--muted)'">✎</button>
+              <button onclick="confirmAppt('${a.id}')" title="Confirmar" style="background:none;border:none;cursor:pointer;color:#2e7d4f;font-size:13px;padding:2px 4px;border-radius:4px" onmouseover="this.style.background='#eaf5ee'" onmouseout="this.style.background=''">✓</button>
+              <button onclick="cancelAppt('${a.id}')" title="Cancelar" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;padding:2px 4px;border-radius:4px" onmouseover="this.style.color='#b85050'" onmouseout="this.style.color='var(--muted)'">✕</button>`:''}
+            </div>
+          </div>
+          <div class="appt-svc">${a.svc}${a.obs?' · '+a.obs:''}${a.valor?'<span style="float:right;font-weight:500;color:var(--rose-deep)">R$'+parseFloat(a.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})+'</span>':''}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function confirmAppt(id){
+  const arr=getApptDay(agendaSelDate);
+  const sid=String(id);
+  const a=arr.find(x=>String(x.id)===sid);
+  if(a){a.status='confirmed';setApptDay(agendaSelDate,arr);sbUpsertAppt(agendaSelDate,a);renderTimeline();}
+}
+function cancelAppt(id){
+  const arr=getApptDay(agendaSelDate);
+  const sid=String(id);
+  const a=arr.find(x=>String(x.id)===sid);
+  if(a){a.status='cancelled';setApptDay(agendaSelDate,arr);sbUpsertAppt(agendaSelDate,a);renderTimeline();}
+}
+function editAppt(id){
+  const arr=getApptDay(agendaSelDate);
+  const a=arr.find(x=>String(x.id)===String(id));
+  if(!a) return;
+  // Abre modal preenchido
+  document.getElementById('mDate').value=agendaSelDate;
+  document.getElementById('mTime').value=a.time;
+  document.getElementById('mSvc').value=a.svc_key||'avaliacao';
+  document.getElementById('mVal').value=a.valor||'';
+  document.getElementById('mFpag').value=a.fpag||'pix';
+  document.getElementById('mObs').value=a.obs||'';
+  if(a.clientId) linkApptClient(a.clientId);
+  else { document.getElementById('mName').value=a.name; document.getElementById('mName').style.display=''; }
+  // Guarda id para update
+  document.getElementById('apptModal').dataset.editId=id;
+  document.getElementById('apptModal').classList.add('open');
+}
+function renderUpcoming(){
+  // Coleta todos os agendamentos futuros de todas as datas
+  const today_str = fmtDateKey(new Date());
+  const future = [];
+  Object.entries(apptsByDate).sort().forEach(([date,arr])=>{
+    if(date>=today_str) arr.filter(a=>a.name&&a.status!=='cancelled').forEach(a=>future.push({...a,date}));
+  });
+  future.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const dm={confirmed:'#7cbf8e',pending:'#c9a96e'};
+  if(!future.length){
+    document.getElementById('upList').innerHTML='<div style="font-size:11px;color:var(--muted);padding:8px 0">Nenhum agendamento futuro.</div>';
+    return;
+  }
+  document.getElementById('upList').innerHTML=future.slice(0,6).map(a=>
+    `<div class="up-item" onclick="agendaSelDate='${a.date}';renderCal();renderTimeline()">
+      <div class="up-dot" style="background:${dm[a.status]||'#c9a96e'}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:500;color:var(--dark)">${a.name.split(' ')[0]}</div>
+        <div style="font-size:10px;color:var(--muted)">${fmtDateBR(a.date)} ${a.time} · ${a.svc.split(' ')[0]}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+// ── AGENDA — vínculo com cliente ──
+let apptLinkedClientId = null;
+
+function closeApptModal(){
+  document.getElementById('apptModal').classList.remove('open');
+  clearApptClient();
+  document.getElementById('mName').value='';
+  document.getElementById('mVal').value='';
+  document.getElementById('mObs').value='';
+  const ln=document.getElementById('leadName');if(ln){ln.value='';ln.style.borderColor='';}
+  const lp=document.getElementById('leadPhone');if(lp){lp.value='';lp.style.borderColor='';}
+}
+
+function searchApptClient(q){
+  if(apptLinkedClientId) return;
+  const drop = document.getElementById('apptClientDrop');
+  const noClient = document.getElementById('apptNoClient');
+  q = (q||'').trim();
+  if(!q){drop.style.display='none';noClient.style.display='none';return;}
+  const matches = clients.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(matches.length){
+    noClient.style.display='none';
+    drop.style.display='block';
+    drop.innerHTML = matches.map(c=>{
+      const st=stageInfo(c.stage);
+      return '<div onclick="linkApptClient('+c.id+')" style="display:flex;align-items:center;gap:9px;padding:9px 12px;cursor:pointer;border-bottom:0.5px solid var(--border)" onmouseover="this.style.background=&quot;var(--rose-light)&quot;" onmouseout="this.style.background=&quot;&quot;">'+
+        '<div class="avatar '+c.av+'" style="width:28px;height:28px;font-size:10px;flex-shrink:0">'+getIn(c.name)+'</div>'+
+        '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:var(--dark)">'+c.name+'</div><div style="font-size:10px;color:var(--muted)">'+c.phone+'</div></div>'+
+        '<span style="background:'+st.bg+';color:'+st.color+';border-radius:3px;padding:2px 7px;font-size:9px;font-weight:500;flex-shrink:0">'+st.label+'</span>'+
+        '</div>';
+    }).join('');
+  } else {
+    drop.style.display='none';
+    noClient.style.display='block';
+    const leadNameInput=document.getElementById('leadName');
+    if(leadNameInput && !leadNameInput.value) leadNameInput.value=q;
+    const btn=noClient.querySelector('button');
+    if(btn) btn.textContent='+ Criar lead "'+q+'"';
+  }
+}
+
+function linkApptClient(id){
+  const c = clients.find(x=>x.id===id);
+  if(!c) return;
+  apptLinkedClientId = id;
+  document.getElementById('mName').value = c.name;
+  document.getElementById('apptClientDrop').style.display='none';
+  document.getElementById('apptNoClient').style.display='none';
+  // Mostra badge
+  const badge = document.getElementById('apptClientBadge');
+  const st = stageInfo(c.stage);
+  document.getElementById('apptClientAv').textContent = getIn(c.name);
+  document.getElementById('apptClientAv').className = 'avatar '+c.av;
+  document.getElementById('apptClientAv').style.cssText='width:28px;height:28px;font-size:10px';
+  document.getElementById('apptClientName').textContent = c.name;
+  document.getElementById('apptClientStage').textContent = st.label+' · '+c.phone;
+  badge.style.display='flex';
+  document.getElementById('mName').style.display='none';
+}
+
+function clearApptClient(){
+  apptLinkedClientId=null;
+  document.getElementById('apptClientBadge').style.display='none';
+  document.getElementById('apptClientDrop').style.display='none';
+  document.getElementById('apptNoClient').style.display='none';
+  const inp=document.getElementById('mName');
+  inp.style.display='';inp.value='';inp.focus();
+}
+
+function createLeadFromAppt(){
+  const nome=(document.getElementById('leadName').value||'').trim();
+  const tel=(document.getElementById('leadPhone').value||'').trim();
+  if(!nome){
+    document.getElementById('leadName').style.borderColor='#b85050';
+    document.getElementById('leadName').focus();
+    return;
+  }
+  if(!tel){
+    document.getElementById('leadPhone').style.borderColor='#b85050';
+    document.getElementById('leadPhone').focus();
+    return;
+  }
+  document.getElementById('leadName').style.borderColor='';
+  document.getElementById('leadPhone').style.borderColor='';
+  const avs=['av-rose','av-gold','av-green','av-purple'];
+  const proc=document.getElementById('mSvc').value;
+  const newId=Date.now();
+  const novo={
+    id:newId,name:nome,phone:tel,bday:'—',since:'Agenda',
+    stage:'novo_lead',visits:0,spent:0,last:'—',
+    procs:proc&&proc!=='locacao'?[proc]:[],
+    obs:'Criado via agenda.',history:[],procedimentos:[],av:avs[cliNovos.length%4]
+  };
+  // Adiciona em ambos os arrays e persiste
+  cliNovos.unshift(novo);
+  clients.unshift(novo);
+  saveCliNovos();
+  sbUpsertCliente(novo);
+  // Atualiza campo principal com o nome e vincula
+  document.getElementById('mName').value=nome;
+  linkApptClient(newId);
+  document.getElementById('apptNoClient').style.display='none';
+  // Atualiza CRM para o lead aparecer imediatamente
+  filterCRM();
+  if(crmView==='kanban') renderKanban();
+}
+
+function saveAppt(){
+  const linkedC=apptLinkedClientId?clients.find(x=>x.id===apptLinkedClientId):null;
+  const n=linkedC?linkedC.name:(document.getElementById('mName').value.trim());
+  if(!n){alert('Informe o cliente.');return;}
+  const dt=document.getElementById('mDate').value||agendaSelDate;
+  const time=document.getElementById('mTime').value;
+  const svc_key=document.getElementById('mSvc').value;
+  const obs=document.getElementById('mObs').value.trim();
+  const valor=parseFloat(document.getElementById('mVal').value)||0;
+  const fpag=document.getElementById('mFpag').value||'pix';
+  const svcLabel={avaliacao:'Avaliação',micropigmentacao:'Remoção micropig.',tatuagem:'Remoção tatuagem',microagulhamento:'Microagulhamento',locacao:'Locação'}[svc_key]||svc_key;
+  const editId=document.getElementById('apptModal').dataset.editId;
+
+  // Vincula procedimento ao cliente (apenas em novos, não em edições)
+  if(!editId && apptLinkedClientId){
+    const c=clients.find(x=>x.id===apptLinkedClientId);
+    const procsComSessao=['micropigmentacao','tatuagem','microagulhamento'];
+    if(c&&procsComSessao.includes(svc_key)){
+      if(!c.procedimentos) c.procedimentos=[];
+      c.procedimentos.unshift({tipo:svc_key,sessao:c.procedimentos.filter(p=>p.tipo===svc_key).length+1,data:fmtDateBR(dt),regiao:'',obs:obs||'Agendado'});
+      c.visits=c.procedimentos.length;c.last=fmtDateBR(dt);
+      if(!c.procs.includes(svc_key)) c.procs.push(svc_key);
+      if(c.stage==='novo_lead'||c.stage==='nutricao') c.stage='cliente_ativo';
+    } else if(c&&svc_key==='avaliacao'){
+      c.last=fmtDateBR(dt);
+      if(c.stage==='novo_lead') c.stage='nutricao';
+    }
+    // Salva clientes novos se for um novo lead criado via agenda
+    const isNew=cliNovos.find(x=>x.id===apptLinkedClientId);
+    if(isNew){ const idx=cliNovos.findIndex(x=>x.id===apptLinkedClientId);cliNovos[idx]=clients.find(x=>x.id===apptLinkedClientId);saveCliNovos(); }
+    else { save('cli_historico',cliHistorico); }
+  }
+
+  const arr=getApptDay(dt);
+  if(editId){
+    const idx=arr.findIndex(x=>x.id===editId);
+    if(idx>=0){ arr[idx]={...arr[idx],time,svc:svcLabel,svc_key,obs,name:n,clientId:apptLinkedClientId||arr[idx].clientId}; }
+    delete document.getElementById('apptModal').dataset.editId;
+  } else {
+    arr.push({id:Date.now(),time,name:n,svc:svcLabel,svc_key,obs,valor,fpag,status:'pending',clientId:apptLinkedClientId});
+  }
+  // Se o agendamento é para outra data, muda para ela
+  agendaSelDate=dt;
+  setApptDay(dt, arr);
+  // Persiste agendamento no Supabase
+  const savedAppt=arr.find(x=>x.time===time&&x.name===n);
+  if(savedAppt) sbUpsertAppt(dt, savedAppt);
+  // Se cliente foi modificado, persiste também
+  if(apptLinkedClientId){
+    const c=clients.find(x=>x.id===apptLinkedClientId);
+    if(c) sbUpsertCliente(c);
+  }
+  renderCal();renderTimeline();renderUpcoming();
+  closeApptModal();
+}
+
+// ── CRM ──
+let crmView='list', stageFilt='all', selClientId=null, procTargetId=null;
+
+function setCRMView(v,el){
+  crmView=v;
+  document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.getElementById('crmListView').style.display=v==='list'?'block':'none';
+  document.getElementById('crmKanbanView').style.display=v==='kanban'?'block':'none';
+  if(v==='kanban') renderKanban(); else filterCRM();
+}
+function setStageFilt(s,el){
+  stageFilt=s;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  if(crmView==='kanban') renderKanban(); else filterCRM();
+}
+function filterCRM(){
+  const q=document.getElementById('crmSearch').value.toLowerCase();
+  let list=clients;
+  if(stageFilt!=='all') list=list.filter(c=>c.stage===stageFilt);
+  if(q) list=list.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q));
+  renderCRMList(list);
+}
+function syncProcChips(){}
+
+function renderCRMList(list){
+  if(!list) list=clients;
+  document.getElementById('clientList').innerHTML=list.map(c=>{
+    const st=stageInfo(c.stage);
+    const pLabels=c.procs.map(p=>'<span style="background:#f0f0f0;color:#555;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:500">'+PROC_LABELS[p]+'</span>').join('');
+    return '<div class="client-card'+(selClientId===c.id?' active':'')+'" onclick="selClient('+c.id+')">' +
+      '<div class="avatar '+c.av+'">'+getIn(c.name)+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:2px">'+c.name+'</div>'+
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+pLabels+'</div>'+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">'+
+        '<span style="background:'+st.bg+';color:'+st.color+';border-radius:4px;padding:2px 8px;font-size:10px;font-weight:500">'+st.label+'</span>'+
+        (c.visits>0?'<div style="font-size:10px;color:var(--muted)">'+c.visits+' sessões</div>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function selClient(id){
+  selClientId=id;
+  const c=clients.find(x=>x.id===id);
+  renderCRMList();
+  const st=stageInfo(c.stage);
+  const procHtml=c.procedimentos&&c.procedimentos.length
+    ? c.procedimentos.map(p=>
+        '<div style="display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--border)">'+
+        '<div style="width:22px;height:22px;border-radius:50%;background:var(--rose-light);color:var(--rose-deep);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0">'+p.sessao+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:11px;font-weight:500;color:var(--dark)">'+PROC_LABELS[p.tipo]+'<span style="font-weight:400;color:var(--muted)"> · '+p.regiao+'</span></div>'+
+          (p.obs?'<div style="font-size:10px;color:var(--muted);margin-top:1px">'+p.obs+'</div>':'')+
+        '</div>'+
+        '<div style="font-size:10px;color:var(--muted);flex-shrink:0">'+p.data+'</div></div>'
+      ).join('')
+    : '<div style="font-size:11px;color:var(--muted);padding:8px 0">Nenhum procedimento registrado.</div>';
+
+  const stageOpts=STAGES.map(s=>'<option value="'+s.id+'"'+(c.stage===s.id?' selected':'')+'>'+s.label+'</option>').join('');
+
+  document.getElementById('detailPanel').innerHTML=
+    '<div class="detail-panel">'+
+    '<div class="dp-top">'+
+      '<div class="dp-avatar '+c.av+'">'+getIn(c.name)+'</div>'+
+      '<div class="dp-name">'+c.name+'</div>'+
+      '<div class="dp-since">'+c.phone+' · desde '+c.since+'</div>'+
+      '<div style="margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">'+
+        '<select class="form-select" style="font-size:11px;padding:4px 8px;width:auto;background:'+st.bg+';color:'+st.color+';border-color:'+st.color+'40;font-weight:500" onchange="changeStage('+c.id+',this.value)">'+stageOpts+'</select>'+
+        c.procs.map(p=>'<span style="background:var(--rose-light);color:var(--rose-deep);border-radius:4px;padding:3px 9px;font-size:10px;font-weight:500">'+PROC_LABELS[p]+'</span>').join('')+
+      '</div>'+
+    '</div>'+
+    '<div class="dp-stats">'+
+      '<div class="dps"><div class="dps-val">'+c.visits+'</div><div class="dps-label">sessões</div></div>'+
+      '<div class="dps"><div class="dps-val">R$'+c.spent.toLocaleString('pt-BR')+'</div><div class="dps-label">investido</div></div>'+
+      '<div class="dps"><div class="dps-val">R$'+(c.visits?Math.round(c.spent/c.visits):0)+'</div><div class="dps-label">p/ sessão</div></div>'+
+    '</div>'+
+    '<div class="dp-section" style="border-bottom:0.5px solid var(--border)">'+
+      '<div class="section-label">informações</div>'+
+      '<div class="info-row"><span class="info-label">Telefone</span><span>'+c.phone+'</span></div>'+
+      '<div class="info-row"><span class="info-label">Aniversário</span><span>'+c.bday+'</span></div>'+
+      '<div class="info-row"><span class="info-label">Última sessão</span><span>'+c.last+'</span></div>'+
+      (c.obs?'<div class="info-row" style="align-items:flex-start"><span class="info-label">Obs.</span><span style="font-size:11px;max-width:155px;text-align:right;line-height:1.5">'+c.obs+'</span></div>':'')+
+    '</div>'+
+    '<div class="dp-section">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+        '<div class="section-label" style="margin:0">procedimentos</div>'+
+        '<button onclick="openProcModal('+c.id+')" style="background:var(--rose-deep);color:#fff;border:none;border-radius:4px;padding:4px 11px;font-size:10px;font-weight:500;cursor:pointer;font-family:Inter,sans-serif">+ Adicionar</button>'+
+      '</div>'+
+      procHtml+
+    '</div>'+
+    '<div class="dp-actions">'+
+      '<button class="btn-ghost" style="font-size:11px" onclick="goTo(\'agenda\',document.querySelector(\'[title=Agenda]\'))">Agendar</button>'+
+      '<button class="btn-primary" style="font-size:11px" onclick="goTo(\'conf\',document.querySelector(\'[title=Confirmações]\'))">WhatsApp</button>'+
+    '</div></div>';
+}
+
+function changeStage(id,stage){
+  const c=clients.find(x=>x.id===id);if(c){c.stage=stage;sbUpsertCliente(c);}
+  renderCRMList();if(crmView==='kanban')renderKanban();
+}
+
+function renderKanban(){
+  const q=document.getElementById('crmSearch').value.toLowerCase();
+  const stages=stageFilt==='all'?STAGES:STAGES.filter(s=>s.id===stageFilt);
+  document.getElementById('kanbanBoard').innerHTML=stages.map(st=>{
+    let cards=clients.filter(c=>c.stage===st.id);
+    if(q) cards=cards.filter(c=>c.name.toLowerCase().includes(q));
+    return '<div class="kb-col">'+
+      '<div class="kb-col-head" style="border-top:2px solid '+st.color+'">'+
+        '<span style="color:'+st.color+';font-weight:500;font-size:12px">'+st.label+'</span>'+
+        '<span style="background:'+st.bg+';color:'+st.color+';border-radius:10px;padding:1px 7px;font-size:10px">'+cards.length+'</span>'+
+      '</div>'+
+      cards.map(c=>{
+        const pLabels=c.procs.map(p=>'<span style="background:var(--rose-light);color:var(--rose-deep);border-radius:3px;padding:1px 6px;font-size:9px">'+PROC_LABELS[p]+'</span>').join('');
+        return '<div class="kb-card" onclick="selKanban('+c.id+')">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+            '<div class="avatar '+c.av+'" style="width:28px;height:28px;font-size:10px">'+getIn(c.name)+'</div>'+
+            '<div style="font-size:12px;font-weight:500;color:var(--dark)">'+c.name+'</div>'+
+          '</div>'+
+          '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">'+pLabels+'</div>'+
+          '<div style="font-size:10px;color:var(--muted)">'+c.phone+(c.visits?' · '+c.visits+' sessões':' · 0 sessões')+'</div>'+
+          '<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">'+
+            STAGES.filter(s=>s.id!==c.stage).slice(0,3).map(s=>
+              '<button onclick="event.stopPropagation();changeStage('+c.id+',\''+s.id+'\')" style="background:'+s.bg+';color:'+s.color+';border:0.5px solid '+s.color+'40;border-radius:3px;padding:2px 7px;font-size:9px;cursor:pointer;font-family:Inter,sans-serif">→ '+s.label+'</button>'
+            ).join('')+
+          '</div>'+
+        '</div>';
+      }).join('')+
+      '<button onclick="document.getElementById(\'clientModal\').classList.add(\'open\')" style="width:100%;padding:8px;border:0.5px dashed var(--border);border-radius:6px;background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:Inter,sans-serif;margin-top:6px">+ Novo</button>'+
+    '</div>';
+  }).join('');
+}
+
+function selKanban(id){
+  selClientId=id;
+  setCRMView('list',document.getElementById('vtList'));
+  setTimeout(()=>selClient(id),50);
+}
+
+function openProcModal(id){
+  procTargetId=id;
+  document.getElementById('pmData').value=new Date().toISOString().split('T')[0];
+  const c=clients.find(x=>x.id===id);
+  document.getElementById('pmSessao').value=(c.procedimentos?c.procedimentos.length:0)+1;
+  document.getElementById('procModal').classList.add('open');
+}
+function saveProc(){
+  const c=clients.find(x=>x.id===procTargetId);if(!c)return;
+  if(!c.procedimentos) c.procedimentos=[];
+  const tipo=document.getElementById('pmTipo').value;
+  const dt=document.getElementById('pmData').value;
+  const fdt=dt?dt.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');
+  c.procedimentos.unshift({
+    tipo,sessao:parseInt(document.getElementById('pmSessao').value)||1,
+    data:fdt,regiao:document.getElementById('pmRegiao').value,obs:document.getElementById('pmObs').value
+  });
+  c.visits=c.procedimentos.length;c.last=fdt;
+  if(!c.procs.includes(tipo)) c.procs.push(tipo);
+  sbUpsertCliente(c);
+  document.getElementById('procModal').classList.remove('open');
+  document.getElementById('pmRegiao').value='';document.getElementById('pmObs').value='';
+  selClient(procTargetId);
+}
+
+function saveClient(){
+  const n=document.getElementById('cnName').value.trim();if(!n)return;
+  const avs=['av-rose','av-gold','av-green','av-purple'];
+  const procs=[...document.querySelectorAll('#cnProcChips input:checked')].map(x=>x.value);
+  const novo={
+    id:Date.now(),name:n,phone:document.getElementById('cnPhone').value||'—',bday:'—',
+    since:'Abr 2026',stage:document.getElementById('cnStage').value,
+    visits:0,spent:0,last:'—',procs,obs:document.getElementById('cnObs').value,
+    history:[],procedimentos:[],av:avs[clients.length%4]
+  };
+  cliNovos.unshift(novo);
+  clients.unshift(novo);
+  saveCliNovos();
+  sbUpsertCliente(novo);
+  document.getElementById('clientModal').classList.remove('open');
+  document.getElementById('cnName').value='';
+  document.querySelectorAll('#cnProcChips input').forEach(i=>i.checked=false);
+  filterCRM();if(crmView==='kanban')renderKanban();
+}
+
+let selConfId=null;
+function updateConfStats(){
+  syncConfAppts(); // sincroniza com Agenda antes de atualizar stats
+  const pend=confAppts.filter(a=>a.status==='pending').length;
+  document.getElementById('csPend').textContent=pend;document.getElementById('csSent').textContent=confAppts.filter(a=>a.status==='sent').length;document.getElementById('csConf').textContent=confAppts.filter(a=>a.status==='confirmed').length;
+  const b=document.getElementById('confBadge');b.textContent=pend;b.style.display=pend>0?'flex':'none';
+}
+function syncConfBack(){
+  // Sincroniza status/mensagens de volta para Agenda
+  confAppts.forEach(c => {
+    const arr = getApptDay(agendaSelDate);
+    const appt = arr.find(x => x.id === c.id);
+    if(appt){
+      appt.status = c.status === 'confirmed' ? 'confirmed' : (c.status === 'canceled' ? 'cancelled' : appt.status);
+      appt.confirmationSent = c.msgs.length > 0;
+      setApptDay(agendaSelDate, arr);
+    }
+  });
+}
+function renderConfList(){
+  syncConfAppts(); // sincroniza com Agenda antes de renderizar
+  const sm={pending:'badge-pending',sent:'badge-sent',confirmed:'badge-confirmed',canceled:'badge-canceled'};
+  const sl={pending:'Pendente',sent:'Msg enviada',confirmed:'Confirmada',canceled:'Cancelada'};
+  document.getElementById('confList').innerHTML=confAppts.map(a=>
+    '<div class="conf-card'+(selConfId===a.id?' sel':'')+((a.status==='confirmed'||a.status==='canceled')?' done':'')+'" onclick="selConf('+a.id+')">'+
+    '<div class="cc-top"><div class="avatar '+a.av+'" style="width:33px;height:33px;font-size:11px">'+getIn(a.name)+'</div><div><div class="cc-name">'+a.name+'</div><div class="cc-svc">'+a.svc+'</div></div><div class="cc-meta"><span class="badge '+sm[a.status]+'">'+sl[a.status]+'</span></div></div>'+
+    '<div class="cc-bot"><span style="color:var(--dark);font-weight:500">Hoje às '+a.time+'</span><span style="color:var(--muted)">'+a.phone+'</span></div>'+
+    (a.status==='pending'?'<div class="cc-acts"><button class="ca-btn ca-confirm" onclick="event.stopPropagation();var x=confAppts.find(y=>y.id==='+a.id+');x.status=\'confirmed\';syncConfBack();updateConfStats();renderConfList()">Confirmar</button><button class="ca-btn ca-wpp" onclick="event.stopPropagation();sendWpp('+a.id+')">Enviar msg</button><button class="ca-btn ca-cancel" onclick="event.stopPropagation();var x=confAppts.find(y=>y.id==='+a.id+');x.status=\'canceled\';syncConfBack();updateConfStats();renderConfList()">Cancelar</button></div>':'')+
+    '</div>').join('');
+}
+function selConf(id){
+  selConfId=id;const a=confAppts.find(x=>x.id===id);renderConfList();
+  const tmpls=['Ola '+a.name.split(' ')[0]+'! Lembrete do seu horario de '+a.svc+' hoje as '+a.time+'. Confirma presenca?','Oi '+a.name.split(' ')[0]+'! Sua '+a.svc+' esta marcada para hoje as '+a.time+'. Ate logo!',a.name.split(' ')[0]+', confirme seu agendamento de '+a.svc+' as '+a.time+'. Responda SIM.'];
+  const chat=a.msgs.length?a.msgs.map(m=>m.out?'<div class="msg-out">'+m.out+'<div class="msg-t">'+m.t+' ✓✓</div></div>':'<div class="msg-in">'+m.in+'<div class="msg-t" style="text-align:left">'+m.t+'</div></div>').join(''):'<div style="text-align:center;color:rgba(0,0,0,.4);font-size:11px;padding:1rem 0">Nenhuma mensagem enviada</div>';
+  document.getElementById('wppPanel').innerHTML=
+    '<div class="wpp-panel"><div class="wpp-head"><div class="wpp-av">'+getIn(a.name)+'</div><div><div class="wpp-n">'+a.name+'</div><div class="wpp-s">'+a.phone+'</div></div></div>'+
+    '<div class="wpp-chat" id="wppChat">'+chat+'</div>'+
+    '<div class="wpp-tmpls"><div class="tmpl-label">mensagens rapidas</div>'+tmpls.map((t,i)=>'<button class="tmpl-chip" onclick="document.getElementById(\'wppTa\').value=\''+t.replace(/'/g,"\\'")+'\'">'+t.substring(0,60)+'...</button>').join('')+'</div>'+
+    '<div class="wpp-input-bar"><textarea class="wpp-ta" id="wppTa" placeholder="Digite uma mensagem..." rows="1"></textarea><button class="wpp-send" onclick="sendMsgConf('+a.id+')">➤</button></div></div>';
+}
+// URL do webhook do n8n (configurável pela tela de Configurações)
+let N8N_WEBHOOK_URL = load('n8n_webhook_url', '');
+
+function sendWpp(id){
+  const a=confAppts.find(x=>x.id===id);
+  const now=new Date(),t='Hoje '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  a.msgs.push({out:'Ola '+a.name.split(' ')[0]+'! Lembrete: '+a.svc+' hoje as '+a.time+'. Confirma presenca?',t});
+  confMsgsStore[a.id] = a.msgs;
+  if(a.status==='pending') a.status='sent';
+  syncConfBack();
+  updateConfStats();renderConfList();if(selConfId===id) selConf(id);
+
+  // Dispara webhook para o n8n
+  if(N8N_WEBHOOK_URL){
+    fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        event: 'whatsapp_message',
+        apptId: a.id,
+        clientName: a.name,
+        phone: a.phone,
+        service: a.svc,
+        time: a.time,
+        message: 'Olá '+a.name.split(' ')[0]+'! Lembrete do seu agendamento de '+a.svc+' hoje às '+a.time+'. Confirma presença?',
+        timestamp: new Date().toISOString()
+      })
+    }).catch(err => console.warn('Erro webhook n8n:', err));
+  }
+}
+function sendMsgConf(id){
+  const ta=document.getElementById('wppTa');const txt=ta.value.trim();if(!txt)return;
+  const a=confAppts.find(x=>x.id===id);const now=new Date(),t='Hoje '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  a.msgs.push({out:txt,t});if(a.status==='pending') a.status='sent';
+  confMsgsStore[a.id] = a.msgs;
+  ta.value='';syncConfBack();updateConfStats();renderConfList();selConf(id);
+
+  // Dispara webhook para o n8n
+  if(N8N_WEBHOOK_URL){
+    fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        event: 'whatsapp_message_custom',
+        apptId: a.id,
+        clientName: a.name,
+        phone: a.phone,
+        service: a.svc,
+        time: a.time,
+        message: txt,
+        timestamp: new Date().toISOString()
+      })
+    }).catch(err => console.warn('Erro webhook n8n:', err));
+  }
+}
+
+const SALDO_INICIAL=28537.50;
+
+
+// Mapa de período → índice do mês (0-based) e rótulo
+const PERIOD_MAP={
+  jan:{m:0,label:'Janeiro'},fev:{m:1,label:'Fevereiro'},mar:{m:2,label:'Março'},
+  abr:{m:3,label:'Abril'},  mai:{m:4,label:'Maio'},     jun:{m:5,label:'Junho'},
+  jul:{m:6,label:'Julho'},  ago:{m:7,label:'Agosto'},   set:{m:8,label:'Setembro'},
+  out:{m:9,label:'Outubro'},nov:{m:10,label:'Novembro'},dez:{m:11,label:'Dezembro'},
+  ano:{m:-1,label:'2026 — Anual'}
+};
+const PERIOD_ORDER=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+// Calcula receita e despesa a partir dos lançamentos reais para um período
+function calcPeriod(p){
+  let list=transactions;
+  if(p!=='ano'){
+    const pm=PERIOD_MAP[p];
+    list=list.filter(x=>{const d=parseDt(x.dt);return d.getMonth()===pm.m&&d.getFullYear()===2026;});
+  }
+  const i=list.filter(x=>x.t==='receita').reduce((a,x)=>a+x.v,0);
+  const e=list.filter(x=>x.t==='despesa').reduce((a,x)=>a+x.v,0);
+  return {i,e,list};
+}
+
+// Saldo acumulado desde o saldo inicial até o final do período
+function getSaldoCaixa(p){
+  if(p==='ano'){
+    const c=calcPeriod('ano');
+    return SALDO_INICIAL+(c.i-c.e);
+  }
+  let acum=SALDO_INICIAL;
+  for(const pm of PERIOD_ORDER){
+    const c=calcPeriod(pm);
+    acum+=(c.i-c.e);
+    if(pm===p) break;
+  }
+  return acum;
+}
+
+// Rótulo de variação vs mês anterior
+function getPeriodLabel(p){
+  if(p==='ano') return {id:'Anual 2026',ed:'Anual 2026',pd:'Anual 2026'};
+  const c=calcPeriod(p);
+  const prevIdx=PERIOD_ORDER.indexOf(p)-1;
+  if(prevIdx<0) return {id:'base 2026',ed:'base 2026',pd:'base 2026'};
+  const prev=calcPeriod(PERIOD_ORDER[prevIdx]);
+  const prevLabel=PERIOD_MAP[PERIOD_ORDER[prevIdx]].label.slice(0,3).toLowerCase();
+  const pct=(v,r)=>r>0?Math.round((v-r)/r*100):0;
+  const sig=v=>v>=0?'▲ ':'▼ ';
+  const liq=c.i-c.e, pliq=prev.i-prev.e;
+  return {
+    id:sig(c.i-prev.i)+Math.abs(pct(c.i,prev.i))+'% vs '+prevLabel,
+    ed:sig(c.e-prev.e)+Math.abs(pct(c.e,prev.e))+'% vs '+prevLabel,
+    pd:sig(liq-pliq)+Math.abs(pct(liq,pliq||1))+'% vs '+prevLabel,
+  };
+}
+
+// Divide lançamentos do período em 4 semanas para o gráfico de barras
+function getBarData(p){
+  const c=calcPeriod(p);
+  if(p==='ano'){
+    // Para o anual, barras = trimestres
+    const q=[[0,1,2],[3,4,5],[6,7,8],[9,10,11]].map(ms=>{
+      let qi=0,qe=0;
+      ms.forEach(m=>{
+        const r=calcPeriod(PERIOD_ORDER[m]);
+        qi+=r.i; qe+=r.e;
+      });
+      return {i:qi,e:qe};
+    });
+    return q;
+  }
+  const weeks=[{i:0,e:0},{i:0,e:0},{i:0,e:0},{i:0,e:0}];
+  c.list.forEach(x=>{
+    const day=parseDt(x.dt).getDate();
+    const w=day<=7?0:day<=14?1:day<=21?2:3;
+    if(x.t==='receita') weeks[w].i+=x.v; else weeks[w].e+=x.v;
+  });
+  return weeks;
+}
+
+function setPeriod(p,el){
+  if(!el)return;
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  curPeriod=p;
+  const c=calcPeriod(p);
+  const lucro=c.i-c.e;
+  const fmt=v=>v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('kI').textContent='R$ '+fmt(c.i);
+  document.getElementById('kE').textContent='R$ '+fmt(c.e);
+  const kp=document.getElementById('kP');
+  kp.textContent=(lucro>=0?'+R$ ':'-R$ ')+fmt(Math.abs(lucro));
+  kp.style.color=lucro>=0?'#2e7d4f':'#b85050';
+  document.getElementById('kT').textContent='R$ '+fmt(getSaldoCaixa(p));
+  const lbl=getPeriodLabel(p);
+  document.getElementById('kId').textContent=lbl.id;
+  document.getElementById('kEd').textContent=lbl.ed;
+  document.getElementById('kPd').textContent=lbl.pd;
+  const prevIdx=PERIOD_ORDER.indexOf(p);
+  document.getElementById('kTd').textContent=
+    p==='jan' ? 'Saldo inicial: R$ '+fmt(SALDO_INICIAL) :
+    p==='ano' ? 'Acumulado 2026' :
+    'Acumulado até '+PERIOD_MAP[p].label.slice(0,3);
+  // Rótulo do gráfico: semanas ou trimestres
+  window._barLabels=p==='ano'?['Q1','Q2','Q3','Q4']:['Sem 1','Sem 2','Sem 3','Sem 4'];
+  renderBars(getBarData(p));
+  const lancTab=document.getElementById('fsec-lancamentos');
+  if(lancTab&&lancTab.classList.contains('active')) renderTxList();
+}
+function setFinSection(s,el){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));if(el) el.classList.add('active');
+  document.querySelectorAll('.fin-section').forEach(x=>x.classList.remove('active'));document.getElementById('fsec-'+s).classList.add('active');
+  if(s==='lancamentos'){renderTxList();renderTxFilters()}
+  if(s==='centros'){renderCCDetail();renderCCManage()}
+  if(s==='pagamentos'){renderFPDetail();renderFPManage()}
+}
+function renderBars(w){
+  const mx=Math.max(...w.map(x=>x.i),1);
+  const lb=window._barLabels||['Sem 1','Sem 2','Sem 3','Sem 4'];
+  document.getElementById('barChart').innerHTML=w.map((x,i)=>'<div class="bar-group"><div class="bar-wrap"><div class="bar bi" style="width:40%;height:'+Math.round(x.i/mx*100)+'%"></div><div class="bar be" style="width:40%;height:'+Math.round(x.e/mx*100)+'%"></div></div><div class="bar-lbl">'+lb[i]+'</div></div>').join('');
+}
+function renderSvcs(){document.getElementById('svcList').innerHTML=svcs.map(s=>'<div class="svc-item"><span class="svc-name">'+s.n+'</span><div class="svc-bg"><div class="svc-fill" style="width:'+s.p+'%;background:'+s.c+'"></div></div><span class="svc-pct">'+s.p+'%</span></div>').join('')}
+function renderFPDonut(){
+  const tot={};formasPag.forEach(f=>tot[f.id]=0);transactions.filter(x=>x.t==='receita').forEach(x=>{if(tot[x.fp]!==undefined)tot[x.fp]+=x.v});
+  const total=Object.values(tot).reduce((a,b)=>a+b,0)||1;let ang=-Math.PI/2,paths='';
+  formasPag.forEach(f=>{const pct=tot[f.id]/total,a=pct*2*Math.PI,ea=ang+a,x1=45+36*Math.cos(ang),y1=45+36*Math.sin(ang),x2=45+36*Math.cos(ea),y2=45+36*Math.sin(ea),ix1=45+20*Math.cos(ang),iy1=45+20*Math.sin(ang),ix2=45+20*Math.cos(ea),iy2=45+20*Math.sin(ea),lg=a>Math.PI?1:0;if(pct>0.01)paths+='<path d="M'+x1.toFixed(1)+','+y1.toFixed(1)+' A36,36 0 '+lg+',1 '+x2.toFixed(1)+','+y2.toFixed(1)+' L'+ix2.toFixed(1)+','+iy2.toFixed(1)+' A20,20 0 '+lg+',0 '+ix1.toFixed(1)+','+iy1.toFixed(1)+' Z" fill="'+f.color+'" stroke="#fff" stroke-width="1"/>';ang=ea;});
+  document.getElementById('fpDonut').innerHTML=paths;
+  document.getElementById('fpLegend').innerHTML=formasPag.map(f=>'<div class="fp-leg-item"><div class="fp-leg-dot" style="background:'+f.color+';border:1px solid rgba(0,0,0,.1)"></div><span style="color:var(--dark)">'+f.name+'</span><span style="color:var(--muted);margin-left:auto;padding-left:8px">'+Math.round(tot[f.id]/total*100)+'%</span></div>').join('');
+}
+function renderCCSummary(){
+  const tot={};centros.forEach(c=>tot[c.id]=0);transactions.filter(x=>x.t==='despesa').forEach(x=>{if(tot[x.cc]!==undefined)tot[x.cc]+=x.v});
+  const total=Object.values(tot).reduce((a,b)=>a+b,0)||1;
+  document.getElementById('ccSummary').innerHTML=centros.map(cc=>'<div class="cc-sum-card"><span style="background:'+cc.color+';color:'+cc.tc+';border-radius:20px;padding:2px 10px;font-size:10px;font-weight:500">'+cc.name+'</span><div class="cc-sum-val">R$'+tot[cc.id].toLocaleString('pt-BR')+'</div><div class="cc-sum-pct">'+Math.round(tot[cc.id]/total*100)+'% das despesas</div><div class="cc-sum-bar"><div class="cc-sum-fill" style="width:'+Math.round(tot[cc.id]/total*100)+'%;background:'+cc.color+'"></div></div></div>').join('');
+}
+function toggleAddForm(){const f=document.getElementById('addForm');f.classList.toggle('open');if(f.classList.contains('open')){document.getElementById('fDt').value=new Date().toISOString().split('T')[0];selCC=null;selFP=null;renderFormChips()}}
+function renderFormChips(){
+  document.getElementById('formCCChips').innerHTML=centros.map(c=>'<span class="cc-chip'+(selCC===c.id?' sel':'')+'" style="background:'+c.color+';color:'+c.tc+'" onclick="selCC=\''+c.id+'\';renderFormChips()">'+c.name+'</span>').join('');
+  document.getElementById('formFPChips').innerHTML=formasPag.map(f=>'<span class="fp-chip'+(selFP===f.id?' sel':'')+'" style="background:'+f.color+';color:'+f.tc+'" onclick="selFP=\''+f.id+'\';renderFormChips()">'+f.name+'</span>').join('');
+}
+function setTxType(t){txType=t;document.getElementById('btnI').className='type-btn'+(t==='income'?' ti':'');document.getElementById('btnE').className='type-btn'+(t==='expense'?' te':'')}
+function addTx(){
+  const desc=document.getElementById('fDesc').value.trim(),val=parseFloat(document.getElementById('fVal').value);if(!desc||!val)return;
+  const dt=document.getElementById('fDt').value,parc=document.getElementById('fParc').value;
+  const fulldt=dt?dt.split('-').reverse().join('/'):'hoje';
+  const ics={est:'🔆',loc:'🏠',dist:'💸',diz:'🙏'};
+  const novo={id:'tx'+Date.now(),t:txType==='income'?'receita':'despesa',d:desc,cc:selCC||'est',fp:selFP||'pix',v:val,dt:fulldt,ic:ics[selCC]||'📋',parc};
+  transactions.unshift(novo);
+  sbAddTx(novo); // salva no Supabase em background
+  toggleAddForm();document.getElementById('fDesc').value='';document.getElementById('fVal').value='';
+  setPeriod(curPeriod,document.querySelector('.ptab.active'));
+  renderTxList();renderCCSummary();renderFPDonut();
+}
+
+function handleDelTx(btn){
+  if(!confirm('Excluir este lançamento?')) return;
+  deleteTx(btn.getAttribute('data-txid'));
+}
+function deleteTx(id){
+  if(!confirm('Excluir este lançamento?')) return;
+  const idx=transactions.findIndex(x=>x.id===id);
+  if(idx>=0) transactions.splice(idx,1);
+  sbDeleteTx(id); // remove do Supabase em background
+  setPeriod(curPeriod,document.querySelector('.ptab.active'));
+  renderTxList();renderCCSummary();renderFPDonut();
+}
+function renderTxFilters(){
+  document.getElementById('ccFilterChips').innerHTML=centros.map(cc=>'<div class="tx-filter-chip'+(txFilter===cc.id?' active':'')+'"'+(txFilter===cc.id?' style="background:'+cc.color+';color:'+cc.tc+';border-color:'+cc.color+'"':'')+' onclick="setTxFilter(\''+cc.id+'\',this)">'+cc.name+'</div>').join('');
+  document.getElementById('fpFilterChips').innerHTML=formasPag.map(fp=>'<div class="tx-filter-chip'+(txFilter===fp.id?' active':'')+'"'+(txFilter===fp.id?' style="background:'+fp.color+';color:'+fp.tc+';border-color:'+fp.color+'"':'')+' onclick="setTxFilter(\''+fp.id+'\',this)">'+fp.name+'</div>').join('');
+}
+function setTxFilter(f,el){
+  txFilter=f;document.querySelectorAll('.tx-filter-chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('style')});
+  const cc=centros.find(x=>x.id===f),fp=formasPag.find(x=>x.id===f);
+  if(cc) el.style.cssText='background:'+cc.color+';color:'+cc.tc+';border-color:'+cc.color;
+  else if(fp) el.style.cssText='background:'+fp.color+';color:'+fp.tc+';border-color:'+fp.color;
+  el.classList.add('active');renderTxList();renderTxFilters();
+}
+function getMonthRange(p){
+  if(p==='ano') return null; // sem filtro = todos do ano
+  const pm=PERIOD_MAP[p];
+  if(!pm) return null;
+  return {m:pm.m+1,y:2026}; // m é 1-based para comparação
+}
+function renderTxList(){
+  let list=transactions;
+  // filtro por período (mês selecionado no topo)
+  const range=getMonthRange(curPeriod);
+  if(range){
+    list=list.filter(x=>{
+      const d=parseDt(x.dt);
+      return d.getMonth()+1===range.m && d.getFullYear()===range.y;
+    });
+  }
+  // filtro por tipo / CC / FP
+  if(txFilter==='income') list=list.filter(x=>x.t==='receita');
+  else if(txFilter==='expense') list=list.filter(x=>x.t==='despesa');
+  else if(txFilter!=='todos') list=list.filter(x=>x.cc===txFilter||x.fp===txFilter);
+  list=[...list].sort((a,b)=>{
+    if(a.t===b.t) return parseDt(a.dt)-parseDt(b.dt);
+    return a.t==='receita'?-1:1;
+  });
+  if(!list.length){document.getElementById('txList').innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px">Nenhum lançamento para este período</div>';return}
+  let lastType=null;
+  document.getElementById('txList').innerHTML=list.map(x=>{
+    const cc=getCC(x.cc),fp=getFP(x.fp);
+    let sep='';
+    if(x.t!==lastType){
+      lastType=x.t;
+      sep='<div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:12px 0 6px">'+(x.t==='receita'?'Receitas — por data':'Despesas — por vencimento')+'</div>';
+    }
+    const delBtn=x.id
+      ? '<button data-txid="'+x.id+'" onclick="handleDelTx(this)" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;padding:4px 7px;border-radius:4px;flex-shrink:0;align-self:center">✕</button>'
+      : '';
+    return sep+
+      '<div class="tx-item">'+
+        '<div class="tx-icon '+(x.t==='receita'?'ico-i':'ico-e')+'">'+x.ic+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div class="tx-name">'+x.d+'</div>'+
+          '<div class="tx-sub">'+
+            '<span class="mini-badge" style="background:'+cc.color+';color:'+cc.tc+'">'+cc.name+'</span>'+
+            '<span class="mini-badge" style="background:'+fp.color+';color:'+fp.tc+'">'+fp.name+'</span>'+
+            (x.parc&&x.parc!=='À vista'?'<span class="mini-badge" style="background:var(--gold-light);color:#8a6520">'+x.parc+'</span>':'')+
+          '</div>'+
+        '</div>'+
+        '<div style="text-align:right;flex-shrink:0">'+
+          '<div class="'+(x.t==='receita'?'tv-i':'tv-e')+'">'+(x.t==='receita'?'+':'-')+'R$'+x.v.toLocaleString('pt-BR')+'</div>'+
+          '<div class="tx-date">'+x.dt+'</div>'+
+        '</div>'+
+        delBtn+
+      '</div>';
+  }).join('');
+}
+function renderCCDetail(){
+  const tot={};centros.forEach(c=>tot[c.id]={i:0,e:0,count:0});transactions.forEach(x=>{if(tot[x.cc]){if(x.t==='receita')tot[x.cc].i+=x.v;else tot[x.cc].e+=x.v;tot[x.cc].count++}});
+  document.getElementById('ccDetail').innerHTML=centros.map(cc=>{const t=tot[cc.id]||{i:0,e:0,count:0},saldo=t.i-t.e;return '<div class="cc-stat-card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><span style="background:'+cc.color+';color:'+cc.tc+';border-radius:20px;padding:3px 13px;font-size:11px;font-weight:500">'+cc.name+'</span><span style="font-size:10px;color:var(--muted);margin-left:auto">'+t.count+' lancamentos</span></div><div class="cc-stat-inner"><div class="cc-mini"><div class="cc-mini-val" style="color:#2e7d4f">R$'+t.i.toLocaleString('pt-BR')+'</div><div class="cc-mini-lbl">Receitas</div></div><div class="cc-mini"><div class="cc-mini-val" style="color:#b85050">R$'+t.e.toLocaleString('pt-BR')+'</div><div class="cc-mini-lbl">Despesas</div></div><div class="cc-mini"><div class="cc-mini-val" style="color:'+(saldo>=0?'#2e7d4f':'#b85050')+'">R$'+Math.abs(saldo).toLocaleString('pt-BR')+'</div><div class="cc-mini-lbl">Saldo</div></div></div>'+transactions.filter(x=>x.cc===cc.id).slice(0,3).map(x=>'<div class="cc-hist-item"><span style="color:var(--dark)">'+x.d+'</span><span style="color:'+(x.t==='income'?'#2e7d4f':'#b85050')+';font-weight:500">'+(x.t==='receita'?'+':'-')+'R$'+x.v+'</span></div>').join('')+'</div>';}).join('');
+}
+function renderCCManage(){document.getElementById('ccManageList').innerHTML=centros.map(cc=>'<div class="manage-item"><div class="manage-dot" style="background:'+cc.color+'"></div><div class="manage-name">'+cc.name+'</div><button class="manage-del" onclick="deleteCC(\''+cc.id+'\')">✕</button></div>').join('')}
+function toggleManageCC(){const f=document.getElementById('addCCForm');f.style.display=f.style.display==='none'?'flex':'none'}
+function addCC(){
+  const name=document.getElementById('newCCName').value.trim(),color=document.getElementById('newCCColor').value;if(!name)return;
+  const lum=parseInt(color.slice(1,3),16)*.299+parseInt(color.slice(3,5),16)*.587+parseInt(color.slice(5,7),16)*.114;
+  centros.push({id:'cc'+Date.now(),name,color,tc:lum>150?'#2d2020':'#fff'});document.getElementById('newCCName').value='';
+  sbSaveCentros();renderCCDetail();renderCCManage();renderFormChips();renderCCSummary();
+}
+function deleteCC(id){centros=centros.filter(c=>c.id!==id);sbSaveCentros();renderCCDetail();renderCCManage();renderFormChips();renderCCSummary()}
+function renderFPDetail(){
+  const tot={};formasPag.forEach(f=>tot[f.id]={i:0,e:0,count:0});transactions.forEach(x=>{if(tot[x.fp]){if(x.t==='receita')tot[x.fp].i+=x.v;else tot[x.fp].e+=x.v;tot[x.fp].count++}});
+  const ti=transactions.filter(x=>x.t==='receita').reduce((a,x)=>a+x.v,0)||1;
+  document.getElementById('fpDetail').innerHTML=formasPag.map(fp=>{const t=tot[fp.id]||{i:0,e:0,count:0},pct=Math.round(t.i/ti*100);return '<div class="fp-stat-card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><span style="background:'+fp.color+';color:'+fp.tc+';border-radius:20px;padding:3px 13px;font-size:11px;font-weight:500">'+fp.name+'</span><span style="font-size:10px;color:var(--muted);margin-left:auto">'+t.count+' lancamentos</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;text-align:center"><div class="cc-mini"><div class="cc-mini-val" style="color:#2e7d4f">R$'+t.i.toLocaleString('pt-BR')+'</div><div class="cc-mini-lbl">Receitas</div></div><div class="cc-mini"><div class="cc-mini-val" style="color:#b85050">R$'+t.e.toLocaleString('pt-BR')+'</div><div class="cc-mini-lbl">Despesas</div></div></div><div style="margin-top:9px;font-size:10px;color:var(--muted);margin-bottom:4px">'+pct+'% das receitas</div><div style="background:#f0e8e8;border-radius:20px;height:5px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+fp.color+';border-radius:20px"></div></div></div>';}).join('');
+}
+function renderFPManage(){document.getElementById('fpManageList').innerHTML=formasPag.map(fp=>'<div class="manage-item"><div class="manage-dot" style="background:'+fp.color+'"></div><div class="manage-name">'+fp.name+'</div><button class="manage-del" onclick="deleteFP(\''+fp.id+'\')">✕</button></div>').join('')}
+function toggleManageFP(){const f=document.getElementById('addFPForm');f.style.display=f.style.display==='none'?'flex':'none'}
+function addFP(){
+  const name=document.getElementById('newFPName').value.trim(),color=document.getElementById('newFPColor').value;if(!name)return;
+  const lum=parseInt(color.slice(1,3),16)*.299+parseInt(color.slice(3,5),16)*.587+parseInt(color.slice(5,7),16)*.114;
+  formasPag.push({id:'fp'+Date.now(),name,color,tc:lum>150?'#2d2020':'#fff'});document.getElementById('newFPName').value='';
+  sbSaveFormas();renderFPDetail();renderFPManage();renderFormChips();renderFPDonut();
+}
+function deleteFP(id){formasPag=formasPag.filter(f=>f.id!==id);sbSaveFormas();renderFPDetail();renderFPManage();renderFormChips();renderFPDonut()}
+
+// ── CONFIGURAÇÕES ──
+function loadConfigForm(){
+  document.getElementById('cfgN8nUrl').value = N8N_WEBHOOK_URL || '';
+}
+
+function saveConfig(){
+  const n8nUrl = document.getElementById('cfgN8nUrl').value.trim();
+  N8N_WEBHOOK_URL = n8nUrl;
+  save('n8n_webhook_url', n8nUrl);
+  alert('Configurações salvas!');
+}
+
+function testWebhook(){
+  const url = document.getElementById('cfgN8nUrl').value.trim();
+  if(!url){ alert('Preencha a URL do webhook primeiro.'); return; }
+
+  fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      event: 'test',
+      message: 'Teste de conexão do sistema Morgana',
+      timestamp: new Date().toISOString()
+    })
+  })
+  .then(() => alert('Webhook testado com sucesso! Verifique seu n8n.'))
+  .catch(err => alert('Erro ao testar webhook: ' + err.message));
+}
+
+// ── INIT ──
+renderCal();renderTimeline();renderUpcoming();updateConfStats();
+// Carrega dados da nuvem em background
+finLoad().then(async ()=>{
+  // Primeira execução: faz upload em massa de clientes e transações para o Supabase
+  const SEEDED_KEY='mp_supabase_seeded_v2';
+  if(!localStorage.getItem(SEEDED_KEY)){
+    const sb=getSB();
+    if(sb){
+      const syncEl=document.getElementById('syncStatus');
+      if(syncEl){syncEl.textContent='⟳ Enviando dados para nuvem...';syncEl.style.opacity='1';}
+      try {
+        // Upload clientes em lotes de 50
+        const batchSize=50;
+        for(let i=0;i<clients.length;i+=batchSize){
+          const batch=clients.slice(i,i+batchSize).map(c=>({
+            id:c.id,name:c.name,phone:c.phone,bday:c.bday,since:c.since,
+            stage:c.stage,visits:c.visits,spent:c.spent,last:c.last,
+            procs:c.procs,obs:c.obs,procedimentos:c.procedimentos||[],av:c.av
+          }));
+          await sb.from('clientes').upsert(batch,{onConflict:'id',ignoreDuplicates:true});
+        }
+        // Upload transações em lotes de 50
+        for(let i=0;i<transactions.length;i+=batchSize){
+          const batch=transactions.slice(i,i+batchSize).map(t=>({
+            id:t.id||Date.now()+i,tipo:t.t,descricao:t.d,centro_custo:t.cc,
+            forma_pagto:t.fp,valor:t.v,data_br:t.dt,icone:t.ic,parcelas:t.parc
+          }));
+          await sb.from('transacoes').upsert(batch,{onConflict:'id',ignoreDuplicates:true});
+        }
+        localStorage.setItem(SEEDED_KEY,'1');
+        if(syncEl){syncEl.textContent='✓ Dados enviados para nuvem';setTimeout(()=>{if(syncEl)syncEl.style.opacity='0';},3000);}
+      } catch(e){
+        console.warn('Seed error:',e.message);
+        if(syncEl){syncEl.textContent='⚠ Erro ao enviar dados';setTimeout(()=>{if(syncEl)syncEl.style.opacity='0';},4000);}
+      }
+    }
+  }
+});
+document.addEventListener('click',e=>{
+  const drop=document.getElementById('apptClientDrop');
+  if(drop&&!drop.contains(e.target)&&e.target.id!=='mName') drop.style.display='none';
+});
+
+// Polling: atualiza agenda e CRM a cada 30s para pegar mudanças de outros dispositivos
+setInterval(async ()=>{
+  const sb=getSB();if(!sb)return;
+  // Recarrega agendamentos
+  const ok=await sbLoadAppts();
+  if(ok&&curPage==='agenda'){renderTimeline();renderUpcoming();renderCal();}
+  // Recarrega clientes
+  const ck=await sbLoadClientes();
+  if(ck&&curPage==='crm'){filterCRM();if(crmView==='kanban')renderKanban();}
+}, 30000);
+</script>
+</body>
+</html>
