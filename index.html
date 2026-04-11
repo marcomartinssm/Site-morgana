@@ -295,10 +295,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--cream);col
     <div class="nav-item" onclick="goTo('crm',this)" title="Clientes">
       <div class="nav-icon">👥</div><div class="nav-label">CRM</div>
     </div>
-    <div class="nav-item" onclick="goTo('conf',this)" title="Confirmações">
-      <div class="nav-icon">💬</div><div class="nav-label">Confirm.</div>
-      <div class="nav-badge" id="confBadge">3</div>
-    </div>
+
     <div class="nav-sep"></div>
     <div class="nav-item" onclick="goTo('fin',this)" title="Financeiro">
       <div class="nav-icon">💰</div><div class="nav-label">Financ.</div>
@@ -381,149 +378,6 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--cream);col
         </div>
         <div id="crmKanbanView" style="display:none">
           <div class="kanban-board" id="kanbanBoard"></div>
-        </div>
-      </div>
-
-      <!-- CONFIRMAÇÕES -->
-      <div class="page" id="page-conf">
-        <div id="confWebhookStatus" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);color:var(--muted);border-radius:6px;padding:5px 13px;font-size:11px;margin-bottom:11px;border:0.5px solid var(--border)"><span id="confWebhookDot" style="width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0"></span><span id="confWebhookLabel">Webhook não configurado — vá em Config para configurar</span></div>
-        <div class="conf-strip">
-          <div class="cs-card"><div class="cs-val" style="color:var(--rose-deep)" id="csTot">8</div><div class="cs-label">hoje</div></div>
-          <div class="cs-card"><div class="cs-val" style="color:#8a6520" id="csPend">3</div><div class="cs-label">pendentes</div></div>
-          <div class="cs-card"><div class="cs-val" style="color:var(--wpp)" id="csSent">3</div><div class="cs-label">enviadas</div></div>
-          <div class="cs-card"><div class="cs-val" style="color:#2e7d4f" id="csConf">2</div><div class="cs-label">confirmadas</div></div>
-        </div>
-        <div class="conf-layout">
-          <div id="confList"></div>
-          <div id="wppPanel"><div class="no-sel" style="min-height:280px"><div style="font-size:28px;opacity:.25;margin-bottom:9px">💬</div><div style="font-size:12px">Selecione uma cliente<br>para ver a conversa</div></div></div>
-        </div>
-      </div>
-
-      <!-- FINANCEIRO -->
-      <div class="page" id="page-fin">
-        <div class="ptabs">
-          <div class="ptab" onclick="setPeriod('jan',this)">Jan</div>
-          <div class="ptab" onclick="setPeriod('fev',this)">Fev</div>
-          <div class="ptab active" onclick="setPeriod('mar',this)">Mar</div>
-          <div class="ptab" onclick="setPeriod('abr',this)">Abr</div>
-          <div class="ptab" onclick="setPeriod('mai',this)">Mai</div>
-          <div class="ptab" onclick="setPeriod('jun',this)">Jun</div>
-          <div class="ptab" onclick="setPeriod('jul',this)">Jul</div>
-          <div class="ptab" onclick="setPeriod('ago',this)">Ago</div>
-          <div class="ptab" onclick="setPeriod('set',this)">Set</div>
-          <div class="ptab" onclick="setPeriod('out',this)">Out</div>
-          <div class="ptab" onclick="setPeriod('nov',this)">Nov</div>
-          <div class="ptab" onclick="setPeriod('dez',this)">Dez</div>
-          <div class="ptab" onclick="setPeriod('ano',this)" style="font-weight:500">2026</div>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi kpi-i"><div class="kpi-label">Receita total</div><div class="kpi-val" id="kI">R$12.840</div><div class="kpi-delta" id="kId">▲ 18% vs fev</div></div>
-          <div class="kpi kpi-e"><div class="kpi-label">Despesas</div><div class="kpi-val" id="kE">R$3.210</div><div class="kpi-delta dn" id="kEd">▲ 5% vs fev</div></div>
-          <div class="kpi kpi-p"><div class="kpi-label">Lucro líquido</div><div class="kpi-val" id="kP">R$9.630</div><div class="kpi-delta" id="kPd">▲ 23% vs fev</div></div>
-          <div class="kpi kpi-t"><div class="kpi-label">Saldo em caixa</div><div class="kpi-val" id="kT">R$107</div><div class="kpi-delta" id="kTd">▲ 8% vs fev</div></div>
-        </div>
-
-        <div class="add-form" id="addForm">
-          <div style="font-family:'Inter',sans-serif;font-size:15px;font-weight:400;color:var(--dark);margin-bottom:11px">Novo lançamento</div>
-          <div class="type-toggle">
-            <button class="type-btn ti" id="btnI" onclick="setTxType('income')">+ Receita</button>
-            <button class="type-btn" id="btnE" onclick="setTxType('expense')">− Despesa</button>
-          </div>
-          <div class="fg4">
-            <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" id="fDesc" placeholder="Ex: Manicure Juliana"/></div>
-            <div class="form-group"><label class="form-label">Valor R$</label><input class="form-input" type="number" id="fVal" placeholder="0"/></div>
-            <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="fDt"/></div>
-            <div class="form-group"><label class="form-label">Parcelas</label><select class="form-select" id="fParc"><option>À vista</option><option>2x</option><option>3x</option><option>6x</option><option>12x</option></select></div>
-          </div>
-          <div class="form-grid2" style="margin-bottom:11px">
-            <div class="form-group"><label class="form-label">Centro de custo</label><div class="cc-chips" id="formCCChips"></div></div>
-            <div class="form-group"><label class="form-label">Forma de pagamento</label><div class="fp-chips" id="formFPChips"></div></div>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn-ghost" style="font-size:12px;padding:7px 17px" onclick="toggleAddForm()">Cancelar</button>
-            <button class="btn-primary" style="font-size:12px;padding:7px 22px" onclick="addTx()">Salvar lançamento</button>
-          </div>
-        </div>
-
-        <div class="stabs">
-          <div class="stab active" onclick="setFinSection('visao',this)">Visão geral</div>
-          <div class="stab" onclick="setFinSection('lancamentos',this)">Lançamentos</div>
-          <div class="stab" onclick="setFinSection('centros',this)">Centros de custo</div>
-          <div class="stab" onclick="setFinSection('pagamentos',this)">Formas de pagamento</div>
-        </div>
-
-        <div class="fin-section active" id="fsec-visao">
-          <div class="fin-grid">
-            <div class="card">
-              <div class="card-title">Receitas & Despesas — por semana</div>
-              <div class="bar-chart" id="barChart"></div>
-              <div class="legend-row">
-                <span><span class="ldot" style="background:var(--rose)"></span>Receitas</span>
-                <span><span class="ldot" style="background:#f0b8b8"></span>Despesas</span>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title">Por serviço</div>
-              <div id="svcList"></div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px">
-            <div class="card">
-              <div class="card-title">Forma de pagamento</div>
-              <div class="fp-donut-row">
-                <svg width="90" height="90" viewBox="0 0 90 90" id="fpDonut"></svg>
-                <div class="fp-legend" id="fpLegend"></div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title">Despesas por centro de custo</div>
-              <div class="cc-summary-grid" id="ccSummary"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="fin-section" id="fsec-lancamentos">
-          <div class="tx-filters" id="txFilters">
-            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Filtrar:</span>
-            <div class="tx-filter-chip active" onclick="setTxFilter('todos',this)">Todos</div>
-            <div class="tx-filter-chip" onclick="setTxFilter('income',this)">Receitas</div>
-            <div class="tx-filter-chip" onclick="setTxFilter('expense',this)">Despesas</div>
-            <div id="ccFilterChips" style="display:contents"></div>
-            <div id="fpFilterChips" style="display:contents"></div>
-          </div>
-          <div id="txList"></div>
-        </div>
-
-        <div class="fin-section" id="fsec-centros">
-          <div class="cc-cards" id="ccDetail"></div>
-          <div class="manage-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
-              <div style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;color:var(--dark)">Gerenciar centros de custo</div>
-              <button class="btn-primary" style="font-size:11px;padding:5px 14px" onclick="toggleManageCC()">+ Novo</button>
-            </div>
-            <div id="ccManageList"></div>
-            <div class="add-inline" id="addCCForm" style="display:none">
-              <input type="text" id="newCCName" placeholder="Nome do centro de custo"/>
-              <input type="color" id="newCCColor" class="color-pick" value="#f4a5a5"/>
-              <button class="btn-primary" style="font-size:12px;padding:6px 15px" onclick="addCC()">Adicionar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="fin-section" id="fsec-pagamentos">
-          <div class="fp-cards" id="fpDetail"></div>
-          <div class="manage-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
-              <div style="font-family:'Inter',sans-serif;font-size:14px;font-weight:400;color:var(--dark)">Gerenciar formas de pagamento</div>
-              <button class="btn-primary" style="font-size:11px;padding:5px 14px" onclick="toggleManageFP()">+ Nova</button>
-            </div>
-            <div id="fpManageList"></div>
-            <div class="add-inline" id="addFPForm" style="display:none">
-              <input type="text" id="newFPName" placeholder="Nome da forma de pagamento"/>
-              <input type="color" id="newFPColor" class="color-pick" value="#b8e0c0"/>
-              <button class="btn-primary" style="font-size:12px;padding:6px 15px" onclick="addFP()">Adicionar</button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1333,8 +1187,8 @@ function getIn(n){return n.split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCa
 function getCC(id){return centros.find(c=>c.id===id)||{name:'—',color:'#eee',tc:'#666'}}
 function getFP(id){return formasPag.find(f=>f.id===id)||{name:'—',color:'#eee',tc:'#666'}}
 
-const titles={agenda:'Agenda — <em>Hoje</em>',crm:'CRM — <em>Clientes</em>',conf:'Confirmações',fin:'Financeiro',config:'Configurações'};
-const topBtns={agenda:'+ Novo agendamento',crm:'+ Novo lead',conf:'Enviar para todas',fin:'+ Lançamento',config:''};
+const titles={agenda:'Agenda — <em>Hoje</em>',crm:'CRM — <em>Clientes</em>',fin:'Financeiro',config:'Configurações'};
+const topBtns={agenda:'+ Novo agendamento',crm:'+ Novo lead',fin:'+ Lançamento',config:''};
 
 function goTo(page,el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');
@@ -1378,7 +1232,7 @@ function topAction(){
     setTimeout(()=>document.getElementById('mName').focus(),100);
   }
   else if(curPage==='crm') document.getElementById('clientModal').classList.add('open');
-  else if(curPage==='conf'){ syncConfAppts(); renderConfList(); updateConfStats(); }
+  
   else if(curPage==='fin') toggleAddForm();
 }
 function topAction2(){if(curPage==='fin') setFinSection('centros',document.querySelectorAll('.stab')[2])}
@@ -1460,6 +1314,7 @@ function renderTimeline(){
               <span class="badge ${bm[a.status]||'badge-pending'}">${bl[a.status]||a.status}</span>
               ${!isCancelled?`<button onclick="editAppt('${a.id}')" title="Editar" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;padding:2px 4px;border-radius:4px" onmouseover="this.style.color='var(--rose-deep)'" onmouseout="this.style.color='var(--muted)'">✎</button>
               <button onclick="confirmAppt('${a.id}')" title="Confirmar" style="background:none;border:none;cursor:pointer;color:#2e7d4f;font-size:13px;padding:2px 4px;border-radius:4px" onmouseover="this.style.background='#eaf5ee'" onmouseout="this.style.background=''">✓</button>
+              <button onclick="sendWppFromAgenda('${a.id}','${agendaSelDate}')" title="Enviar confirmação WhatsApp" style="background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;color:#25d366" onmouseover="this.style.background='#eaf5ee'" onmouseout="this.style.background=''">📲</button>
               <button onclick="cancelAppt('${a.id}')" title="Cancelar" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;padding:2px 4px;border-radius:4px" onmouseover="this.style.color='#b85050'" onmouseout="this.style.color='var(--muted)'">✕</button>`:''}
             </div>
           </div>
@@ -1872,12 +1727,7 @@ function saveClient(){
 }
 
 let selConfId=null;
-function updateConfStats(){
-  syncConfAppts(); // sincroniza com Agenda antes de atualizar stats
-  const pend=confAppts.filter(a=>a.status==='pending').length;
-  document.getElementById('csPend').textContent=pend;document.getElementById('csSent').textContent=confAppts.filter(a=>a.status==='sent').length;document.getElementById('csConf').textContent=confAppts.filter(a=>a.status==='confirmed').length;
-  const b=document.getElementById('confBadge');b.textContent=pend;b.style.display=pend>0?'flex':'none';
-}
+function updateConfStats(){ /* aba removida */ }
 function syncConfBack(){
   // Sincroniza status/mensagens de volta para Agenda
   confAppts.forEach(c => {
@@ -1911,6 +1761,59 @@ function selConf(id){
     '<div class="wpp-tmpls"><div class="tmpl-label">mensagens rapidas</div>'+tmpls.map((t,i)=>'<button class="tmpl-chip" onclick="document.getElementById(\'wppTa\').value=\''+t.replace(/'/g,"\\'")+'\'">'+t.substring(0,60)+'...</button>').join('')+'</div>'+
     '<div class="wpp-input-bar"><textarea class="wpp-ta" id="wppTa" placeholder="Digite uma mensagem..." rows="1"></textarea><button class="wpp-send" onclick="sendMsgConf('+a.id+')">➤</button></div></div>';
 }
+// Envio de confirmação direto da agenda
+function sendWppFromAgenda(apptId, dateKey){
+  if(!N8N_WEBHOOK_URL){
+    alert('Webhook não configurado.\nVá em ⚙ Config → cole a URL do webhook → Salvar.');
+    return;
+  }
+  const arr = getApptDay(dateKey);
+  const a = arr.find(x=>String(x.id)===String(apptId));
+  if(!a){ alert('Agendamento não encontrado.'); return; }
+  // Busca telefone do cliente vinculado
+  const client = a.clientId ? clients.find(x=>String(x.id)===String(a.clientId)) : null;
+  const phone = client ? client.phone : (a.phone||'');
+  if(!phone||phone==='—'){
+    alert('Cliente sem telefone cadastrado.\nAdicione o telefone na ficha do CRM.');
+    return;
+  }
+  const dateBR = fmtDateBR(dateKey);
+  const hoje = fmtDateKey(new Date());
+  const dateLabel = dateKey === hoje ? 'hoje' : dateBR;
+  const msg = 'Olá ' + a.name.split(' ')[0] + '! 😊 Confirmando seu agendamento de *' + a.svc + '* ' + dateLabel + ' às *' + a.time + '*. Confirma sua presença?';
+  fetch(N8N_WEBHOOK_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      event:'whatsapp_confirmation',
+      apptId: a.id,
+      clientName: a.name,
+      phone,
+      service: a.svc,
+      date: dateBR,
+      time: a.time,
+      message: msg,
+      timestamp: new Date().toISOString()
+    })
+  })
+  .then(r=>{
+    if(r.ok){
+      // Marca como enviado e atualiza na nuvem
+      a.confirmationSent = true;
+      if(a.status==='pending') a.status='sent';
+      setApptDay(dateKey, arr);
+      sbUpsertAppt(dateKey, a);
+      renderTimeline();
+      // Feedback visual rápido
+      const btn = document.querySelector(`button[onclick*="sendWppFromAgenda('${apptId}'"]`);
+      if(btn){ btn.textContent='✅'; btn.style.color='#2e7d4f'; setTimeout(()=>{btn.textContent='📲';btn.style.color='#25d366';},2000); }
+    } else {
+      alert('Erro ao enviar. Verifique se o webhook está ativo no n8n.');
+    }
+  })
+  .catch(()=>alert('Erro de conexão. Verifique a URL do webhook nas configurações.'));
+}
+
 // URL do webhook do n8n (configurável pela tela de Configurações)
 let N8N_WEBHOOK_URL = load('n8n_webhook_url', '');
 
