@@ -492,6 +492,134 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--cream);col
         </div>
       </div>
 
+      <!-- FINANCEIRO -->
+      <div class="page" id="page-fin">
+        <div class="ptabs">
+          <div class="ptab" onclick="setPeriod('jan',this)">Jan</div>
+          <div class="ptab" onclick="setPeriod('fev',this)">Fev</div>
+          <div class="ptab active" onclick="setPeriod('mar',this)">Mar</div>
+          <div class="ptab" onclick="setPeriod('abr',this)">Abr</div>
+          <div class="ptab" onclick="setPeriod('mai',this)">Mai</div>
+          <div class="ptab" onclick="setPeriod('jun',this)">Jun</div>
+          <div class="ptab" onclick="setPeriod('jul',this)">Jul</div>
+          <div class="ptab" onclick="setPeriod('ago',this)">Ago</div>
+          <div class="ptab" onclick="setPeriod('set',this)">Set</div>
+          <div class="ptab" onclick="setPeriod('out',this)">Out</div>
+          <div class="ptab" onclick="setPeriod('nov',this)">Nov</div>
+          <div class="ptab" onclick="setPeriod('dez',this)">Dez</div>
+          <div class="ptab" onclick="setPeriod('ano',this)" style="font-weight:500">2026</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi kpi-i"><div class="kpi-label">Receita total</div><div class="kpi-val" id="kI">—</div><div class="kpi-delta" id="kId">—</div></div>
+          <div class="kpi kpi-e"><div class="kpi-label">Despesas</div><div class="kpi-val" id="kE">—</div><div class="kpi-delta dn" id="kEd">—</div></div>
+          <div class="kpi kpi-p"><div class="kpi-label">Lucro líquido</div><div class="kpi-val" id="kP">—</div><div class="kpi-delta" id="kPd">—</div></div>
+          <div class="kpi kpi-t"><div class="kpi-label">Saldo em caixa</div><div class="kpi-val" id="kT">—</div><div class="kpi-delta" id="kTd">—</div></div>
+        </div>
+
+        <div class="add-form" id="addForm">
+          <div style="font-size:15px;font-weight:400;color:var(--dark);margin-bottom:11px">Novo lançamento</div>
+          <div class="type-toggle">
+            <button class="type-btn ti" id="btnI" onclick="setTxType('income')">+ Receita</button>
+            <button class="type-btn" id="btnE" onclick="setTxType('expense')">− Despesa</button>
+          </div>
+          <div class="fg4">
+            <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" id="fDesc" placeholder="Ex: Sessão laser"/></div>
+            <div class="form-group"><label class="form-label">Valor R$</label><input class="form-input" type="number" id="fVal" placeholder="0"/></div>
+            <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="fDt"/></div>
+            <div class="form-group"><label class="form-label">Parcelas</label><select class="form-select" id="fParc"><option>À vista</option><option>2x</option><option>3x</option><option>6x</option><option>12x</option></select></div>
+          </div>
+          <div class="form-grid2" style="margin-bottom:11px">
+            <div class="form-group"><label class="form-label">Centro de custo</label><div class="cc-chips" id="formCCChips"></div></div>
+            <div class="form-group"><label class="form-label">Forma de pagamento</label><div class="fp-chips" id="formFPChips"></div></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-ghost" style="font-size:12px;padding:7px 17px" onclick="toggleAddForm()">Cancelar</button>
+            <button class="btn-primary" style="font-size:12px;padding:7px 22px" onclick="addTx()">Salvar lançamento</button>
+          </div>
+        </div>
+
+        <div class="stabs">
+          <div class="stab active" onclick="setFinSection('visao',this)">Visão geral</div>
+          <div class="stab" onclick="setFinSection('lancamentos',this)">Lançamentos</div>
+          <div class="stab" onclick="setFinSection('centros',this)">Centros de custo</div>
+          <div class="stab" onclick="setFinSection('pagamentos',this)">Formas de pagamento</div>
+        </div>
+
+        <div class="fin-section active" id="fsec-visao">
+          <div class="fin-grid">
+            <div class="card">
+              <div class="card-title">Receitas & Despesas — por semana</div>
+              <div class="bar-chart" id="barChart"></div>
+              <div class="legend-row">
+                <span><span class="ldot" style="background:var(--rose)"></span>Receitas</span>
+                <span><span class="ldot" style="background:#c9bbd4"></span>Despesas</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Por serviço</div>
+              <div id="svcList"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px">
+            <div class="card">
+              <div class="card-title">Forma de pagamento</div>
+              <div class="fp-donut-row">
+                <svg width="90" height="90" viewBox="0 0 90 90" id="fpDonut"></svg>
+                <div class="fp-legend" id="fpLegend"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Despesas por centro de custo</div>
+              <div class="cc-summary-grid" id="ccSummary"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fin-section" id="fsec-lancamentos">
+          <div class="tx-filters" id="txFilters">
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Filtrar:</span>
+            <div class="tx-filter-chip active" onclick="setTxFilter('todos',this)">Todos</div>
+            <div class="tx-filter-chip" onclick="setTxFilter('income',this)">Receitas</div>
+            <div class="tx-filter-chip" onclick="setTxFilter('expense',this)">Despesas</div>
+            <div id="ccFilterChips" style="display:contents"></div>
+            <div id="fpFilterChips" style="display:contents"></div>
+          </div>
+          <div id="txList"></div>
+        </div>
+
+        <div class="fin-section" id="fsec-centros">
+          <div class="cc-cards" id="ccDetail"></div>
+          <div class="manage-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+              <div style="font-size:14px;color:var(--dark)">Gerenciar centros de custo</div>
+              <button class="btn-primary" style="font-size:11px;padding:5px 14px" onclick="toggleManageCC()">+ Novo</button>
+            </div>
+            <div id="ccManageList"></div>
+            <div class="add-inline" id="addCCForm" style="display:none">
+              <input type="text" id="newCCName" placeholder="Nome do centro de custo"/>
+              <input type="color" id="newCCColor" class="color-pick" value="#f4a5a5"/>
+              <button class="btn-primary" style="font-size:12px;padding:6px 15px" onclick="addCC()">Adicionar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fin-section" id="fsec-pagamentos">
+          <div class="fp-cards" id="fpDetail"></div>
+          <div class="manage-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+              <div style="font-size:14px;color:var(--dark)">Gerenciar formas de pagamento</div>
+              <button class="btn-primary" style="font-size:11px;padding:5px 14px" onclick="toggleManageFP()">+ Nova</button>
+            </div>
+            <div id="fpManageList"></div>
+            <div class="add-inline" id="addFPForm" style="display:none">
+              <input type="text" id="newFPName" placeholder="Nome da forma de pagamento"/>
+              <input type="color" id="newFPColor" class="color-pick" value="#b8e0c0"/>
+              <button class="btn-primary" style="font-size:12px;padding:6px 15px" onclick="addFP()">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- CONFIGURAÇÕES -->
       <div class="page" id="page-config">
         <div class="card" style="max-width:700px">
@@ -1302,28 +1430,20 @@ const titles={agenda:'Agenda — <em>Hoje</em>',crm:'CRM — <em>Clientes</em>',
 const topBtns={agenda:'+ Novo agendamento',crm:'+ Novo lead',fin:'+ Lançamento',config:''};
 
 function goTo(page,el){
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('pageTitle').innerHTML=titles[page];document.getElementById('topBtn').textContent=topBtns[page];
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pageEl=document.getElementById('page-'+page);
+  if(pageEl) pageEl.classList.add('active');
+  document.getElementById('pageTitle').innerHTML=titles[page]||page;
+  document.getElementById('topBtn').textContent=topBtns[page]||'';
   document.getElementById('topBtn2').style.display=page==='fin'?'inline-block':'none';
   curPage=page;
   if(page==='agenda'){renderCal();renderTimeline();renderUpcoming()}
   if(page==='crm'){filterCRM();if(crmView==='kanban')renderKanban()}
-  if(page==='conf'){
-    // Atualiza indicador de webhook
-    updateWebhookStatusBadge();
-    // Recarrega agendamentos do Supabase para garantir dados atualizados
-    sbLoadAppts().then(()=>{
-      syncConfAppts();renderConfList();updateConfStats();
-    }).catch(()=>{
-      syncConfAppts();renderConfList();updateConfStats();
-    });
-  }
   if(page==='fin'){
-    // Renderiza imediatamente com dados já em memória
     setPeriod(curPeriod, document.querySelector('.ptab.active'));
     renderSvcs();renderFPDonut();renderCCSummary();renderTxFilters();renderTxList();
-    // Se cloud ainda não carregou, tenta agora sem bloquear
     if(!_finStorageReady){
       finLoad().then(()=>{
         setPeriod(curPeriod, document.querySelector('.ptab.active'));
@@ -2328,6 +2448,24 @@ function testWebhook(){
 
 // ── INIT ──
 renderCal();renderTimeline();renderUpcoming();updateConfStats();
+
+// Força layout mobile via JS (fallback para Safari iOS)
+function applyMobileLayout(){
+  if(window.innerWidth>768) return;
+  const shell=document.querySelector('.shell');
+  const sidenav=document.querySelector('.sidenav');
+  const main=document.querySelector('.main');
+  if(!shell||!sidenav||!main) return;
+  shell.style.cssText='display:flex;flex-direction:column;height:100%;position:fixed;width:100%;top:0;left:0';
+  sidenav.style.cssText='order:2;width:100%;height:56px;flex-direction:row;padding:0;gap:0;flex-shrink:0;border-top:0.5px solid rgba(255,255,255,.2);display:flex;align-items:center';
+  main.style.cssText='order:1;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0';
+  document.querySelectorAll('.nav-logo,.nav-sep').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.nav-item').forEach(e=>{
+    e.style.cssText='flex:1;height:100%;border-radius:0;gap:2px;padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer';
+  });
+}
+applyMobileLayout();
+window.addEventListener('resize', applyMobileLayout);
 // Carrega dados da nuvem em background
 finLoad().then(async ()=>{
   // Primeira execução: faz upload em massa de clientes e transações para o Supabase
