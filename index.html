@@ -964,10 +964,20 @@ async function sbDeleteAppt(id){
 async function sbLoadAppts(){
   try {
     const sb=getSB();if(!sb)return false;
-    const {data,error}=await sb.from('agendamentos').select('*');
-    if(error||!data) return false;
+    // Supabase retorna max 1000 por query — busca em páginas
+    let allData=[], page=0, pageSize=1000;
+    while(true){
+      const {data,error}=await sb.from('agendamentos')
+        .select('*')
+        .range(page*pageSize, (page+1)*pageSize-1);
+      if(error) throw error;
+      if(!data||data.length===0) break;
+      allData=allData.concat(data);
+      if(data.length<pageSize) break;
+      page++;
+    }
     apptsByDate={};
-    data.forEach(r=>{
+    allData.forEach(r=>{
       if(!apptsByDate[r.date_key]) apptsByDate[r.date_key]=[];
       apptsByDate[r.date_key].push({
         id:r.id,time:r.time,name:r.name,svc:r.svc,
@@ -976,7 +986,6 @@ async function sbLoadAppts(){
         valor:parseFloat(r.valor)||0,fpag:r.fpag||'pix'
       });
     });
-    // Ordena cada dia por horário
     Object.keys(apptsByDate).forEach(k=>{
       apptsByDate[k].sort((a,b)=>a.time.localeCompare(b.time));
     });
