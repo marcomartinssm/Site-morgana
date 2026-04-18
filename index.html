@@ -837,6 +837,15 @@ async function finLoad(){
       formasPag = fpData.map(r=>({id:r.id,name:r.nome,color:r.cor,tc:r.cor_texto}));
     }
 
+    // Carrega webhook do Supabase (sincroniza entre dispositivos)
+    try {
+      const {data:cfgData}=await sb.from('configuracoes').select('valor').eq('chave','n8n_webhook_url').single();
+      if(cfgData&&cfgData.valor){
+        N8N_WEBHOOK_URL=cfgData.valor;
+        save('n8n_webhook_url',cfgData.valor);
+      }
+    } catch(e){ /* tabela pode não existir ainda */ }
+
     // Carrega clientes do Supabase
     const cliLoaded = await sbLoadClientes();
     if(cliLoaded){
@@ -2421,10 +2430,15 @@ function loadConfigForm(){
   document.getElementById('cfgN8nUrl').value = N8N_WEBHOOK_URL || '';
 }
 
-function saveConfig(){
+async function saveConfig(){
   const n8nUrl = document.getElementById('cfgN8nUrl').value.trim();
   N8N_WEBHOOK_URL = n8nUrl;
   save('n8n_webhook_url', n8nUrl);
+  // Salva no Supabase para sincronizar entre dispositivos
+  try {
+    const sb=getSB();
+    if(sb) await sb.from('configuracoes').upsert({chave:'n8n_webhook_url',valor:n8nUrl});
+  } catch(e){ console.warn('saveConfig Supabase:',e.message); }
   updateWebhookStatusBadge();
   alert('Configurações salvas!');
 }
@@ -2469,7 +2483,7 @@ window.addEventListener('resize', applyMobileLayout);
 // Carrega dados da nuvem em background
 finLoad().then(async ()=>{
   // Primeira execução: faz upload em massa de clientes e transações para o Supabase
-  const SEEDED_KEY='mp_supabase_seeded_v3';
+  const SEEDED_KEY='mp_supabase_seeded_v4';
   if(!localStorage.getItem(SEEDED_KEY)){
     const sb=getSB();
     if(sb){
