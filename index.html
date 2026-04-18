@@ -995,9 +995,9 @@ async function sbLoadAppts(){
 }
 
 // ── AGENDA: localStorage (pessoal) ──
-let apptsByDate = load('appts', {});
+let apptsByDate = {}; // Carregado do Supabase, não do localStorage
 
-function saveAppts(){ save('appts', apptsByDate); }
+function saveAppts(){ /* localStorage desativado — Supabase é a fonte */ }
 
 // Retorna agendamentos do dia selecionado
 function parseDt(dt){
@@ -2470,6 +2470,8 @@ function testWebhook(){
 }
 
 // ── INIT ──
+// Limpa agendamentos antigos do localStorage para evitar duplicatas
+localStorage.removeItem('mp_appts');
 renderCal();renderTimeline();renderUpcoming();updateConfStats();
 
 // Força layout mobile via JS (fallback para Safari iOS)
