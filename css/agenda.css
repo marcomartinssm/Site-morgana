@@ -1,0 +1,503 @@
+.agenda-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 15px;
+}
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 11px;
+}
+
+.cal-title {
+  font-family: 'Inter',sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rose-deep);
+  letter-spacing: -.01em;
+}
+
+.cal-nav {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 15px;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.cal-nav:hover {
+  background: var(--rose-light);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.cal-day-name {
+  font-size: 9px;
+  color: var(--muted);
+  padding: 3px 0;
+  text-transform: uppercase;
+}
+
+.cal-day {
+  font-size: 11px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--dark);
+  width: 27px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1px auto;
+  transition: all .15s;
+  position: relative;
+}
+
+.cal-day:hover {
+  background: var(--rose-light);
+}
+
+.cal-day.today {
+  background: var(--rose-deep);
+  color: #fff;
+  font-weight: 500;
+}
+
+.cal-day.sel {
+  background: var(--rose-light);
+  color: var(--rose-deep);
+  font-weight: 500;
+}
+
+.cal-day.other {
+  color: var(--muted);
+  opacity: .4;
+}
+
+.cal-day.has::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tl-panel {
+  background: #fff;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+}
+
+.tl-header {
+  padding: 12px 15px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tl-day-label {
+  font-family: 'Inter',sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+
+.tl-day-label em {
+  color: var(--rose-deep);
+  font-style: normal;
+}
+
+.tl-body {
+  padding: 12px 15px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tl-row {
+  display: flex;
+  gap: 11px;
+  min-height: 48px;
+}
+
+.tl-time {
+  width: 40px;
+  font-size: 10px;
+  color: var(--muted);
+  padding-top: 3px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.tl-slot {
+  flex: 1;
+  border-left: 0.5px solid var(--border);
+  padding-left: 11px;
+}
+
+.appt-card {
+  border-radius: 6px;
+  padding: 7px 11px;
+  cursor: pointer;
+  transition: transform .15s;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+
+.appt-card:hover {
+  transform: translateX(3px);
+}
+
+.appt-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.appt-card.confirmed {
+  background: #f0faf3;
+  border: 0.5px solid #a8d8b5;
+}
+
+.appt-card.confirmed::before {
+  background: #7cbf8e;
+}
+
+.appt-card.pending {
+  background: var(--gold-light);
+  border: 0.5px solid #c8bbb0;
+}
+
+.appt-card.pending::before {
+  background: var(--gold);
+}
+
+.appt-card.vip {
+  background: var(--rose-light);
+  border: 0.5px solid var(--rose);
+}
+
+.appt-card.vip::before {
+  background: var(--rose-deep);
+}
+
+.appt-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.appt-name {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.appt-svc {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.tl-stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+  padding: 11px 15px;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.ts-card {
+  text-align: center;
+  padding: 9px;
+  background: #fff;
+  border-radius: 6px;
+  border: 0.5px solid var(--border);
+}
+
+.ts-val {
+  font-family: 'Inter',sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--rose-deep);
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+
+.ts-label {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.up-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: background .15s;
+}
+
+.up-item:hover {
+  background: var(--rose-light);
+}
+
+.up-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Linha do tempo: itens gerados via JS ── */
+.cal-card {
+  margin-bottom: 13px;
+}
+
+.tl-view-pill {
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: var(--rose-light);
+  color: var(--rose-deep);
+  border: 0.5px solid var(--rose);
+}
+
+.tl-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tl-empty span {
+  font-size: 11px;
+  opacity: .7;
+}
+
+.tl-row.is-cancelled {
+  opacity: .45;
+}
+
+.appt-card.is-cancelled {
+  filter: grayscale(.5);
+}
+
+.appt-client-chip {
+  background: var(--rose-light);
+  color: var(--rose-deep);
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-size: 9px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.appt-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.appt-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.appt-btn-edit, .appt-btn-cancel {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.appt-btn-edit:hover {
+  color: var(--rose-deep);
+}
+
+.appt-btn-cancel:hover {
+  color: #b85050;
+}
+
+.appt-btn-confirm {
+  color: #2e7d4f;
+  font-size: 13px;
+}
+
+.appt-btn-wpp {
+  color: #25d366;
+  font-size: 13px;
+}
+
+.appt-btn-confirm:hover, .appt-btn-wpp:hover {
+  background: #eaf5ee;
+}
+
+.appt-valor {
+  float: right;
+  font-weight: 500;
+  color: var(--rose-deep);
+}
+
+.up-empty {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 8px 0;
+}
+
+.up-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.up-meta {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ── Modal de agendamento: busca e vínculo de cliente ── */
+.client-search {
+  position: relative;
+}
+
+.client-drop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  z-index: 300;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 3px;
+}
+
+.client-drop-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  cursor: pointer;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.client-drop-item:hover {
+  background: var(--rose-light);
+}
+
+.client-drop-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.client-drop-phone {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.appt-client-badge {
+  margin-top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  background: var(--rose-light);
+  border-radius: 6px;
+  border: 0.5px solid var(--rose);
+}
+
+.appt-client-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.appt-client-stage {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.appt-client-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 2px 5px;
+}
+
+.new-lead {
+  margin-top: 7px;
+}
+
+.new-lead-box {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 11px 12px;
+}
+
+.new-lead-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 9px;
+}
+
+.new-lead .form-grid2 {
+  margin-bottom: 8px;
+}
+
+.new-lead-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--rose-deep);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}

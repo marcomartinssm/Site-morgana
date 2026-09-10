@@ -1,0 +1,227 @@
+@media (max-width: 768px) {
+  /* Reset base para mobile */
+  html, body {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Shell vira coluna com nav embaixo */
+  .shell {
+    flex-direction: column;
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+
+  /* Sidenav vira bottom bar */
+  .sidenav {
+    order: 2;
+    width: 100% !important;
+    height: 56px !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    flex-shrink: 0 !important;
+    border-top: 0.5px solid rgba(255,255,255,.2);
+    border-left: none;
+  }
+
+  .nav-logo {
+    display: none !important;
+  }
+
+  .nav-sep {
+    display: none !important;
+  }
+
+  .nav-item {
+    flex: 1 !important;
+    width: auto !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    gap: 2px !important;
+    padding: 4px 0 !important;
+    flex-direction: column !important;
+  }
+
+  .nav-icon {
+    font-size: 20px !important;
+  }
+
+  .nav-label {
+    font-size: 9px !important;
+  }
+
+  /* Main ocupa o espaço restante */
+  .main {
+    order: 1;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Content scrollável */
+  .content {
+    padding: 12px 13px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    height: 100%;
+  }
+
+  /* Topbar */
+  .topbar {
+    padding: 10px 13px !important;
+  }
+
+  .page-title {
+    font-size: 13px !important;
+  }
+
+  .topbar-date, #syncStatus {
+    display: none !important;
+  }
+
+  #topBtn2 {
+    display: none !important;
+  }
+
+  .btn-primary, .btn-ghost {
+    padding: 7px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* Agenda */
+  .agenda-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .tl-panel {
+    height: auto !important;
+    min-height: 200px;
+  }
+
+  .tl-stats {
+    gap: 6px !important;
+    padding: 8px 10px !important;
+  }
+
+  .ts-val {
+    font-size: 18px !important;
+  }
+
+  /* CRM */
+  .crm-toolbar {
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .crm-toolbar .search-box {
+    flex: 1 1 100% !important;
+    order: -1;
+  }
+
+  .crm-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  #detailPanel {
+    display: none;
+  }
+
+  .ftabs {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ftab {
+    padding: 4px 9px !important;
+    font-size: 10px !important;
+  }
+
+  .kanban-board {
+    gap: 10px;
+  }
+
+  .kb-col {
+    flex: 0 0 185px !important;
+  }
+
+  /* Financeiro */
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 7px;
+  }
+
+  .kpi {
+    padding: 10px 11px !important;
+  }
+
+  .kpi-val {
+    font-size: 17px !important;
+  }
+
+  .fin-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ptabs {
+    gap: 2px !important;
+  }
+
+  .ptab {
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+  }
+
+  .stab {
+    padding: 6px 10px !important;
+    font-size: 10px !important;
+  }
+
+  .cc-cards, .fp-cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  .fg4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .cc-summary-grid {
+    flex-direction: column;
+  }
+
+  /* Modal sobe de baixo */
+  .modal-overlay {
+    align-items: flex-end !important;
+  }
+
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 88vh !important;
+    margin: 0 !important;
+  }
+
+  .form-grid2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .kpi-val {
+    font-size: 15px !important;
+  }
+
+  .ptab {
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+  }
+
+  .stab {
+    font-size: 9px !important;
+    padding: 5px 8px !important;
+  }
+}
