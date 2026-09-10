@@ -9,9 +9,9 @@ let agendaSelDate = fmtDateKey(new Date());   // dia selecionado (YYYY-MM-DD)
 let apptsByDate = {};                         // { 'YYYY-MM-DD': [agendamentos] } — vem do Supabase
 let apptLinkedClientId = null;                // cliente vinculado no modal
 
-const STATUS_BADGE = { confirmed: 'badge-confirmed', pending: 'badge-pending', cancelled: 'badge-canceled' };
-const STATUS_LABEL = { confirmed: 'Confirmado', pending: 'Pendente', cancelled: 'Cancelado' };
-const STATUS_DOT = { confirmed: '#7cbf8e', pending: '#c9a96e' };
+const STATUS_BADGE = { confirmed: 'badge-confirmed', pending: 'badge-pending', sent: 'badge-sent', cancelled: 'badge-canceled' };
+const STATUS_LABEL = { confirmed: 'Confirmado', pending: 'Pendente', sent: 'Enviado', cancelled: 'Cancelado' };
+const STATUS_DOT = { confirmed: '#4caf7a', pending: '#e0a93b', sent: '#5b8fd0' };
 
 function getApptDay(dateStr) {
   return apptsByDate[dateStr] || [];
@@ -73,11 +73,13 @@ function renderTimeline() {
   if (!dayAppts.length) {
     $('tlBody').innerHTML = `
       <div class="tl-empty">
-        Nenhum agendamento para este dia.<br>
-        <span>Clique em + Novo agendamento para adicionar.</span>
+        <div class="tl-empty-icon">${icon('calendar')}</div>
+        <div class="tl-empty-title">Nenhum agendamento para este dia</div>
+        <span>Clique em “Novo agendamento” para adicionar.</span>
       </div>`;
     $('tlTotal').textContent = '0';
     $('tlConf').textContent = '0';
+    $('tlPrev').textContent = 'R$ ' + fmtMoney(0);
     return;
   }
 
@@ -85,7 +87,7 @@ function renderTimeline() {
   const previsto = sorted.filter(a => a.status !== 'cancelled').reduce((s, a) => s + (parseFloat(a.valor) || 0), 0);
   $('tlTotal').textContent = sorted.length;
   $('tlConf').textContent = sorted.filter(a => a.status === 'confirmed').length;
-  $('tlPrev').textContent = 'R$' + previsto.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  $('tlPrev').textContent = 'R$ ' + fmtMoney(previsto);
 
   $('tlBody').innerHTML = sorted.map(renderApptRow).join('');
 }
@@ -95,30 +97,31 @@ function renderApptRow(a) {
   const isCancelled = a.status === 'cancelled';
 
   const clientChip = linked
-    ? `<span class="appt-client-chip" onclick="openClientFicha(${linked.id})" title="Ver ficha">↗ ${firstName(linked.name)}</span>`
+    ? `<span class="appt-client-chip" onclick="openClientFicha(${linked.id})" title="Ver ficha">${icon('arrowUpRight')}${firstName(linked.name)}</span>`
     : '';
   const actions = isCancelled ? '' : `
-    <button class="appt-btn appt-btn-edit" onclick="editAppt('${a.id}')" title="Editar">✎</button>
-    <button class="appt-btn appt-btn-confirm" onclick="setApptStatus('${a.id}','confirmed')" title="Confirmar">✓</button>
-    <button class="appt-btn appt-btn-wpp" data-wpp="${a.id}" onclick="sendWppFromAgenda('${a.id}','${agendaSelDate}')" title="Enviar confirmação WhatsApp">📲</button>
-    <button class="appt-btn appt-btn-cancel" onclick="setApptStatus('${a.id}','cancelled')" title="Cancelar">✕</button>`;
-  const valor = a.valor
-    ? `<span class="appt-valor">R$${parseFloat(a.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>`
-    : '';
+    <div class="appt-actions">
+      <button class="appt-btn appt-btn-edit" onclick="editAppt('${a.id}')" title="Editar">${icon('pencil')}</button>
+      <button class="appt-btn appt-btn-confirm" onclick="setApptStatus('${a.id}','confirmed')" title="Confirmar">${icon('check')}</button>
+      <button class="appt-btn appt-btn-wpp" data-wpp="${a.id}" onclick="sendWppFromAgenda('${a.id}','${agendaSelDate}')" title="Enviar confirmação WhatsApp">${icon('send')}</button>
+      <button class="appt-btn appt-btn-cancel" onclick="setApptStatus('${a.id}','cancelled')" title="Cancelar">${icon('x')}</button>
+    </div>`;
+  const valor = a.valor ? `<span class="appt-valor">R$ ${fmtMoney(parseFloat(a.valor))}</span>` : '';
 
   return `
     <div class="tl-row${isCancelled ? ' is-cancelled' : ''}">
       <div class="tl-time">${a.time}</div>
       <div class="tl-slot">
-        <div class="appt-card ${isCancelled ? 'pending is-cancelled' : a.status}">
-          <div class="appt-top">
+        <div class="appt-card ${isCancelled ? 'is-cancelled' : a.status}">
+          <div class="appt-main">
             <div class="appt-name">${a.name}${clientChip}</div>
-            <div class="appt-actions">
-              <span class="badge ${STATUS_BADGE[a.status] || 'badge-pending'}">${STATUS_LABEL[a.status] || a.status}</span>
-              ${actions}
-            </div>
+            <div class="appt-svc">${a.svc}${a.obs ? ' · ' + a.obs : ''}</div>
           </div>
-          <div class="appt-svc">${a.svc}${a.obs ? ' · ' + a.obs : ''}${valor}</div>
+          <div class="appt-meta">
+            ${valor}
+            <span class="badge ${STATUS_BADGE[a.status] || 'badge-pending'}">${STATUS_LABEL[a.status] || a.status}</span>
+            ${actions}
+          </div>
         </div>
       </div>
     </div>`;
@@ -147,14 +150,18 @@ function renderUpcoming() {
     $('upList').innerHTML = '<div class="up-empty">Nenhum agendamento futuro.</div>';
     return;
   }
-  $('upList').innerHTML = future.slice(0, 6).map(a => `
-    <div class="up-item" onclick="selectAgendaDate('${a.date}')">
-      <div class="up-dot" style="background:${STATUS_DOT[a.status] || '#c9a96e'}"></div>
-      <div class="fill">
-        <div class="up-name">${firstName(a.name)}</div>
-        <div class="up-meta">${fmtDateBR(a.date)} ${a.time} · ${a.svc.split(' ')[0]}</div>
-      </div>
-    </div>`).join('');
+  $('upList').innerHTML = future.slice(0, 6).map(a => {
+    const [, m, d] = a.date.split('-');
+    return `
+      <div class="up-item" onclick="selectAgendaDate('${a.date}')">
+        <div class="up-date"><span class="up-day">${d}</span><span class="up-month">${MONTHS[m - 1].slice(0, 3)}</span></div>
+        <div class="fill">
+          <div class="up-name">${a.name}</div>
+          <div class="up-meta">${a.time} · ${a.svc}</div>
+        </div>
+        <div class="up-dot" style="background:${STATUS_DOT[a.status] || STATUS_DOT.pending}" title="${STATUS_LABEL[a.status] || ''}"></div>
+      </div>`;
+  }).join('');
 }
 
 // ── Modal de agendamento ──

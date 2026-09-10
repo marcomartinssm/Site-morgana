@@ -370,7 +370,7 @@ function renderTxList() {
           <div class="${income ? 'tv-i' : 'tv-e'}">${income ? '+' : '-'}${brl(x.v)}</div>
           <div class="tx-date">${x.dt}</div>
         </div>
-        ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')">✕</button>` : ''}
+        ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')" title="Excluir">${icon('trash')}</button>` : ''}
       </div>`;
   }).join('');
 }
@@ -392,7 +392,7 @@ function totalsBy(field, items) {
 const statCardHead = (item, count) => `
   <div class="stat-card-head">
     <span class="pill pill-lg" style="background:${item.color};color:${item.tc}">${item.name}</span>
-    <span class="stat-card-count">${count} lancamentos</span>
+    <span class="stat-card-count">${count} lançamentos</span>
   </div>`;
 const miniStat = (value, label, cls) =>
   `<div class="cc-mini"><div class="cc-mini-val ${cls}">${value}</div><div class="cc-mini-lbl">${label}</div></div>`;
@@ -463,7 +463,7 @@ function renderCatalogManage(kind) {
     <div class="manage-item">
       <div class="manage-dot" style="background:${it.color}"></div>
       <div class="manage-name">${it.name}</div>
-      <button class="manage-del" onclick="deleteCatalogItem('${kind}','${it.id}')">✕</button>
+      <button class="manage-del" onclick="deleteCatalogItem('${kind}','${it.id}')" title="Excluir">${icon('trash')}</button>
     </div>`).join('');
 }
 

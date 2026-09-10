@@ -11,14 +11,14 @@ GitHub Pages a partir da branch `main`.
 ```
 index.html              Estrutura das telas e modais (sem estilos nem lógica embutidos)
 css/
-  base.css              Variáveis de cor, layout geral, botões, cards, formulários e modais
+  base.css              Tokens de design (cores, raios, sombras), layout, botões, cards, formulários e modais
   agenda.css            Calendário, linha do tempo e modal de agendamento
   crm.css               Lista, kanban e ficha do cliente
   financeiro.css        KPIs, gráficos, lançamentos, centros de custo e formas de pagamento
-  responsive.css        Ajustes para celular (barra de navegação inferior)
+  responsive.css        Tablet (menu recolhido) e celular (barra de navegação inferior)
 js/
   config.js             Chaves do Supabase e constantes (meses, estágios, procedimentos…)
-  utils.js              Funções auxiliares: datas, formatação, localStorage
+  utils.js              Funções auxiliares: datas, formatação, localStorage e ícones SVG
   api.js                Leitura e gravação no Supabase (conversão banco ⇄ tela)
   agenda.js             Calendário, agendamentos do dia e modal de agendamento
   crm.js                Clientes: lista, kanban, ficha e procedimentos

@@ -71,6 +71,10 @@ function filterCRM() {
 
 // ── Lista ──
 function renderCRMList(list = clients) {
+  if (!list.length) {
+    $('clientList').innerHTML = '<div class="list-empty">Nenhum cliente encontrado.</div>';
+    return;
+  }
   $('clientList').innerHTML = list.map(c => {
     const st = stageInfo(c.stage);
     const procTags = c.procs.map(p => `<span class="proc-tag proc-tag-grey">${PROC_LABELS[p]}</span>`).join('');
@@ -146,7 +150,7 @@ function buildClientDetail(c) {
         <div class="dp-name">${c.name}</div>
         <div class="dp-since">${c.phone} · desde ${c.since}</div>
         <div class="dp-tags">
-          <select class="form-select stage-select" style="background:${st.bg};color:${st.color};border-color:${st.color}40" onchange="changeStage(${c.id},this.value)">${stageOpts}</select>
+          <select class="form-select stage-select" style="background-color:${st.bg};color:${st.color};border-color:${st.color}40" onchange="changeStage(${c.id},this.value)">${stageOpts}</select>
           ${procTags}
         </div>
       </div>
@@ -165,12 +169,12 @@ function buildClientDetail(c) {
       <div class="dp-section">
         <div class="dp-section-head">
           <div class="section-label">procedimentos</div>
-          <button class="btn-mini" onclick="openProcModal(${c.id})">+ Adicionar</button>
+          <button class="btn-mini" onclick="openProcModal(${c.id})">${icon('plus')}Adicionar</button>
         </div>
         ${procHtml}
       </div>
       <div class="dp-actions">
-        <button class="btn-ghost" onclick="goTo('agenda',document.querySelector('[title=Agenda]'))">Agendar</button>
+        <button class="btn-ghost" onclick="goTo('agenda',document.querySelector('[title=Agenda]'))">${icon('calendar')}<span>Agendar</span></button>
       </div>
     </div>`;
 }
@@ -195,8 +199,8 @@ function renderKanban() {
     if (q) cards = cards.filter(c => c.name.toLowerCase().includes(q));
     return `
       <div class="kb-col">
-        <div class="kb-col-head" style="border-top:2px solid ${st.color}">
-          <span class="kb-col-title" style="color:${st.color}">${st.label}</span>
+        <div class="kb-col-head">
+          <span class="kb-col-title"><span class="kb-dot" style="background:${st.color}"></span>${st.label}</span>
           <span class="kb-count" style="background:${st.bg};color:${st.color}">${cards.length}</span>
         </div>
         ${cards.map(renderKanbanCard).join('')}

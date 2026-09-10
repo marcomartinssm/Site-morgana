@@ -7,10 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="Morgana Laser"/>
-  <meta name="theme-color" content="#5c4470"/>
+  <meta name="theme-color" content="#ffffff"/>
   <title>Morgana Pires Laser Removal</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/base.css"/>
   <link rel="stylesheet" href="css/agenda.css"/>
   <link rel="stylesheet" href="css/crm.css"/>
@@ -24,33 +26,38 @@
 
   <!-- ═══ MENU LATERAL ═══ -->
   <nav class="sidenav">
-    <div class="nav-logo">Morgana<span>Laser Removal</span></div>
-    <div class="nav-item active" onclick="goTo('agenda',this)" title="Agenda">
-      <div class="nav-icon">📅</div><div class="nav-label">Agenda</div>
+    <div class="nav-brand">
+      <div class="nav-mark">M</div>
+      <div class="nav-logo">Morgana<span>Laser Removal</span></div>
     </div>
-    <div class="nav-item" onclick="goTo('crm',this)" title="Clientes">
-      <div class="nav-icon">👥</div><div class="nav-label">CRM</div>
-    </div>
-    <div class="nav-sep"></div>
-    <div class="nav-item" onclick="goTo('fin',this)" title="Financeiro">
-      <div class="nav-icon">💰</div><div class="nav-label">Financ.</div>
-    </div>
-    <div class="nav-sep"></div>
-    <div class="nav-item" onclick="goTo('config',this)" title="Configurações">
-      <div class="nav-icon">⚙</div><div class="nav-label">Config</div>
-    </div>
+    <div class="nav-group-label">Menu</div>
+    <button type="button" class="nav-item active" onclick="goTo('agenda',this)" title="Agenda">
+      <span class="nav-icon" data-icon="calendar"></span><span class="nav-label">Agenda</span>
+    </button>
+    <button type="button" class="nav-item" onclick="goTo('crm',this)" title="Clientes">
+      <span class="nav-icon" data-icon="users"></span><span class="nav-label">Clientes</span>
+    </button>
+    <button type="button" class="nav-item" onclick="goTo('fin',this)" title="Financeiro">
+      <span class="nav-icon" data-icon="wallet"></span><span class="nav-label">Financeiro</span>
+    </button>
+    <div class="nav-spacer"></div>
+    <button type="button" class="nav-item" onclick="goTo('config',this)" title="Configurações">
+      <span class="nav-icon" data-icon="settings"></span><span class="nav-label">Ajustes</span>
+    </button>
   </nav>
 
   <div class="main">
 
     <!-- ═══ BARRA SUPERIOR ═══ -->
     <header class="topbar">
-      <div class="page-title" id="pageTitle">Agenda — <em>Hoje</em></div>
+      <div class="page-heading">
+        <h1 class="page-title" id="pageTitle">Agenda</h1>
+        <div class="topbar-date" id="topDate"></div>
+      </div>
       <div class="topbar-right">
         <span class="sync-status" id="syncStatus"></span>
-        <span class="topbar-date" id="topDate"></span>
-        <button class="btn-ghost" id="topBtn2" onclick="topAction2()" style="display:none">⚙ Configurar</button>
-        <button class="btn-primary" id="topBtn" onclick="topAction()">+ Novo agendamento</button>
+        <button class="btn-ghost" id="topBtn2" onclick="topAction2()" hidden><span data-icon="settings"></span><span>Configurar</span></button>
+        <button class="btn-primary" id="topBtn" onclick="topAction()"><span data-icon="plus"></span><span>Novo agendamento</span></button>
       </div>
     </header>
 
@@ -59,32 +66,44 @@
       <!-- ═══ AGENDA ═══ -->
       <section class="page active" id="page-agenda">
         <div class="agenda-grid">
-          <div>
+          <div class="agenda-side">
             <div class="card cal-card">
               <div class="cal-header">
-                <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+                <button class="cal-nav" onclick="changeMonth(-1)" aria-label="Mês anterior"><span data-icon="chevronLeft"></span></button>
                 <div class="cal-title" id="calTitle"></div>
-                <button class="cal-nav" onclick="changeMonth(1)">›</button>
+                <button class="cal-nav" onclick="changeMonth(1)" aria-label="Próximo mês"><span data-icon="chevronRight"></span></button>
               </div>
               <div class="cal-grid" id="calGrid"></div>
             </div>
             <div class="card">
-              <div class="section-label">próximos agendamentos</div>
+              <div class="card-title">Próximos agendamentos</div>
               <div id="upList"></div>
             </div>
           </div>
 
           <div class="tl-panel">
             <div class="tl-header">
-              <div class="tl-day-label"><em id="tlDay"></em></div>
+              <div>
+                <div class="tl-eyebrow">Agenda do dia</div>
+                <div class="tl-day-label"><em id="tlDay"></em></div>
+              </div>
               <div class="tl-view-pill">Dia</div>
             </div>
-            <div class="tl-body" id="tlBody"></div>
             <div class="tl-stats">
-              <div class="ts-card"><div class="ts-val" id="tlTotal">8</div><div class="ts-label">hoje</div></div>
-              <div class="ts-card"><div class="ts-val" id="tlConf">5</div><div class="ts-label">confirmados</div></div>
-              <div class="ts-card"><div class="ts-val" id="tlPrev">R$0</div><div class="ts-label">previsto</div></div>
+              <div class="ts-card">
+                <span class="ts-icon" data-icon="calendar"></span>
+                <div><div class="ts-val" id="tlTotal">0</div><div class="ts-label">agendamentos</div></div>
+              </div>
+              <div class="ts-card">
+                <span class="ts-icon ts-icon-success" data-icon="checkCircle"></span>
+                <div><div class="ts-val" id="tlConf">0</div><div class="ts-label">confirmados</div></div>
+              </div>
+              <div class="ts-card">
+                <span class="ts-icon ts-icon-gold" data-icon="banknote"></span>
+                <div><div class="ts-val" id="tlPrev">R$ 0,00</div><div class="ts-label">previsto</div></div>
+              </div>
             </div>
+            <div class="tl-body" id="tlBody"></div>
           </div>
         </div>
       </section>
@@ -93,12 +112,12 @@
       <section class="page" id="page-crm">
         <div class="crm-toolbar">
           <div class="search-box crm-search">
-            <span class="search-icon">⌕</span>
-            <input type="text" placeholder="Buscar..." id="crmSearch" oninput="filterCRM()"/>
+            <span class="search-icon" data-icon="search"></span>
+            <input type="text" placeholder="Buscar por nome ou telefone..." id="crmSearch" oninput="refreshCRM()"/>
           </div>
           <div class="view-toggle">
-            <button class="vt-btn active" id="vtList" onclick="setCRMView('list',this)">☰ Lista</button>
-            <button class="vt-btn" id="vtKanban" onclick="setCRMView('kanban',this)">⊞ Kanban</button>
+            <button class="vt-btn active" id="vtList" onclick="setCRMView('list',this)"><span data-icon="list"></span><span class="vt-label">Lista</span></button>
+            <button class="vt-btn" id="vtKanban" onclick="setCRMView('kanban',this)"><span data-icon="kanban"></span><span class="vt-label">Kanban</span></button>
           </div>
           <div class="ftabs ftabs-grow">
             <div class="ftab active" onclick="setStageFilt('all',this)">Todos</div>
@@ -115,7 +134,7 @@
             <div class="client-list" id="clientList"></div>
             <div id="detailPanel">
               <div class="no-sel">
-                <div class="no-sel-icon">◎</div>
+                <div class="no-sel-icon" data-icon="user"></div>
                 <div class="no-sel-text">Selecione um cliente<br>para ver a ficha</div>
               </div>
             </div>
@@ -146,10 +165,22 @@
         </div>
 
         <div class="kpi-grid">
-          <div class="kpi kpi-i"><div class="kpi-label">Receita total</div><div class="kpi-val" id="kI">—</div><div class="kpi-delta" id="kId">—</div></div>
-          <div class="kpi kpi-e"><div class="kpi-label">Despesas</div><div class="kpi-val" id="kE">—</div><div class="kpi-delta dn" id="kEd">—</div></div>
-          <div class="kpi kpi-p"><div class="kpi-label">Lucro líquido</div><div class="kpi-val" id="kP">—</div><div class="kpi-delta" id="kPd">—</div></div>
-          <div class="kpi kpi-t"><div class="kpi-label">Saldo em caixa</div><div class="kpi-val" id="kT">—</div><div class="kpi-delta" id="kTd">—</div></div>
+          <div class="kpi kpi-i">
+            <div class="kpi-head"><span class="kpi-label">Receita total</span><span class="kpi-icon" data-icon="trendingUp"></span></div>
+            <div class="kpi-val" id="kI">—</div><div class="kpi-delta" id="kId">—</div>
+          </div>
+          <div class="kpi kpi-e">
+            <div class="kpi-head"><span class="kpi-label">Despesas</span><span class="kpi-icon" data-icon="trendingDown"></span></div>
+            <div class="kpi-val" id="kE">—</div><div class="kpi-delta dn" id="kEd">—</div>
+          </div>
+          <div class="kpi kpi-p">
+            <div class="kpi-head"><span class="kpi-label">Lucro líquido</span><span class="kpi-icon" data-icon="chart"></span></div>
+            <div class="kpi-val" id="kP">—</div><div class="kpi-delta" id="kPd">—</div>
+          </div>
+          <div class="kpi kpi-t">
+            <div class="kpi-head"><span class="kpi-label">Saldo em caixa</span><span class="kpi-icon" data-icon="wallet"></span></div>
+            <div class="kpi-val" id="kT">—</div><div class="kpi-delta" id="kTd">—</div>
+          </div>
         </div>
 
         <!-- Novo lançamento -->
@@ -189,7 +220,7 @@
         <div class="fin-section active" id="fsec-visao">
           <div class="fin-grid">
             <div class="card">
-              <div class="card-title">Receitas & Despesas — por semana</div>
+              <div class="card-title">Receitas &amp; despesas</div>
               <div class="bar-chart" id="barChart"></div>
               <div class="legend-row">
                 <span><span class="ldot legend-dot-income"></span>Receitas</span>
@@ -219,7 +250,7 @@
         <!-- Lançamentos -->
         <div class="fin-section" id="fsec-lancamentos">
           <div class="tx-filters" id="txFilters">
-            <span class="tx-filter-label">Filtrar:</span>
+            <span class="tx-filter-label">Filtrar</span>
             <div class="tx-filter-chip active" onclick="setTxFilter('todos',this)">Todos</div>
             <div class="tx-filter-chip" onclick="setTxFilter('income',this)">Receitas</div>
             <div class="tx-filter-chip" onclick="setTxFilter('expense',this)">Despesas</div>
@@ -235,7 +266,7 @@
           <div class="manage-card">
             <div class="manage-head">
               <div class="manage-title">Gerenciar centros de custo</div>
-              <button class="btn-primary" onclick="toggleCatalogForm('cc')">+ Novo</button>
+              <button class="btn-primary" onclick="toggleCatalogForm('cc')"><span data-icon="plus"></span><span>Novo</span></button>
             </div>
             <div id="ccManageList"></div>
             <div class="add-inline" id="addCCForm" style="display:none">
@@ -252,7 +283,7 @@
           <div class="manage-card">
             <div class="manage-head">
               <div class="manage-title">Gerenciar formas de pagamento</div>
-              <button class="btn-primary" onclick="toggleCatalogForm('fp')">+ Nova</button>
+              <button class="btn-primary" onclick="toggleCatalogForm('fp')"><span data-icon="plus"></span><span>Nova</span></button>
             </div>
             <div id="fpManageList"></div>
             <div class="add-inline" id="addFPForm" style="display:none">
@@ -298,7 +329,10 @@
 <!-- ═══ MODAL: AGENDAMENTO ═══ -->
 <div class="modal-overlay" id="apptModal" onclick="if(event.target===this)closeApptModal()">
   <div class="modal modal-wide">
-    <div class="modal-title">Novo agendamento</div>
+    <div class="modal-head">
+      <div class="modal-title">Novo agendamento</div>
+      <button class="modal-close" onclick="closeApptModal()" aria-label="Fechar"><span data-icon="x"></span></button>
+    </div>
 
     <div class="form-group">
       <label class="form-label">Cliente</label>
@@ -315,7 +349,7 @@
           <div class="appt-client-name" id="apptClientName"></div>
           <div class="appt-client-stage" id="apptClientStage"></div>
         </div>
-        <button class="appt-client-clear" onclick="clearApptClient()">✕</button>
+        <button class="appt-client-clear" onclick="clearApptClient()" aria-label="Remover cliente"><span data-icon="x"></span></button>
       </div>
 
       <!-- Criar lead (quando o nome não é encontrado no CRM) -->
@@ -369,7 +403,10 @@
 <!-- ═══ MODAL: NOVO CLIENTE ═══ -->
 <div class="modal-overlay" id="clientModal" onclick="if(event.target===this)closeModal('clientModal')">
   <div class="modal modal-wide">
-    <div class="modal-title">Novo lead / cliente</div>
+    <div class="modal-head">
+      <div class="modal-title">Novo lead / cliente</div>
+      <button class="modal-close" onclick="closeModal('clientModal')" aria-label="Fechar"><span data-icon="x"></span></button>
+    </div>
     <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="cnName" placeholder="Nome"/></div>
     <div class="form-grid2">
       <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="cnPhone" placeholder="(11) 99999-9999"/></div>
@@ -406,7 +443,10 @@
 <!-- ═══ MODAL: PROCEDIMENTO ═══ -->
 <div class="modal-overlay" id="procModal" onclick="if(event.target===this)closeModal('procModal')">
   <div class="modal">
-    <div class="modal-title" id="procModalTitle">Adicionar procedimento</div>
+    <div class="modal-head">
+      <div class="modal-title" id="procModalTitle">Adicionar procedimento</div>
+      <button class="modal-close" onclick="closeModal('procModal')" aria-label="Fechar"><span data-icon="x"></span></button>
+    </div>
     <div class="form-group">
       <label class="form-label">Tipo</label>
       <select class="form-select" id="pmTipo">
