@@ -47,7 +47,10 @@ const getCC = id => centros.find(c => c.id === id) || FALLBACK_CATALOG_ITEM;
 const getFP = id => formasPag.find(f => f.id === id) || FALLBACK_CATALOG_ITEM;
 const sumValues = list => list.reduce((a, x) => a + x.v, 0);
 const isIncome = x => x.t === 'receita';
+// Pendente: receita a receber ou despesa a pagar
+const isPending = x => !x.rec;
 const isPendingIncome = x => isIncome(x) && !x.rec;
+const isPendingExpense = x => !isIncome(x) && !x.rec;
 // Chip colorido de centro de custo / forma de pagamento
 const catalogChip = (item, cls, selected, onclick) =>
   `<span class="${cls}${selected ? ' sel' : ''}" style="background:${item.color};color:${item.tc}" onclick="${onclick}">${item.name}</span>`;
@@ -71,13 +74,14 @@ function calcPeriod(p) {
   };
 }
 
-// Dia em que o dinheiro entrou ou saiu do caixa: receitas pela quitação, despesas pela data do lançamento
-const cashDate = x => parseDt(isIncome(x) && x.quit ? x.quit : x.dt);
+// Dia em que o dinheiro entrou ou saiu do caixa: a data de quitação, ou a do lançamento
+const cashDate = x => parseDt(x.quit || x.dt);
 
-// Saldo acumulado (fluxo de caixa) desde o saldo inicial até o final do período — receitas a receber não entram
-function getSaldoCaixa(p) {
+// Saldo acumulado (fluxo de caixa) desde o saldo inicial até o final do período.
+// Pendências (a receber / a pagar) só entram no saldo projetado.
+function getSaldoCaixa(p, projetado = false) {
   return transactions.reduce((saldo, x) => {
-    if (isPendingIncome(x)) return saldo;
+    if (!projetado && isPending(x)) return saldo;
     if (p !== 'ano') {
       const d = cashDate(x);
       if (d.getFullYear() !== ANO_BASE || d.getMonth() > PERIOD_MAP[p].m) return saldo;
@@ -150,13 +154,16 @@ function setPeriod(p, el) {
   $('kE').textContent = 'R$ ' + fmtMoney(c.e);
   $('kP').textContent = (lucro >= 0 ? '+R$ ' : '-R$ ') + fmtMoney(Math.abs(lucro));
   $('kP').style.color = lucro >= 0 ? '#2e7d4f' : '#b85050';
-  $('kT').textContent = 'R$ ' + fmtMoney(getSaldoCaixa(p));
+  const saldo = getSaldoCaixa(p);
+  const saldoProjetado = getSaldoCaixa(p, true);
+  $('kT').textContent = 'R$ ' + fmtMoney(saldo);
 
   const lbl = getPeriodLabel(p);
   $('kId').textContent = lbl.id;
   $('kEd').textContent = lbl.ed;
   $('kPd').textContent = lbl.pd;
   $('kTd').textContent =
+    Math.abs(saldoProjetado - saldo) >= 0.01 ? 'Projetado: R$ ' + fmtMoney(saldoProjetado) :
     p === 'jan' ? 'Saldo inicial: R$ ' + fmtMoney(SALDO_INICIAL) :
     p === 'ano' ? 'Acumulado ' + ANO_BASE :
     'Acumulado até ' + PERIOD_MAP[p].label.slice(0, 3);
@@ -255,6 +262,7 @@ function toggleAddForm() {
     selCC = null;
     selFP = null;
     renderFormChips();
+    setTxType(txType);
   }
 }
 
@@ -267,6 +275,10 @@ function setTxType(t) {
   txType = t;
   $('btnI').className = 'type-btn' + (t === 'income' ? ' ti' : '');
   $('btnE').className = 'type-btn' + (t === 'expense' ? ' te' : '');
+  // Situação inicial: receitas a receber, despesas já pagas
+  $('fSit').innerHTML = t === 'income'
+    ? '<option value="pendente">A receber</option><option value="quitado">Recebido</option>'
+    : '<option value="quitado">Pago</option><option value="pendente">A pagar</option>';
 }
 
 function afterTxChange() {
@@ -292,7 +304,7 @@ function addTx() {
     dt: dt ? fmtDateBR(dt) : 'hoje',
     ic: TX_ICONS[selCC] || '📋',
     parc: $('fParc').value,
-    rec: txType !== 'income',   // receitas novas aguardam confirmação de recebimento
+    rec: $('fSit').value === 'quitado',
   };
   transactions.unshift(novo);
   sbAddTx(novo);
@@ -367,12 +379,13 @@ function setTxFilter(f, el) {
 
 function renderTxList() {
   const periodList = calcPeriod(curPeriod).list;
-  renderTxSummary(periodList.filter(isPendingIncome));
+  renderTxSummary(periodList.filter(isPendingIncome), periodList.filter(isPendingExpense));
 
   let list = periodList;
   if (txFilter === 'income') list = list.filter(isIncome);
   else if (txFilter === 'expense') list = list.filter(x => x.t === 'despesa');
   else if (txFilter === 'pendente') list = list.filter(isPendingIncome);
+  else if (txFilter === 'apagar') list = list.filter(isPendingExpense);
   else if (txFilter !== 'todos') list = list.filter(x => x.cc === txFilter || x.fp === txFilter);
 
   // Receitas primeiro; cada grupo em ordem de data
@@ -392,10 +405,12 @@ function renderTxList() {
       lastType = x.t;
       sep = `<div class="tx-sep">${income ? 'Receitas — por data' : 'Despesas — por vencimento'}</div>`;
     }
-    const pending = isPendingIncome(x);
-    const receiptBadge = !income ? ''
-      : pending ? '<span class="mini-badge mini-badge-pending">A receber</span>'
-      : `<button class="mini-badge mini-badge-received" onclick="undoReceipt('${x.id}')" title="Quitado em ${x.quit || x.dt} — clique para desmarcar">${icon('check')}Recebido${x.quit && x.quit !== x.dt ? ' ' + x.quit.slice(0, 5) : ''}</button>`;
+    const pending = isPending(x);
+    const receiptBadge = pending
+      ? `<span class="mini-badge mini-badge-pending">${income ? 'A receber' : 'A pagar'}</span>`
+      : `<button class="mini-badge mini-badge-received" onclick="undoReceipt('${x.id}')" title="Quitado em ${x.quit || x.dt} — clique para desmarcar">${icon('check')}${income ? 'Recebido' : 'Pago'}${x.quit && x.quit !== x.dt ? ' ' + x.quit.slice(0, 5) : ''}</button>`;
+    const confirmLabel = income ? 'Confirmar recebimento' : 'Confirmar pagamento';
+    const signed = income ? x.v : -x.v;   // despesa com valor negativo na planilha vira entrada
     return sep + `
       <div class="tx-item">
         <div class="tx-icon ${income ? 'ico-i' : 'ico-e'}">${x.ic}</div>
@@ -408,9 +423,9 @@ function renderTxList() {
             ${x.parc && !/^[AÀ] vista$/.test(x.parc) ? `<span class="mini-badge mini-badge-gold">${x.parc}</span>` : ''}
           </div>
         </div>
-        ${pending ? `<button class="tx-receive" onclick="openReceiptModal('${x.id}')" title="Confirmar recebimento">${icon('checkCircle')}<span>Confirmar recebimento</span></button>` : ''}
+        ${pending ? `<button class="tx-receive" onclick="openReceiptModal('${x.id}')" title="${confirmLabel}">${icon('checkCircle')}<span>${confirmLabel}</span></button>` : ''}
         <div class="tx-amount">
-          <div class="${income ? 'tv-i' : 'tv-e'}">${income ? '+' : '-'}${brl(x.v)}</div>
+          <div class="${income ? 'tv-i' : 'tv-e'}">${signed >= 0 ? '+' : '-'}${brl(Math.abs(signed))}</div>
           <div class="tx-date">${x.dt}</div>
         </div>
         ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')" title="Excluir">${icon('trash')}</button>` : ''}
@@ -418,27 +433,37 @@ function renderTxList() {
   }).join('');
 }
 
-// ── Confirmação de recebimento ──
+// ── Confirmação de recebimento (receitas) e de pagamento (despesas) ──
 let receiptTxId = null;
 let receiptFP = null;
 
-function renderTxSummary(pending) {
-  $('txSummary').innerHTML = pending.length ? `
+function renderTxSummary(pendingIncome, pendingExpense) {
+  const card = (list, title, what) => list.length ? `
     <div class="tx-summary">
       <span class="tx-summary-icon">${icon('clock')}</span>
       <div class="fill">
-        <div class="tx-summary-title">A receber no período</div>
-        <div class="tx-summary-sub">${pending.length} ${pending.length === 1 ? 'lançamento aguardando' : 'lançamentos aguardando'} confirmação</div>
+        <div class="tx-summary-title">${title}</div>
+        <div class="tx-summary-sub">${list.length} ${list.length === 1 ? 'lançamento aguardando' : 'lançamentos aguardando'} ${what}</div>
       </div>
-      <div class="tx-summary-val">R$ ${fmtMoney(sumValues(pending))}</div>
+      <div class="tx-summary-val">R$ ${fmtMoney(sumValues(list))}</div>
     </div>` : '';
+  $('txSummary').innerHTML = card(pendingIncome, 'A receber no período', 'recebimento')
+    + card(pendingExpense, 'A pagar no período', 'pagamento');
 }
 
 function openReceiptModal(id) {
   const tx = transactions.find(x => x.id === id);
   if (!tx) return;
+  const income = isIncome(tx);
   receiptTxId = id;
   receiptFP = tx.fp;
+  $('rcTitle').textContent = income ? 'Confirmar recebimento' : 'Confirmar pagamento';
+  $('rcSave').textContent = $('rcTitle').textContent;
+  $('rcFPLabel').textContent = income ? 'Forma de recebimento' : 'Forma de pagamento';
+  $('rcHint').textContent = income
+    ? 'Dia em que o dinheiro caiu na conta. No cartão de crédito pode ser outro dia.'
+    : 'Dia em que o valor saiu da conta.';
+  $('rcVal').classList.toggle('receipt-val-out', !income);
   $('rcDesc').textContent = tx.d;
   $('rcVal').textContent = 'R$ ' + fmtMoney(tx.v);
   $('rcDate').textContent = 'Competência ' + tx.dt;
@@ -455,7 +480,7 @@ function saveReceipt() {
   const tx = transactions.find(x => x.id === receiptTxId);
   if (!tx) return;
   if (!formasPag.some(f => f.id === receiptFP)) {
-    alert('Escolha a forma de recebimento.');
+    alert('Escolha a forma de ' + (isIncome(tx) ? 'recebimento.' : 'pagamento.'));
     return;
   }
   const quitKey = $('rcQuit').value;
@@ -473,7 +498,7 @@ function saveReceipt() {
 
 function undoReceipt(id) {
   const tx = transactions.find(x => x.id === id);
-  if (!tx || !confirm('Marcar "' + tx.d + '" como não recebido?')) return;
+  if (!tx || !confirm('Marcar "' + tx.d + '" como não ' + (isIncome(tx) ? 'recebido' : 'pago') + '?')) return;
   tx.rec = false;
   tx.quit = null;
   sbUpdateTxReceipt(tx);

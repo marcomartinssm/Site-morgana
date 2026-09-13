@@ -751,6 +751,14 @@
   color: var(--muted);
 }
 
+.receipt-val-out {
+  color: var(--danger);
+}
+
+.form-sit {
+  max-width: 260px;
+}
+
 .tx-amount {
   flex-shrink: 0;
   text-align: right;

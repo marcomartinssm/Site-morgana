@@ -68,7 +68,8 @@ const apptToRow = (dateKey, a) => ({
 
 // ── Leitura ──
 async function sbLoadTransacoes() {
-  const { data, error } = await getSB().from('transacoes').select('*').order('data_br', { ascending: true });
+  // Cópias de importações repetidas ficam no banco (duplicado_de), mas não entram nas contas
+  const { data, error } = await getSB().from('transacoes').select('*').is('duplicado_de', null).order('data_br', { ascending: true });
   if (error) throw error;
   return data && data.length ? data.map(txFromRow) : null;
 }

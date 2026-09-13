@@ -199,6 +199,10 @@
               <select class="form-select" id="fParc"><option>À vista</option><option>2x</option><option>3x</option><option>6x</option><option>12x</option></select>
             </div>
           </div>
+          <div class="form-group form-sit">
+            <label class="form-label">Situação</label>
+            <select class="form-select" id="fSit"><option value="pendente">A receber</option><option value="quitado">Recebido</option></select>
+          </div>
           <div class="form-grid2">
             <div class="form-group"><label class="form-label">Centro de custo</label><div class="cc-chips" id="formCCChips"></div></div>
             <div class="form-group"><label class="form-label">Forma de pagamento</label><div class="fp-chips" id="formFPChips"></div></div>
@@ -255,6 +259,7 @@
             <div class="tx-filter-chip" onclick="setTxFilter('income',this)">Receitas</div>
             <div class="tx-filter-chip" onclick="setTxFilter('expense',this)">Despesas</div>
             <div class="tx-filter-chip" onclick="setTxFilter('pendente',this)">A receber</div>
+            <div class="tx-filter-chip" onclick="setTxFilter('apagar',this)">A pagar</div>
             <div class="chip-group" id="ccFilterChips"></div>
             <div class="chip-group" id="fpFilterChips"></div>
           </div>
@@ -476,7 +481,7 @@
 <div class="modal-overlay" id="receiptModal" onclick="if(event.target===this)closeModal('receiptModal')">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">Confirmar recebimento</div>
+      <div class="modal-title" id="rcTitle">Confirmar recebimento</div>
       <button class="modal-close" onclick="closeModal('receiptModal')" aria-label="Fechar"><span data-icon="x"></span></button>
     </div>
     <div class="receipt-summary">
@@ -487,17 +492,17 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Forma de recebimento</label>
+      <label class="form-label" id="rcFPLabel">Forma de recebimento</label>
       <div class="fp-chips" id="rcFPChips"></div>
     </div>
     <div class="form-group">
       <label class="form-label">Data de quitação</label>
       <input class="form-input" type="date" id="rcQuit"/>
-      <div class="form-hint">Dia em que o dinheiro caiu na conta. No cartão de crédito pode ser outro dia.</div>
+      <div class="form-hint" id="rcHint">Dia em que o dinheiro caiu na conta. No cartão de crédito pode ser outro dia.</div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('receiptModal')">Cancelar</button>
-      <button class="btn-save" onclick="saveReceipt()">Confirmar recebimento</button>
+      <button class="btn-save" id="rcSave" onclick="saveReceipt()">Confirmar recebimento</button>
     </div>
   </div>
 </div>
