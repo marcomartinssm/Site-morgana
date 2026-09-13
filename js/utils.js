@@ -18,9 +18,9 @@ function load(key, def) {
 }
 
 // ── Datas ──
-// Chave de data no formato YYYY-MM-DD
+// Chave de data no formato YYYY-MM-DD (no fuso local; toISOString usaria UTC e viraria o dia após as 21h)
 function fmtDateKey(d) {
-  return d.toISOString().split('T')[0];
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 // YYYY-MM-DD → DD/MM/YYYY
 function fmtDateBR(iso) {
@@ -39,6 +39,11 @@ function parseDt(dt) {
 // ── Formatação ──
 function fmtMoney(v) {
   return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+// Últimos 8 dígitos do telefone, ignorando DDI, DDD, espaços, traços e parênteses ('' se tiver menos de 8)
+function phoneKey(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return digits.length >= 8 ? digits.slice(-8) : '';
 }
 // Iniciais para o avatar ("Maria Silva" → "MS")
 function getIn(name) {
@@ -70,7 +75,10 @@ const ICONS = {
   kanban: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
   pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
-  checkCircle: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  checkCheck: '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+  refresh: '<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  checkCircle:'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
   send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
   user: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',

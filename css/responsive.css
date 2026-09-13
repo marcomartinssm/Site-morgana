@@ -381,6 +381,25 @@
     font-size: 16px;
   }
 
+  .tx-receive {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+  }
+
+  .tx-receive span {
+    display: none;
+  }
+
+  .tx-receive .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tx-summary-val {
+    font-size: 16px;
+  }
+
   /* Formulários e modais */
   .form-grid2 {
     grid-template-columns: 1fr;

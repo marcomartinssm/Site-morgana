@@ -31,6 +31,37 @@ function addClient(c) {
   refreshCRM();
 }
 
+// Cliente já cadastrado com o mesmo telefone (compara os últimos 8 dígitos)
+function findClientByPhone(phone) {
+  const key = phoneKey(phone);
+  return key ? clients.find(c => phoneKey(c.phone) === key) : null;
+}
+
+// Junta os dados de um novo cadastro em um cliente que já existe
+function mergeIntoClient(c, fields) {
+  (fields.procs || []).forEach(p => { if (!c.procs.includes(p)) c.procs.push(p); });
+  if (fields.obs && !(c.obs || '').includes(fields.obs)) c.obs = c.obs ? c.obs + ' | ' + fields.obs : fields.obs;
+  if ((!c.bday || c.bday === '—') && fields.bday && fields.bday !== '—') c.bday = fields.bday;
+  sbUpsertCliente(c);
+  refreshCRM();
+}
+
+// Cadastra um cliente, mas antes procura duplicado pelo telefone; devolve o cliente usado (existente ou novo)
+function addOrMergeClient(fields) {
+  const existing = findClientByPhone(fields.phone);
+  const useExisting = existing && confirm(
+    'Já existe "' + existing.name + '" com esse telefone (' + existing.phone + ').\n\n' +
+    'OK: usar esse cadastro e juntar as informações\n' +
+    'Cancelar: criar um cadastro separado (ex.: pessoas diferentes com o mesmo número)');
+  if (useExisting) {
+    mergeIntoClient(existing, fields);
+    return existing;
+  }
+  const novo = newClient(fields);
+  addClient(novo);
+  return novo;
+}
+
 function refreshCRM() {
   filterCRM();
   if (crmView === 'kanban') renderKanban();
@@ -124,8 +155,21 @@ function selClient(id) {
   }
 }
 
+// Histórico do cliente na agenda, para comparar com as sessões registradas na ficha
+function clientApptStats(clientId) {
+  const s = { done: 0, cancelled: 0, rescheduled: 0 };
+  Object.values(apptsByDate).forEach(arr => arr.forEach(a => {
+    if (a.clientId !== clientId) return;
+    if (a.status === 'done') s.done++;
+    if (a.status === 'cancelled') s.cancelled++;
+    s.rescheduled += a.reagendamentos || 0;
+  }));
+  return s;
+}
+
 function buildClientDetail(c) {
   const st = stageInfo(c.stage);
+  const hist = clientApptStats(c.id);
 
   const procHtml = c.procedimentos && c.procedimentos.length
     ? c.procedimentos.map(p => `
@@ -158,6 +202,14 @@ function buildClientDetail(c) {
         <div class="dps"><div class="dps-val">${c.visits}</div><div class="dps-label">sessões</div></div>
         <div class="dps"><div class="dps-val">R$${c.spent.toLocaleString('pt-BR')}</div><div class="dps-label">investido</div></div>
         <div class="dps"><div class="dps-val">R$${perSession}</div><div class="dps-label">p/ sessão</div></div>
+      </div>
+      <div class="dp-section dp-section-bordered">
+        <div class="section-label">histórico na agenda</div>
+        <div class="dp-agenda">
+          <div class="dpa dpa-done"><div class="dpa-val">${hist.done}</div><div class="dpa-label">concluídos</div></div>
+          <div class="dpa dpa-cancel"><div class="dpa-val">${hist.cancelled}</div><div class="dpa-label">cancelados</div></div>
+          <div class="dpa dpa-resched"><div class="dpa-val">${hist.rescheduled}</div><div class="dpa-label">reagendados</div></div>
+        </div>
       </div>
       <div class="dp-section dp-section-bordered">
         <div class="section-label">informações</div>
@@ -237,14 +289,16 @@ function saveClient() {
   const name = $('cnName').value.trim();
   if (!name) return;
   const procs = [...document.querySelectorAll('#cnProcChips input:checked')].map(x => x.value);
-  addClient(newClient({
+  const now = new Date();
+  addOrMergeClient({
     name,
     phone: $('cnPhone').value || '—',
-    since: 'Abr 2026',
+    bday: $('cnBday').value ? fmtDateBR($('cnBday').value) : '—',
+    since: MONTHS[now.getMonth()].slice(0, 3) + ' ' + now.getFullYear(),
     stage: $('cnStage').value,
     procs,
     obs: $('cnObs').value,
-  }));
+  });
   closeModal('clientModal');
   $('cnName').value = '';
   document.querySelectorAll('#cnProcChips input').forEach(i => { i.checked = false; });

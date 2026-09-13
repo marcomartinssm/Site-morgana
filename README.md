@@ -37,9 +37,9 @@ globais; o `app.js` vem por último porque inicializa a aplicação.
 
 | Tabela             | Conteúdo                                   |
 |--------------------|--------------------------------------------|
-| `agendamentos`     | Agenda (um registro por horário)           |
-| `clientes`         | CRM, com procedimentos em `procedimentos`  |
-| `transacoes`       | Lançamentos financeiros                    |
+| `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário e `transacao_id` liga o atendimento concluído à sua receita |
+| `clientes`         | CRM, com procedimentos em `procedimentos`; duplicados mesclados ficam ocultos (`mesclado_em`) |
+| `transacoes`       | Lançamentos financeiros; `data_br` é a competência, `recebido` e `data_quitacao` controlam o recebimento (fluxo de caixa) |
 | `centros_custo`    | Centros de custo                           |
 | `formas_pagamento` | Formas de pagamento                        |
 | `configuracoes`    | Configurações (ex.: URL do webhook do n8n) |

@@ -410,6 +410,45 @@
   border-bottom: 1px solid var(--line);
 }
 
+.dp-agenda {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dpa {
+  padding: 10px 6px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+.dpa-val {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dpa-label {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.dpa-done .dpa-val {
+  color: var(--success);
+}
+
+.dpa-cancel .dpa-val {
+  color: var(--danger);
+}
+
+.dpa-resched .dpa-val {
+  color: var(--info);
+}
+
 .dp-section-head {
   display: flex;
   align-items: center;

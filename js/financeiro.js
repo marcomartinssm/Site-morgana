@@ -47,6 +47,10 @@ const getCC = id => centros.find(c => c.id === id) || FALLBACK_CATALOG_ITEM;
 const getFP = id => formasPag.find(f => f.id === id) || FALLBACK_CATALOG_ITEM;
 const sumValues = list => list.reduce((a, x) => a + x.v, 0);
 const isIncome = x => x.t === 'receita';
+const isPendingIncome = x => isIncome(x) && !x.rec;
+// Chip colorido de centro de custo / forma de pagamento
+const catalogChip = (item, cls, selected, onclick) =>
+  `<span class="${cls}${selected ? ' sel' : ''}" style="background:${item.color};color:${item.tc}" onclick="${onclick}">${item.name}</span>`;
 const brl = v => 'R$' + v.toLocaleString('pt-BR');
 
 // ── Cálculos ──
@@ -67,19 +71,19 @@ function calcPeriod(p) {
   };
 }
 
-// Saldo acumulado desde o saldo inicial até o final do período
+// Dia em que o dinheiro entrou ou saiu do caixa: receitas pela quitação, despesas pela data do lançamento
+const cashDate = x => parseDt(isIncome(x) && x.quit ? x.quit : x.dt);
+
+// Saldo acumulado (fluxo de caixa) desde o saldo inicial até o final do período — receitas a receber não entram
 function getSaldoCaixa(p) {
-  if (p === 'ano') {
-    const c = calcPeriod('ano');
-    return SALDO_INICIAL + (c.i - c.e);
-  }
-  let acum = SALDO_INICIAL;
-  for (const pm of PERIOD_ORDER) {
-    const c = calcPeriod(pm);
-    acum += c.i - c.e;
-    if (pm === p) break;
-  }
-  return acum;
+  return transactions.reduce((saldo, x) => {
+    if (isPendingIncome(x)) return saldo;
+    if (p !== 'ano') {
+      const d = cashDate(x);
+      if (d.getFullYear() !== ANO_BASE || d.getMonth() > PERIOD_MAP[p].m) return saldo;
+    }
+    return saldo + (isIncome(x) ? x.v : -x.v);
+  }, SALDO_INICIAL);
 }
 
 // Variação em relação ao mês anterior
@@ -255,10 +259,8 @@ function toggleAddForm() {
 }
 
 function renderFormChips() {
-  const chip = (item, cls, selected, onclick) =>
-    `<span class="${cls}${selected ? ' sel' : ''}" style="background:${item.color};color:${item.tc}" onclick="${onclick}">${item.name}</span>`;
-  $('formCCChips').innerHTML = centros.map(c => chip(c, 'cc-chip', selCC === c.id, `selCC='${c.id}';renderFormChips()`)).join('');
-  $('formFPChips').innerHTML = formasPag.map(f => chip(f, 'fp-chip', selFP === f.id, `selFP='${f.id}';renderFormChips()`)).join('');
+  $('formCCChips').innerHTML = centros.map(c => catalogChip(c, 'cc-chip', selCC === c.id, `selCC='${c.id}';renderFormChips()`)).join('');
+  $('formFPChips').innerHTML = formasPag.map(f => catalogChip(f, 'fp-chip', selFP === f.id, `selFP='${f.id}';renderFormChips()`)).join('');
 }
 
 function setTxType(t) {
@@ -290,6 +292,7 @@ function addTx() {
     dt: dt ? fmtDateBR(dt) : 'hoje',
     ic: TX_ICONS[selCC] || '📋',
     parc: $('fParc').value,
+    rec: txType !== 'income',   // receitas novas aguardam confirmação de recebimento
   };
   transactions.unshift(novo);
   sbAddTx(novo);
@@ -298,6 +301,36 @@ function addTx() {
   $('fDesc').value = '';
   $('fVal').value = '';
   afterTxChange();
+}
+
+// Centro de custo da receita de um agendamento: locação ou estética
+const apptCostCenter = appt => (appt.svc_key === 'locacao' || /^loca/i.test(appt.svc || '') ? 'loc' : 'est');
+
+// Receita lançada automaticamente ao concluir um agendamento
+function addApptIncome(appt, dateKey, valor) {
+  const cc = apptCostCenter(appt);
+  const novo = {
+    id: 'tx' + Date.now(),
+    t: 'receita',
+    d: appt.name + ' · ' + appt.svc,
+    cc,
+    fp: appt.fpag || 'pix',
+    v: valor,
+    dt: fmtDateBR(dateKey),
+    ic: TX_ICONS[cc] || '📋',
+    parc: 'À vista',
+    rec: false,
+  };
+  transactions.unshift(novo);
+  sbAddTx(novo);
+  if (curPage === 'fin') afterTxChange();
+  return novo;
+}
+
+// Receita de um atendimento concluído: pelo vínculo salvo ou, nos antigos, pela descrição e data
+function findApptIncome(appt, dateKey) {
+  if (appt.txId) return transactions.find(t => t.id === appt.txId) || null;
+  return transactions.find(t => isIncome(t) && t.d === appt.name + ' · ' + appt.svc && t.dt === fmtDateBR(dateKey)) || null;
 }
 
 function deleteTx(id) {
@@ -333,9 +366,13 @@ function setTxFilter(f, el) {
 }
 
 function renderTxList() {
-  let list = calcPeriod(curPeriod).list;
+  const periodList = calcPeriod(curPeriod).list;
+  renderTxSummary(periodList.filter(isPendingIncome));
+
+  let list = periodList;
   if (txFilter === 'income') list = list.filter(isIncome);
   else if (txFilter === 'expense') list = list.filter(x => x.t === 'despesa');
+  else if (txFilter === 'pendente') list = list.filter(isPendingIncome);
   else if (txFilter !== 'todos') list = list.filter(x => x.cc === txFilter || x.fp === txFilter);
 
   // Receitas primeiro; cada grupo em ordem de data
@@ -355,17 +392,23 @@ function renderTxList() {
       lastType = x.t;
       sep = `<div class="tx-sep">${income ? 'Receitas — por data' : 'Despesas — por vencimento'}</div>`;
     }
+    const pending = isPendingIncome(x);
+    const receiptBadge = !income ? ''
+      : pending ? '<span class="mini-badge mini-badge-pending">A receber</span>'
+      : `<button class="mini-badge mini-badge-received" onclick="undoReceipt('${x.id}')" title="Quitado em ${x.quit || x.dt} — clique para desmarcar">${icon('check')}Recebido${x.quit && x.quit !== x.dt ? ' ' + x.quit.slice(0, 5) : ''}</button>`;
     return sep + `
       <div class="tx-item">
         <div class="tx-icon ${income ? 'ico-i' : 'ico-e'}">${x.ic}</div>
         <div class="fill">
           <div class="tx-name">${x.d}</div>
           <div class="tx-sub">
+            ${receiptBadge}
             <span class="mini-badge" style="background:${cc.color};color:${cc.tc}">${cc.name}</span>
             <span class="mini-badge" style="background:${fp.color};color:${fp.tc}">${fp.name}</span>
-            ${x.parc && x.parc !== 'À vista' ? `<span class="mini-badge mini-badge-gold">${x.parc}</span>` : ''}
+            ${x.parc && !/^[AÀ] vista$/.test(x.parc) ? `<span class="mini-badge mini-badge-gold">${x.parc}</span>` : ''}
           </div>
         </div>
+        ${pending ? `<button class="tx-receive" onclick="openReceiptModal('${x.id}')" title="Confirmar recebimento">${icon('checkCircle')}<span>Confirmar recebimento</span></button>` : ''}
         <div class="tx-amount">
           <div class="${income ? 'tv-i' : 'tv-e'}">${income ? '+' : '-'}${brl(x.v)}</div>
           <div class="tx-date">${x.dt}</div>
@@ -373,6 +416,68 @@ function renderTxList() {
         ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')" title="Excluir">${icon('trash')}</button>` : ''}
       </div>`;
   }).join('');
+}
+
+// ── Confirmação de recebimento ──
+let receiptTxId = null;
+let receiptFP = null;
+
+function renderTxSummary(pending) {
+  $('txSummary').innerHTML = pending.length ? `
+    <div class="tx-summary">
+      <span class="tx-summary-icon">${icon('clock')}</span>
+      <div class="fill">
+        <div class="tx-summary-title">A receber no período</div>
+        <div class="tx-summary-sub">${pending.length} ${pending.length === 1 ? 'lançamento aguardando' : 'lançamentos aguardando'} confirmação</div>
+      </div>
+      <div class="tx-summary-val">R$ ${fmtMoney(sumValues(pending))}</div>
+    </div>` : '';
+}
+
+function openReceiptModal(id) {
+  const tx = transactions.find(x => x.id === id);
+  if (!tx) return;
+  receiptTxId = id;
+  receiptFP = tx.fp;
+  $('rcDesc').textContent = tx.d;
+  $('rcVal').textContent = 'R$ ' + fmtMoney(tx.v);
+  $('rcDate').textContent = 'Competência ' + tx.dt;
+  $('rcQuit').value = fmtDateKey(new Date());
+  renderReceiptChips();
+  openModal('receiptModal');
+}
+
+function renderReceiptChips() {
+  $('rcFPChips').innerHTML = formasPag.map(f => catalogChip(f, 'fp-chip', receiptFP === f.id, `receiptFP='${f.id}';renderReceiptChips()`)).join('');
+}
+
+function saveReceipt() {
+  const tx = transactions.find(x => x.id === receiptTxId);
+  if (!tx) return;
+  if (!formasPag.some(f => f.id === receiptFP)) {
+    alert('Escolha a forma de recebimento.');
+    return;
+  }
+  const quitKey = $('rcQuit').value;
+  if (!quitKey) {
+    alert('Informe a data de quitação.');
+    return;
+  }
+  tx.fp = receiptFP;
+  tx.rec = true;
+  tx.quit = fmtDateBR(quitKey);
+  sbUpdateTxReceipt(tx);
+  closeModal('receiptModal');
+  afterTxChange();
+}
+
+function undoReceipt(id) {
+  const tx = transactions.find(x => x.id === id);
+  if (!tx || !confirm('Marcar "' + tx.d + '" como não recebido?')) return;
+  tx.rec = false;
+  tx.quit = null;
+  sbUpdateTxReceipt(tx);
+  afterTxChange();
 }
 
 // ── Centros de custo e formas de pagamento ──

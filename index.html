@@ -193,7 +193,7 @@
           <div class="fg4">
             <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" id="fDesc" placeholder="Ex: Sessão laser"/></div>
             <div class="form-group"><label class="form-label">Valor R$</label><input class="form-input" type="number" id="fVal" placeholder="0"/></div>
-            <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="fDt"/></div>
+            <div class="form-group"><label class="form-label">Data de competência</label><input class="form-input" type="date" id="fDt"/></div>
             <div class="form-group">
               <label class="form-label">Parcelas</label>
               <select class="form-select" id="fParc"><option>À vista</option><option>2x</option><option>3x</option><option>6x</option><option>12x</option></select>
@@ -254,9 +254,11 @@
             <div class="tx-filter-chip active" onclick="setTxFilter('todos',this)">Todos</div>
             <div class="tx-filter-chip" onclick="setTxFilter('income',this)">Receitas</div>
             <div class="tx-filter-chip" onclick="setTxFilter('expense',this)">Despesas</div>
+            <div class="tx-filter-chip" onclick="setTxFilter('pendente',this)">A receber</div>
             <div class="chip-group" id="ccFilterChips"></div>
             <div class="chip-group" id="fpFilterChips"></div>
           </div>
+          <div id="txSummary"></div>
           <div id="txList"></div>
         </div>
 
@@ -330,7 +332,7 @@
 <div class="modal-overlay" id="apptModal" onclick="if(event.target===this)closeApptModal()">
   <div class="modal modal-wide">
     <div class="modal-head">
-      <div class="modal-title">Novo agendamento</div>
+      <div class="modal-title" id="apptModalTitle">Novo agendamento</div>
       <button class="modal-close" onclick="closeApptModal()" aria-label="Fechar"><span data-icon="x"></span></button>
     </div>
 
@@ -466,6 +468,36 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('procModal')">Cancelar</button>
       <button class="btn-save" onclick="saveProc()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: CONFIRMAR RECEBIMENTO ═══ -->
+<div class="modal-overlay" id="receiptModal" onclick="if(event.target===this)closeModal('receiptModal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Confirmar recebimento</div>
+      <button class="modal-close" onclick="closeModal('receiptModal')" aria-label="Fechar"><span data-icon="x"></span></button>
+    </div>
+    <div class="receipt-summary">
+      <div class="receipt-desc" id="rcDesc"></div>
+      <div class="receipt-meta">
+        <div class="receipt-val" id="rcVal"></div>
+        <div class="receipt-date" id="rcDate"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Forma de recebimento</label>
+      <div class="fp-chips" id="rcFPChips"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Data de quitação</label>
+      <input class="form-input" type="date" id="rcQuit"/>
+      <div class="form-hint">Dia em que o dinheiro caiu na conta. No cartão de crédito pode ser outro dia.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('receiptModal')">Cancelar</button>
+      <button class="btn-save" onclick="saveReceipt()">Confirmar recebimento</button>
     </div>
   </div>
 </div>

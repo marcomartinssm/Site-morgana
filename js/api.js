@@ -26,10 +26,12 @@ async function sbWrite(label, op) {
 const txFromRow = r => ({
   id: r.id, t: r.tipo, d: r.descricao, cc: r.centro_custo, fp: r.forma_pagto,
   v: parseFloat(r.valor), dt: r.data_br, ic: r.icone || '📋', parc: r.parcelas || 'A vista',
+  rec: r.recebido !== false, quit: r.data_quitacao || null,
 });
 const txToRow = tx => ({
   id: tx.id, tipo: tx.t, descricao: tx.d, centro_custo: tx.cc, forma_pagto: tx.fp,
-  valor: tx.v, data_br: tx.dt, icone: tx.ic, parcelas: tx.parc,
+  valor: tx.v, data_br: tx.dt, icone: tx.ic, parcelas: tx.parc, recebido: tx.rec !== false,
+  data_quitacao: tx.quit || null,
 });
 
 // Centros de custo e formas de pagamento têm o mesmo formato
@@ -48,10 +50,11 @@ const clienteToRow = c => ({
 });
 
 const apptFromRow = r => ({
-  id: r.id, time: r.time, name: r.name, svc: r.svc,
+  id: r.id, time: r.time, name: r.name, svc: r.svc, svc_key: r.svc_key || 'avaliacao',
   dur: r.dur || '—', status: r.status || 'pending',
   clientId: r.client_id, obs: r.obs || '',
   valor: parseFloat(r.valor) || 0, fpag: r.fpag || 'pix',
+  reagendamentos: r.reagendamentos || 0, txId: r.transacao_id || null,
 });
 const apptToRow = (dateKey, a) => ({
   id: typeof a.id === 'string' ? parseInt(a.id.replace('a', '')) || Date.now() : a.id,
@@ -60,6 +63,7 @@ const apptToRow = (dateKey, a) => ({
   dur: a.dur || '-', status: a.status,
   client_id: a.clientId || null, obs: a.obs || '',
   valor: a.valor || 0, fpag: a.fpag || 'pix',
+  reagendamentos: a.reagendamentos || 0, transacao_id: a.txId || null,
 });
 
 // ── Leitura ──
@@ -88,7 +92,8 @@ async function sbLoadClientes() {
   try {
     const sb = getSB();
     if (!sb) return null;
-    const { data, error } = await sb.from('clientes').select('*').order('name');
+    // Cadastros duplicados que foram mesclados ficam no banco, mas não aparecem
+    const { data, error } = await sb.from('clientes').select('*').is('mesclado_em', null).order('name');
     if (error || !data || !data.length) return null;
     return data.map(clienteFromRow);
   } catch (e) {
@@ -127,6 +132,8 @@ async function sbLoadAppts() {
 
 // ── Escrita ──
 const sbAddTx = tx => sbWrite('sbAddTx', sb => sb.from('transacoes').insert(txToRow(tx)));
+const sbUpdateTxReceipt = tx => sbWrite('sbUpdateTxReceipt', sb => sb.from('transacoes').update({ forma_pagto: tx.fp, recebido: tx.rec, data_quitacao: tx.quit || null }).eq('id', tx.id));
+const sbUpdateTx = tx => sbWrite('sbUpdateTx', sb => sb.from('transacoes').update(txToRow(tx)).eq('id', tx.id));
 const sbDeleteTx = id => sbWrite('sbDeleteTx', sb => sb.from('transacoes').delete().eq('id', id));
 const sbSaveCentros = () => sbWrite('sbSaveCentros', sb => sb.from('centros_custo').upsert(centros.map(catalogToRow)));
 const sbSaveFormas = () => sbWrite('sbSaveFormas', sb => sb.from('formas_pagamento').upsert(formasPag.map(catalogToRow)));

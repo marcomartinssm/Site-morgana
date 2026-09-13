@@ -441,6 +441,11 @@ button {
   color: var(--muted);
 }
 
+.badge-done {
+  background: var(--success);
+  color: #fff;
+}
+
 .avatar {
   width: 40px;
   height: 40px;
