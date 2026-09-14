@@ -31,6 +31,37 @@ function addClient(c) {
   refreshCRM();
 }
 
+// Cliente já cadastrado com o mesmo telefone (compara os últimos 8 dígitos)
+function findClientByPhone(phone) {
+  const key = phoneKey(phone);
+  return key ? clients.find(c => phoneKey(c.phone) === key) : null;
+}
+
+// Junta os dados de um novo cadastro em um cliente que já existe
+function mergeIntoClient(c, fields) {
+  (fields.procs || []).forEach(p => { if (!c.procs.includes(p)) c.procs.push(p); });
+  if (fields.obs && !(c.obs || '').includes(fields.obs)) c.obs = c.obs ? c.obs + ' | ' + fields.obs : fields.obs;
+  if ((!c.bday || c.bday === '—') && fields.bday && fields.bday !== '—') c.bday = fields.bday;
+  sbUpsertCliente(c);
+  refreshCRM();
+}
+
+// Cadastra um cliente, mas antes procura duplicado pelo telefone; devolve o cliente usado (existente ou novo)
+function addOrMergeClient(fields) {
+  const existing = findClientByPhone(fields.phone);
+  const useExisting = existing && confirm(
+    'Já existe "' + existing.name + '" com esse telefone (' + existing.phone + ').\n\n' +
+    'OK: usar esse cadastro e juntar as informações\n' +
+    'Cancelar: criar um cadastro separado (ex.: pessoas diferentes com o mesmo número)');
+  if (useExisting) {
+    mergeIntoClient(existing, fields);
+    return existing;
+  }
+  const novo = newClient(fields);
+  addClient(novo);
+  return novo;
+}
+
 function refreshCRM() {
   filterCRM();
   if (crmView === 'kanban') renderKanban();
@@ -71,6 +102,10 @@ function filterCRM() {
 
 // ── Lista ──
 function renderCRMList(list = clients) {
+  if (!list.length) {
+    $('clientList').innerHTML = '<div class="list-empty">Nenhum cliente encontrado.</div>';
+    return;
+  }
   $('clientList').innerHTML = list.map(c => {
     const st = stageInfo(c.stage);
     const procTags = c.procs.map(p => `<span class="proc-tag proc-tag-grey">${PROC_LABELS[p]}</span>`).join('');
@@ -120,8 +155,21 @@ function selClient(id) {
   }
 }
 
+// Histórico do cliente na agenda, para comparar com as sessões registradas na ficha
+function clientApptStats(clientId) {
+  const s = { done: 0, cancelled: 0, rescheduled: 0 };
+  Object.values(apptsByDate).forEach(arr => arr.forEach(a => {
+    if (a.clientId !== clientId) return;
+    if (a.status === 'done') s.done++;
+    if (a.status === 'cancelled') s.cancelled++;
+    s.rescheduled += a.reagendamentos || 0;
+  }));
+  return s;
+}
+
 function buildClientDetail(c) {
   const st = stageInfo(c.stage);
+  const hist = clientApptStats(c.id);
 
   const procHtml = c.procedimentos && c.procedimentos.length
     ? c.procedimentos.map(p => `
@@ -146,7 +194,7 @@ function buildClientDetail(c) {
         <div class="dp-name">${c.name}</div>
         <div class="dp-since">${c.phone} · desde ${c.since}</div>
         <div class="dp-tags">
-          <select class="form-select stage-select" style="background:${st.bg};color:${st.color};border-color:${st.color}40" onchange="changeStage(${c.id},this.value)">${stageOpts}</select>
+          <select class="form-select stage-select" style="background-color:${st.bg};color:${st.color};border-color:${st.color}40" onchange="changeStage(${c.id},this.value)">${stageOpts}</select>
           ${procTags}
         </div>
       </div>
@@ -154,6 +202,14 @@ function buildClientDetail(c) {
         <div class="dps"><div class="dps-val">${c.visits}</div><div class="dps-label">sessões</div></div>
         <div class="dps"><div class="dps-val">R$${c.spent.toLocaleString('pt-BR')}</div><div class="dps-label">investido</div></div>
         <div class="dps"><div class="dps-val">R$${perSession}</div><div class="dps-label">p/ sessão</div></div>
+      </div>
+      <div class="dp-section dp-section-bordered">
+        <div class="section-label">histórico na agenda</div>
+        <div class="dp-agenda">
+          <div class="dpa dpa-done"><div class="dpa-val">${hist.done}</div><div class="dpa-label">concluídos</div></div>
+          <div class="dpa dpa-cancel"><div class="dpa-val">${hist.cancelled}</div><div class="dpa-label">cancelados</div></div>
+          <div class="dpa dpa-resched"><div class="dpa-val">${hist.rescheduled}</div><div class="dpa-label">reagendados</div></div>
+        </div>
       </div>
       <div class="dp-section dp-section-bordered">
         <div class="section-label">informações</div>
@@ -165,12 +221,12 @@ function buildClientDetail(c) {
       <div class="dp-section">
         <div class="dp-section-head">
           <div class="section-label">procedimentos</div>
-          <button class="btn-mini" onclick="openProcModal(${c.id})">+ Adicionar</button>
+          <button class="btn-mini" onclick="openProcModal(${c.id})">${icon('plus')}Adicionar</button>
         </div>
         ${procHtml}
       </div>
       <div class="dp-actions">
-        <button class="btn-ghost" onclick="goTo('agenda',document.querySelector('[title=Agenda]'))">Agendar</button>
+        <button class="btn-ghost" onclick="goTo('agenda',document.querySelector('[title=Agenda]'))">${icon('calendar')}<span>Agendar</span></button>
       </div>
     </div>`;
 }
@@ -195,8 +251,8 @@ function renderKanban() {
     if (q) cards = cards.filter(c => c.name.toLowerCase().includes(q));
     return `
       <div class="kb-col">
-        <div class="kb-col-head" style="border-top:2px solid ${st.color}">
-          <span class="kb-col-title" style="color:${st.color}">${st.label}</span>
+        <div class="kb-col-head">
+          <span class="kb-col-title"><span class="kb-dot" style="background:${st.color}"></span>${st.label}</span>
           <span class="kb-count" style="background:${st.bg};color:${st.color}">${cards.length}</span>
         </div>
         ${cards.map(renderKanbanCard).join('')}
@@ -233,14 +289,16 @@ function saveClient() {
   const name = $('cnName').value.trim();
   if (!name) return;
   const procs = [...document.querySelectorAll('#cnProcChips input:checked')].map(x => x.value);
-  addClient(newClient({
+  const now = new Date();
+  addOrMergeClient({
     name,
     phone: $('cnPhone').value || '—',
-    since: 'Abr 2026',
+    bday: $('cnBday').value ? fmtDateBR($('cnBday').value) : '—',
+    since: MONTHS[now.getMonth()].slice(0, 3) + ' ' + now.getFullYear(),
     stage: $('cnStage').value,
     procs,
     obs: $('cnObs').value,
-  }));
+  });
   closeModal('clientModal');
   $('cnName').value = '';
   document.querySelectorAll('#cnProcChips input').forEach(i => { i.checked = false; });

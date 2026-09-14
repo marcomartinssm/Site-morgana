@@ -11,14 +11,14 @@ GitHub Pages a partir da branch `main`.
 ```
 index.html              Estrutura das telas e modais (sem estilos nem lógica embutidos)
 css/
-  base.css              Variáveis de cor, layout geral, botões, cards, formulários e modais
+  base.css              Tokens de design (cores, raios, sombras), layout, botões, cards, formulários e modais
   agenda.css            Calendário, linha do tempo e modal de agendamento
   crm.css               Lista, kanban e ficha do cliente
   financeiro.css        KPIs, gráficos, lançamentos, centros de custo e formas de pagamento
-  responsive.css        Ajustes para celular (barra de navegação inferior)
+  responsive.css        Tablet (menu recolhido) e celular (barra de navegação inferior)
 js/
   config.js             Chaves do Supabase e constantes (meses, estágios, procedimentos…)
-  utils.js              Funções auxiliares: datas, formatação, localStorage
+  utils.js              Funções auxiliares: datas, formatação, localStorage e ícones SVG
   api.js                Leitura e gravação no Supabase (conversão banco ⇄ tela)
   agenda.js             Calendário, agendamentos do dia e modal de agendamento
   crm.js                Clientes: lista, kanban, ficha e procedimentos
@@ -37,9 +37,9 @@ globais; o `app.js` vem por último porque inicializa a aplicação.
 
 | Tabela             | Conteúdo                                   |
 |--------------------|--------------------------------------------|
-| `agendamentos`     | Agenda (um registro por horário)           |
-| `clientes`         | CRM, com procedimentos em `procedimentos`  |
-| `transacoes`       | Lançamentos financeiros                    |
+| `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário e `transacao_id` liga o atendimento concluído à sua receita |
+| `clientes`         | CRM, com procedimentos em `procedimentos`; duplicados mesclados ficam ocultos (`mesclado_em`) |
+| `transacoes`       | Lançamentos financeiros; `data_br` é a competência, `recebido` e `data_quitacao` controlam recebimento/pagamento (fluxo de caixa); cópias de importação ficam ocultas (`duplicado_de`); ids `plan26_…` vieram da planilha "Financeiro 2026" (abr–ago) |
 | `centros_custo`    | Centros de custo                           |
 | `formas_pagamento` | Formas de pagamento                        |
 | `configuracoes`    | Configurações (ex.: URL do webhook do n8n) |

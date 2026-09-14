@@ -47,6 +47,13 @@ const getCC = id => centros.find(c => c.id === id) || FALLBACK_CATALOG_ITEM;
 const getFP = id => formasPag.find(f => f.id === id) || FALLBACK_CATALOG_ITEM;
 const sumValues = list => list.reduce((a, x) => a + x.v, 0);
 const isIncome = x => x.t === 'receita';
+// Pendente: receita a receber ou despesa a pagar
+const isPending = x => !x.rec;
+const isPendingIncome = x => isIncome(x) && !x.rec;
+const isPendingExpense = x => !isIncome(x) && !x.rec;
+// Chip colorido de centro de custo / forma de pagamento
+const catalogChip = (item, cls, selected, onclick) =>
+  `<span class="${cls}${selected ? ' sel' : ''}" style="background:${item.color};color:${item.tc}" onclick="${onclick}">${item.name}</span>`;
 const brl = v => 'R$' + v.toLocaleString('pt-BR');
 
 // ── Cálculos ──
@@ -67,19 +74,20 @@ function calcPeriod(p) {
   };
 }
 
-// Saldo acumulado desde o saldo inicial até o final do período
-function getSaldoCaixa(p) {
-  if (p === 'ano') {
-    const c = calcPeriod('ano');
-    return SALDO_INICIAL + (c.i - c.e);
-  }
-  let acum = SALDO_INICIAL;
-  for (const pm of PERIOD_ORDER) {
-    const c = calcPeriod(pm);
-    acum += c.i - c.e;
-    if (pm === p) break;
-  }
-  return acum;
+// Dia em que o dinheiro entrou ou saiu do caixa: a data de quitação, ou a do lançamento
+const cashDate = x => parseDt(x.quit || x.dt);
+
+// Saldo acumulado (fluxo de caixa) desde o saldo inicial até o final do período.
+// Pendências (a receber / a pagar) só entram no saldo projetado.
+function getSaldoCaixa(p, projetado = false) {
+  return transactions.reduce((saldo, x) => {
+    if (!projetado && isPending(x)) return saldo;
+    if (p !== 'ano') {
+      const d = cashDate(x);
+      if (d.getFullYear() !== ANO_BASE || d.getMonth() > PERIOD_MAP[p].m) return saldo;
+    }
+    return saldo + (isIncome(x) ? x.v : -x.v);
+  }, SALDO_INICIAL);
 }
 
 // Variação em relação ao mês anterior
@@ -146,13 +154,16 @@ function setPeriod(p, el) {
   $('kE').textContent = 'R$ ' + fmtMoney(c.e);
   $('kP').textContent = (lucro >= 0 ? '+R$ ' : '-R$ ') + fmtMoney(Math.abs(lucro));
   $('kP').style.color = lucro >= 0 ? '#2e7d4f' : '#b85050';
-  $('kT').textContent = 'R$ ' + fmtMoney(getSaldoCaixa(p));
+  const saldo = getSaldoCaixa(p);
+  const saldoProjetado = getSaldoCaixa(p, true);
+  $('kT').textContent = 'R$ ' + fmtMoney(saldo);
 
   const lbl = getPeriodLabel(p);
   $('kId').textContent = lbl.id;
   $('kEd').textContent = lbl.ed;
   $('kPd').textContent = lbl.pd;
   $('kTd').textContent =
+    Math.abs(saldoProjetado - saldo) >= 0.01 ? 'Projetado: R$ ' + fmtMoney(saldoProjetado) :
     p === 'jan' ? 'Saldo inicial: R$ ' + fmtMoney(SALDO_INICIAL) :
     p === 'ano' ? 'Acumulado ' + ANO_BASE :
     'Acumulado até ' + PERIOD_MAP[p].label.slice(0, 3);
@@ -251,20 +262,23 @@ function toggleAddForm() {
     selCC = null;
     selFP = null;
     renderFormChips();
+    setTxType(txType);
   }
 }
 
 function renderFormChips() {
-  const chip = (item, cls, selected, onclick) =>
-    `<span class="${cls}${selected ? ' sel' : ''}" style="background:${item.color};color:${item.tc}" onclick="${onclick}">${item.name}</span>`;
-  $('formCCChips').innerHTML = centros.map(c => chip(c, 'cc-chip', selCC === c.id, `selCC='${c.id}';renderFormChips()`)).join('');
-  $('formFPChips').innerHTML = formasPag.map(f => chip(f, 'fp-chip', selFP === f.id, `selFP='${f.id}';renderFormChips()`)).join('');
+  $('formCCChips').innerHTML = centros.map(c => catalogChip(c, 'cc-chip', selCC === c.id, `selCC='${c.id}';renderFormChips()`)).join('');
+  $('formFPChips').innerHTML = formasPag.map(f => catalogChip(f, 'fp-chip', selFP === f.id, `selFP='${f.id}';renderFormChips()`)).join('');
 }
 
 function setTxType(t) {
   txType = t;
   $('btnI').className = 'type-btn' + (t === 'income' ? ' ti' : '');
   $('btnE').className = 'type-btn' + (t === 'expense' ? ' te' : '');
+  // Situação inicial: receitas a receber, despesas já pagas
+  $('fSit').innerHTML = t === 'income'
+    ? '<option value="pendente">A receber</option><option value="quitado">Recebido</option>'
+    : '<option value="quitado">Pago</option><option value="pendente">A pagar</option>';
 }
 
 function afterTxChange() {
@@ -290,6 +304,7 @@ function addTx() {
     dt: dt ? fmtDateBR(dt) : 'hoje',
     ic: TX_ICONS[selCC] || '📋',
     parc: $('fParc').value,
+    rec: $('fSit').value === 'quitado',
   };
   transactions.unshift(novo);
   sbAddTx(novo);
@@ -298,6 +313,36 @@ function addTx() {
   $('fDesc').value = '';
   $('fVal').value = '';
   afterTxChange();
+}
+
+// Centro de custo da receita de um agendamento: locação ou estética
+const apptCostCenter = appt => (appt.svc_key === 'locacao' || /^loca/i.test(appt.svc || '') ? 'loc' : 'est');
+
+// Receita lançada automaticamente ao concluir um agendamento
+function addApptIncome(appt, dateKey, valor) {
+  const cc = apptCostCenter(appt);
+  const novo = {
+    id: 'tx' + Date.now(),
+    t: 'receita',
+    d: appt.name + ' · ' + appt.svc,
+    cc,
+    fp: appt.fpag || 'pix',
+    v: valor,
+    dt: fmtDateBR(dateKey),
+    ic: TX_ICONS[cc] || '📋',
+    parc: 'À vista',
+    rec: false,
+  };
+  transactions.unshift(novo);
+  sbAddTx(novo);
+  if (curPage === 'fin') afterTxChange();
+  return novo;
+}
+
+// Receita de um atendimento concluído: pelo vínculo salvo ou, nos antigos, pela descrição e data
+function findApptIncome(appt, dateKey) {
+  if (appt.txId) return transactions.find(t => t.id === appt.txId) || null;
+  return transactions.find(t => isIncome(t) && t.d === appt.name + ' · ' + appt.svc && t.dt === fmtDateBR(dateKey)) || null;
 }
 
 function deleteTx(id) {
@@ -333,9 +378,14 @@ function setTxFilter(f, el) {
 }
 
 function renderTxList() {
-  let list = calcPeriod(curPeriod).list;
+  const periodList = calcPeriod(curPeriod).list;
+  renderTxSummary(periodList.filter(isPendingIncome), periodList.filter(isPendingExpense));
+
+  let list = periodList;
   if (txFilter === 'income') list = list.filter(isIncome);
   else if (txFilter === 'expense') list = list.filter(x => x.t === 'despesa');
+  else if (txFilter === 'pendente') list = list.filter(isPendingIncome);
+  else if (txFilter === 'apagar') list = list.filter(isPendingExpense);
   else if (txFilter !== 'todos') list = list.filter(x => x.cc === txFilter || x.fp === txFilter);
 
   // Receitas primeiro; cada grupo em ordem de data
@@ -355,24 +405,104 @@ function renderTxList() {
       lastType = x.t;
       sep = `<div class="tx-sep">${income ? 'Receitas — por data' : 'Despesas — por vencimento'}</div>`;
     }
+    const pending = isPending(x);
+    const receiptBadge = pending
+      ? `<span class="mini-badge mini-badge-pending">${income ? 'A receber' : 'A pagar'}</span>`
+      : `<button class="mini-badge mini-badge-received" onclick="undoReceipt('${x.id}')" title="Quitado em ${x.quit || x.dt} — clique para desmarcar">${icon('check')}${income ? 'Recebido' : 'Pago'}${x.quit && x.quit !== x.dt ? ' ' + x.quit.slice(0, 5) : ''}</button>`;
+    const confirmLabel = income ? 'Confirmar recebimento' : 'Confirmar pagamento';
+    const signed = income ? x.v : -x.v;   // despesa com valor negativo na planilha vira entrada
     return sep + `
       <div class="tx-item">
         <div class="tx-icon ${income ? 'ico-i' : 'ico-e'}">${x.ic}</div>
         <div class="fill">
           <div class="tx-name">${x.d}</div>
           <div class="tx-sub">
+            ${receiptBadge}
             <span class="mini-badge" style="background:${cc.color};color:${cc.tc}">${cc.name}</span>
             <span class="mini-badge" style="background:${fp.color};color:${fp.tc}">${fp.name}</span>
-            ${x.parc && x.parc !== 'À vista' ? `<span class="mini-badge mini-badge-gold">${x.parc}</span>` : ''}
+            ${x.parc && !/^[AÀ] vista$/.test(x.parc) ? `<span class="mini-badge mini-badge-gold">${x.parc}</span>` : ''}
           </div>
         </div>
+        ${pending ? `<button class="tx-receive" onclick="openReceiptModal('${x.id}')" title="${confirmLabel}">${icon('checkCircle')}<span>${confirmLabel}</span></button>` : ''}
         <div class="tx-amount">
-          <div class="${income ? 'tv-i' : 'tv-e'}">${income ? '+' : '-'}${brl(x.v)}</div>
+          <div class="${income ? 'tv-i' : 'tv-e'}">${signed >= 0 ? '+' : '-'}${brl(Math.abs(signed))}</div>
           <div class="tx-date">${x.dt}</div>
         </div>
-        ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')">✕</button>` : ''}
+        ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')" title="Excluir">${icon('trash')}</button>` : ''}
       </div>`;
   }).join('');
+}
+
+// ── Confirmação de recebimento (receitas) e de pagamento (despesas) ──
+let receiptTxId = null;
+let receiptFP = null;
+
+function renderTxSummary(pendingIncome, pendingExpense) {
+  const card = (list, title, what) => list.length ? `
+    <div class="tx-summary">
+      <span class="tx-summary-icon">${icon('clock')}</span>
+      <div class="fill">
+        <div class="tx-summary-title">${title}</div>
+        <div class="tx-summary-sub">${list.length} ${list.length === 1 ? 'lançamento aguardando' : 'lançamentos aguardando'} ${what}</div>
+      </div>
+      <div class="tx-summary-val">R$ ${fmtMoney(sumValues(list))}</div>
+    </div>` : '';
+  $('txSummary').innerHTML = card(pendingIncome, 'A receber no período', 'recebimento')
+    + card(pendingExpense, 'A pagar no período', 'pagamento');
+}
+
+function openReceiptModal(id) {
+  const tx = transactions.find(x => x.id === id);
+  if (!tx) return;
+  const income = isIncome(tx);
+  receiptTxId = id;
+  receiptFP = tx.fp;
+  $('rcTitle').textContent = income ? 'Confirmar recebimento' : 'Confirmar pagamento';
+  $('rcSave').textContent = $('rcTitle').textContent;
+  $('rcFPLabel').textContent = income ? 'Forma de recebimento' : 'Forma de pagamento';
+  $('rcHint').textContent = income
+    ? 'Dia em que o dinheiro caiu na conta. No cartão de crédito pode ser outro dia.'
+    : 'Dia em que o valor saiu da conta.';
+  $('rcVal').classList.toggle('receipt-val-out', !income);
+  $('rcDesc').textContent = tx.d;
+  $('rcVal').textContent = 'R$ ' + fmtMoney(tx.v);
+  $('rcDate').textContent = 'Competência ' + tx.dt;
+  $('rcQuit').value = fmtDateKey(new Date());
+  renderReceiptChips();
+  openModal('receiptModal');
+}
+
+function renderReceiptChips() {
+  $('rcFPChips').innerHTML = formasPag.map(f => catalogChip(f, 'fp-chip', receiptFP === f.id, `receiptFP='${f.id}';renderReceiptChips()`)).join('');
+}
+
+function saveReceipt() {
+  const tx = transactions.find(x => x.id === receiptTxId);
+  if (!tx) return;
+  if (!formasPag.some(f => f.id === receiptFP)) {
+    alert('Escolha a forma de ' + (isIncome(tx) ? 'recebimento.' : 'pagamento.'));
+    return;
+  }
+  const quitKey = $('rcQuit').value;
+  if (!quitKey) {
+    alert('Informe a data de quitação.');
+    return;
+  }
+  tx.fp = receiptFP;
+  tx.rec = true;
+  tx.quit = fmtDateBR(quitKey);
+  sbUpdateTxReceipt(tx);
+  closeModal('receiptModal');
+  afterTxChange();
+}
+
+function undoReceipt(id) {
+  const tx = transactions.find(x => x.id === id);
+  if (!tx || !confirm('Marcar "' + tx.d + '" como não ' + (isIncome(tx) ? 'recebido' : 'pago') + '?')) return;
+  tx.rec = false;
+  tx.quit = null;
+  sbUpdateTxReceipt(tx);
+  afterTxChange();
 }
 
 // ── Centros de custo e formas de pagamento ──
@@ -392,7 +522,7 @@ function totalsBy(field, items) {
 const statCardHead = (item, count) => `
   <div class="stat-card-head">
     <span class="pill pill-lg" style="background:${item.color};color:${item.tc}">${item.name}</span>
-    <span class="stat-card-count">${count} lancamentos</span>
+    <span class="stat-card-count">${count} lançamentos</span>
   </div>`;
 const miniStat = (value, label, cls) =>
   `<div class="cc-mini"><div class="cc-mini-val ${cls}">${value}</div><div class="cc-mini-lbl">${label}</div></div>`;
@@ -463,7 +593,7 @@ function renderCatalogManage(kind) {
     <div class="manage-item">
       <div class="manage-dot" style="background:${it.color}"></div>
       <div class="manage-name">${it.name}</div>
-      <button class="manage-del" onclick="deleteCatalogItem('${kind}','${it.id}')">✕</button>
+      <button class="manage-del" onclick="deleteCatalogItem('${kind}','${it.id}')" title="Excluir">${icon('trash')}</button>
     </div>`).join('');
 }
 

@@ -7,15 +7,15 @@ let curPage = 'agenda';
 let dataLoaded = false;
 
 const PAGE_TITLES = {
-  agenda: 'Agenda — <em>Hoje</em>',
-  crm: 'CRM — <em>Clientes</em>',
+  agenda: 'Agenda',
+  crm: 'Clientes',
   fin: 'Financeiro',
   config: 'Configurações',
 };
 const TOP_BUTTONS = {
-  agenda: '+ Novo agendamento',
-  crm: '+ Novo lead',
-  fin: '+ Lançamento',
+  agenda: 'Novo agendamento',
+  crm: 'Novo lead',
+  fin: 'Novo lançamento',
   config: '',
 };
 
@@ -34,10 +34,13 @@ function goTo(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const pageEl = $('page-' + page);
   if (pageEl) pageEl.classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
 
-  $('pageTitle').innerHTML = PAGE_TITLES[page] || page;
-  $('topBtn').textContent = TOP_BUTTONS[page] || '';
-  $('topBtn2').style.display = page === 'fin' ? 'inline-block' : 'none';
+  $('pageTitle').textContent = PAGE_TITLES[page] || page;
+  const btnLabel = TOP_BUTTONS[page] || '';
+  $('topBtn').innerHTML = icon('plus') + '<span>' + btnLabel + '</span>';
+  $('topBtn').hidden = !btnLabel;
+  $('topBtn2').hidden = page !== 'fin';
   curPage = page;
 
   if (page === 'agenda') renderAgenda();
@@ -138,23 +141,6 @@ function startPolling() {
   }, POLLING_MS);
 }
 
-// ── Layout mobile ──
-// Reforça via JS o layout de barra inferior (fallback para o Safari do iOS)
-function applyMobileLayout() {
-  if (window.innerWidth > 768) return;
-  const shell = document.querySelector('.shell');
-  const sidenav = document.querySelector('.sidenav');
-  const main = document.querySelector('.main');
-  if (!shell || !sidenav || !main) return;
-  shell.style.cssText = 'display:flex;flex-direction:column;height:100%;position:fixed;width:100%;top:0;left:0';
-  sidenav.style.cssText = 'order:2;width:100%;height:56px;flex-direction:row;padding:0;gap:0;flex-shrink:0;border-top:0.5px solid rgba(255,255,255,.2);display:flex;align-items:center';
-  main.style.cssText = 'order:1;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0';
-  document.querySelectorAll('.nav-logo,.nav-sep').forEach(e => { e.style.display = 'none'; });
-  document.querySelectorAll('.nav-item').forEach(e => {
-    e.style.cssText = 'flex:1;height:100%;border-radius:0;gap:2px;padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer';
-  });
-}
-
 // Fecha a lista de clientes do modal de agendamento ao clicar fora dela
 function closeClientDropOnOutsideClick(e) {
   const drop = $('apptClientDrop');
@@ -163,11 +149,10 @@ function closeClientDropOnOutsideClick(e) {
 
 // ── Inicialização ──
 function init() {
+  hydrateIcons();
   renderTopDate();
   localStorage.removeItem('mp_appts');   // limpeza de dados de versões antigas
   renderAgenda();
-  applyMobileLayout();
-  window.addEventListener('resize', applyMobileLayout);
   document.addEventListener('click', closeClientDropOnOutsideClick);
   loadAllData();
   startPolling();

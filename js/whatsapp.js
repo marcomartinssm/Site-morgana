@@ -61,9 +61,9 @@ function sendWppFromAgenda(apptId, dateKey) {
       // Feedback visual rápido no botão
       const btn = document.querySelector(`[data-wpp="${apptId}"]`);
       if (btn) {
-        btn.textContent = '✅';
-        btn.style.color = '#2e7d4f';
-        setTimeout(() => { btn.textContent = '📲'; btn.style.color = '#25d366'; }, 2000);
+        btn.innerHTML = icon('check');
+        btn.style.color = '#2f7d53';
+        setTimeout(() => { btn.innerHTML = icon('send'); btn.style.color = ''; }, 2000);
       }
     })
     .catch(() => alert('Erro de conexão. Verifique a URL do webhook nas configurações.'));
