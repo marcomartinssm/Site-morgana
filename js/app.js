@@ -111,15 +111,7 @@ async function loadAllData() {
   dataLoaded = true;
   showSyncStatus('✓ Online', 2000);
 
-  const activePtab = document.querySelector('.ptab.active');
-  if (activePtab) setPeriod(curPeriod, activePtab);
-  if (curPage === 'fin') {
-    renderSvcs();
-    renderFPDonut();
-    renderCCSummary();
-    renderTxFilters();
-    renderTxList();
-  }
+  if (curPage === 'fin') renderFinanceiro();
 }
 
 // Atualiza agenda e CRM periodicamente para pegar mudanças de outros dispositivos
@@ -150,6 +142,7 @@ function closeClientDropOnOutsideClick(e) {
 // ── Inicialização ──
 function init() {
   hydrateIcons();
+  initPeriod();
   renderTopDate();
   localStorage.removeItem('mp_appts');   // limpeza de dados de versões antigas
   renderAgenda();

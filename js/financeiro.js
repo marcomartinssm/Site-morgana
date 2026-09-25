@@ -3,7 +3,7 @@
    centros de custo e formas de pagamento
    ========================================================================== */
 
-let curPeriod = 'mar';
+let curPeriod = 'mar';   // trocado pelo mês atual na inicialização (initPeriod)
 let transactions = [];     // carregado do Supabase
 let txType = 'income';     // tipo do novo lançamento: 'income' | 'expense'
 let txFilter = 'todos';    // filtro da lista de lançamentos
@@ -140,8 +140,20 @@ function apptSvcByTxId() {
 }
 
 // ── Período e seções ──
+// O financeiro abre no mês atual; passado o ano-base, abre no anual
+function initPeriod() {
+  const hoje = new Date();
+  if (hoje.getFullYear() === ANO_BASE) curPeriod = PERIOD_ORDER[hoje.getMonth()];
+  else if (hoje.getFullYear() > ANO_BASE) curPeriod = 'ano';
+}
+
+// Aba do período atual, mesmo antes do primeiro clique
+const periodTab = () => document.querySelector('.ptab.active')
+  || document.querySelectorAll('.ptab')[PERIOD_ORDER.indexOf(curPeriod)]
+  || document.querySelector('.ptab-year');
+
 function renderFinanceiro() {
-  setPeriod(curPeriod, document.querySelector('.ptab.active'));
+  setPeriod(curPeriod, periodTab());
   renderTxFilters();
   renderTxList();
 }
@@ -322,7 +334,7 @@ function setTxType(t) {
 }
 
 function afterTxChange() {
-  setPeriod(curPeriod, document.querySelector('.ptab.active'));
+  setPeriod(curPeriod, periodTab());
   renderTxList();
 }
 
