@@ -104,7 +104,8 @@ function renderApptRow(a) {
     ? `<span class="appt-client-chip" onclick="openClientFicha(${linked.id})" title="Ver ficha">${icon('arrowUpRight')}${firstName(linked.name)}</span>`
     : '';
   const editBtn = `<button class="appt-btn appt-btn-edit" onclick="editAppt('${a.id}')" title="Editar">${icon('pencil')}</button>`;
-  const actions = isCancelled ? '' : isDone ? `<div class="appt-actions">${editBtn}</div>` : `
+  // Concluídos e cancelados só têm o editar: a situação é trocada dentro da edição
+  const actions = isCancelled || isDone ? `<div class="appt-actions">${editBtn}</div>` : `
     <div class="appt-actions">
       <button class="appt-btn appt-btn-done" onclick="concludeAppt('${a.id}')" title="Concluir atendimento">${icon('checkCheck')}<span>Concluir</span></button>
       ${editBtn}
@@ -143,35 +144,68 @@ function setApptStatus(id, status) {
   renderTimeline();
 }
 
-// Conclui o atendimento: soma o valor no "investido" do cliente e lança a receita no Financeiro
+// Texto da confirmação: o que acontece ao concluir um atendimento
+function conclusionEffects(appt) {
+  const valor = parseFloat(appt.valor) || 0;
+  const client = appt.clientId ? clients.find(x => x.id === appt.clientId) : null;
+  if (valor <= 0) return '\n\nSem valor informado: nada será lançado no Financeiro.';
+  const effects = ['• lançar R$ ' + fmtMoney(valor) + ' como receita a receber no Financeiro'];
+  if (client) effects.push('• somar o valor ao "investido" de ' + firstName(client.name));
+  return '\n\nIsso vai:\n' + effects.join('\n');
+}
+
+// Aplica a conclusão: soma o valor no "investido" do cliente e lança a receita no Financeiro
+function applyConclusion(appt, dateKey) {
+  appt.status = 'done';
+  const valor = parseFloat(appt.valor) || 0;
+  if (valor <= 0) return;
+  const client = appt.clientId ? clients.find(x => x.id === appt.clientId) : null;
+  if (client) {
+    client.spent = (parseFloat(client.spent) || 0) + valor;
+    sbUpsertCliente(client);
+  }
+  // Receita já recebida que ficou de uma conclusão desfeita: reaproveita em vez de duplicar
+  const kept = appt.txId ? transactions.find(t => t.id === appt.txId) : null;
+  appt.txId = kept ? kept.id : addApptIncome(appt, dateKey, valor).id;   // vínculo usado se o atendimento for editado depois
+}
+
 function concludeAppt(id) {
   const arr = getApptDay(agendaSelDate);
   const a = arr.find(x => String(x.id) === String(id));
   if (!a || a.status === 'done') return;
+  if (!confirm('Concluir o atendimento de ' + a.name + '?' + conclusionEffects(a))) return;
 
-  const valor = parseFloat(a.valor) || 0;
-  const client = a.clientId ? clients.find(x => x.id === a.clientId) : null;
-  const effects = [];
-  if (valor > 0) {
-    effects.push('• lançar R$ ' + fmtMoney(valor) + ' como receita a receber no Financeiro');
-    if (client) effects.push('• somar o valor ao "investido" de ' + firstName(client.name));
-  }
-  const detail = effects.length
-    ? '\n\nIsso vai:\n' + effects.join('\n')
-    : '\n\nSem valor informado: nada será lançado no Financeiro.';
-  if (!confirm('Concluir o atendimento de ' + a.name + '?' + detail)) return;
-
-  a.status = 'done';
-  if (valor > 0) {
-    if (client) {
-      client.spent = (parseFloat(client.spent) || 0) + valor;
-      sbUpsertCliente(client);
-    }
-    a.txId = addApptIncome(a, agendaSelDate, valor).id;   // vínculo usado se o atendimento for editado depois
-  }
+  applyConclusion(a, agendaSelDate);
   setApptDay(agendaSelDate, arr);
   sbUpsertAppt(agendaSelDate, a);
   renderTimeline();
+}
+
+// Desfaz a conclusão: tira o valor do "investido" e exclui a receita que ainda estava a receber.
+// Receita já recebida continua no Financeiro. Devolve false se o usuário desistir.
+function undoConclusion(before, beforeDate, after) {
+  const valor = parseFloat(before.valor) || 0;
+  const client = (before.clientId && clients.find(c => c.id === before.clientId)) || null;
+  const tx = findApptIncome(before, beforeDate);
+  const effects = [];
+  if (client && valor > 0) effects.push('• tirar R$ ' + fmtMoney(valor) + ' do "investido" de ' + firstName(client.name));
+  if (tx && !tx.rec) effects.push('• excluir a receita a receber de R$ ' + fmtMoney(tx.v) + ' do Financeiro');
+  if (tx && tx.rec) effects.push('• a receita de R$ ' + fmtMoney(tx.v) + ' já foi recebida e continua no Financeiro (exclua em Lançamentos se não valer mais)');
+  const detail = effects.length ? '\n\nIsso vai:\n' + effects.join('\n') : '';
+  if (!confirm('Desfazer a conclusão do atendimento de ' + before.name + '?' + detail)) return false;
+
+  if (client && valor > 0) {
+    client.spent = Math.max(0, (parseFloat(client.spent) || 0) - valor);
+    sbUpsertCliente(client);
+  }
+  if (tx && !tx.rec) {
+    transactions.splice(transactions.indexOf(tx), 1);
+    sbDeleteTx(tx.id);
+    after.txId = null;
+  } else {
+    after.txId = tx ? tx.id : null;
+  }
+  return true;
 }
 
 // Edição de um atendimento já concluído: mantém a receita e o "investido" coerentes com os novos dados.
@@ -255,6 +289,7 @@ function renderUpcoming() {
 // ── Modal de agendamento ──
 function openNewApptModal() {
   $('apptModalTitle').textContent = 'Novo agendamento';
+  $('mStatusGroup').hidden = true;
   $('mDate').value = fmtDateKey(new Date());
   clearApptClient();
   $('mName').value = '';
@@ -272,6 +307,8 @@ function editAppt(id) {
   $('mVal').value = a.valor || '';
   $('mFpag').value = a.fpag || 'pix';
   $('mObs').value = a.obs || '';
+  $('mStatus').value = a.status;
+  $('mStatusGroup').hidden = false;
   if (a.clientId) {
     linkApptClient(a.clientId);
   } else {
@@ -288,6 +325,7 @@ function closeApptModal() {
   $('apptModal').classList.remove('open');
   delete $('apptModal').dataset.editId;
   delete $('apptModal').dataset.editDate;
+  $('mStatusGroup').hidden = true;
   clearApptClient();
   $('mName').value = '';
   $('mVal').value = '';
@@ -435,13 +473,26 @@ function saveAppt() {
     const orig = origArr.find(x => String(x.id) === String(editId));
     if (orig) {
       savedAppt = { ...orig, time, svc, svc_key, obs, valor, fpag, name, clientId: apptLinkedClientId || orig.clientId };
-      if (orig.status === 'done') {
-        // Atendimento concluído: mudar dia/horário é correção, não reagendamento
+      const newStatus = $('mStatus').value || orig.status;
+      const moved = dt !== editDate || time !== orig.time;
+      if (orig.status === 'done' && newStatus === 'done') {
+        // Continua concluído: mudar dia/horário é correção, não reagendamento
         if (!syncConcludedAppt(orig, editDate, savedAppt, dt)) return;
-      } else if (dt !== editDate || time !== orig.time) {
-        // Mudou dia ou horário: conta como reagendamento e volta a precisar de confirmação
-        savedAppt.reagendamentos = (orig.reagendamentos || 0) + 1;
-        savedAppt.status = 'pending';
+      } else if (orig.status === 'done') {
+        // Desconcluir
+        if (!undoConclusion(orig, editDate, savedAppt)) return;
+        savedAppt.status = newStatus;
+      } else if (newStatus === 'done') {
+        // Concluir pela edição (ex.: acertar a data do atendimento e já concluir)
+        if (!confirm('Concluir o atendimento de ' + name + '?' + conclusionEffects(savedAppt))) return;
+        applyConclusion(savedAppt, dt);
+      } else {
+        savedAppt.status = newStatus;
+        if (moved) {
+          // Mudou dia ou horário: conta como reagendamento; sem troca manual da situação, volta a Pendente
+          savedAppt.reagendamentos = (orig.reagendamentos || 0) + 1;
+          if (newStatus === orig.status) savedAppt.status = 'pending';
+        }
       }
       setApptDay(editDate, origArr.filter(x => x !== orig));
     }

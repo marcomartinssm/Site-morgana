@@ -399,6 +399,17 @@
       </div>
     </div>
     <div class="form-group"><label class="form-label">Observações</label><input class="form-input" id="mObs" placeholder="Número da sessão, região..."/></div>
+    <div class="form-group" id="mStatusGroup" hidden>
+      <label class="form-label">Situação</label>
+      <select class="form-select" id="mStatus">
+        <option value="pending">Pendente</option>
+        <option value="sent">Enviado</option>
+        <option value="confirmed">Confirmado</option>
+        <option value="done">Concluído</option>
+        <option value="cancelled">Cancelado</option>
+      </select>
+      <div class="form-hint">Mudar de "Concluído" para outra situação desfaz a conclusão (receita e "investido").</div>
+    </div>
 
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeApptModal()">Cancelar</button>
