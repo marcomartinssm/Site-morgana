@@ -23,13 +23,8 @@ let formasPag = [
   { id: 'din',  name: 'Dinheiro',          color: '#1a6a50', tc: '#fff' },
 ];
 
-// Distribuição "Por serviço" — valores fixos (ainda não calculados a partir dos dados)
-const svcs = [
-  { n: 'Remoção micropig.', p: 68, c: '#9b7fa6' },
-  { n: 'Remoção tatuagem',  p: 22, c: '#5c4470' },
-  { n: 'Aluguel sala',      p: 7,  c: '#8a7a6a' },
-  { n: 'Outros',            p: 3,  c: '#c2b8cc' },
-];
+// Cores das barras de "Receitas por serviço"
+const SVC_COLORS = ['#9b7fa6', '#5c4470', '#8a7a6a', '#7c9cbf', '#4a9068', '#c2b8cc'];
 
 const TX_ICONS = { est: '🔆', loc: '🏠', dist: '💸', diz: '🙏' };
 
@@ -54,7 +49,7 @@ const isPendingExpense = x => !isIncome(x) && !x.rec;
 // Chip colorido de centro de custo / forma de pagamento
 const catalogChip = (item, cls, selected, onclick) =>
   `<span class="${cls}${selected ? ' sel' : ''}" style="background:${item.color};color:${item.tc}" onclick="${onclick}">${item.name}</span>`;
-const brl = v => 'R$' + v.toLocaleString('pt-BR');
+const brl = v => 'R$ ' + fmtMoney(v);   // sempre com centavos
 
 // ── Cálculos ──
 // Receita, despesa e lançamentos de um período
@@ -132,12 +127,21 @@ function getBarData(p) {
   return weeks;
 }
 
+// Lançamentos do período selecionado
+const periodList = () => calcPeriod(curPeriod).list;
+
+// Procedimento de cada receita gerada por um atendimento concluído: { idDaReceita: 'Remoção micropig.' }
+function apptSvcByTxId() {
+  const map = {};
+  Object.values(apptsByDate).forEach(arr => arr.forEach(a => {
+    if (a.txId) map[String(a.txId)] = a.svc;
+  }));
+  return map;
+}
+
 // ── Período e seções ──
 function renderFinanceiro() {
   setPeriod(curPeriod, document.querySelector('.ptab.active'));
-  renderSvcs();
-  renderFPDonut();
-  renderCCSummary();
   renderTxFilters();
   renderTxList();
 }
@@ -170,7 +174,12 @@ function setPeriod(p, el) {
 
   const labels = p === 'ano' ? ['Q1', 'Q2', 'Q3', 'Q4'] : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
   renderBars(getBarData(p), labels);
+  renderSvcs();
+  renderFPDonut();
+  renderCCSummary();
   if ($('fsec-lancamentos').classList.contains('active')) renderTxList();
+  if ($('fsec-centros').classList.contains('active')) renderCCDetail();
+  if ($('fsec-pagamentos').classList.contains('active')) renderFPDetail();
 }
 
 function setFinSection(section, el) {
@@ -198,20 +207,42 @@ function renderBars(weeks, labels) {
 }
 
 function renderSvcs() {
-  $('svcList').innerHTML = svcs.map(s => `
-    <div class="svc-item">
-      <span class="svc-name">${s.n}</span>
-      <div class="svc-bg"><div class="svc-fill" style="width:${s.p}%;background:${s.c}"></div></div>
-      <span class="svc-pct">${s.p}%</span>
-    </div>`).join('');
+  const svcMap = apptSvcByTxId();
+  const tot = {};
+  periodList().filter(isIncome).forEach(x => {
+    // Atendimento concluído traz o procedimento; lançamento avulso entra pelo centro de custo
+    const label = svcMap[String(x.id)] || getCC(x.cc).name;
+    tot[label] = (tot[label] || 0) + x.v;
+  });
+
+  const total = Object.values(tot).reduce((a, b) => a + b, 0);
+  if (!total) {
+    $('svcList').innerHTML = '<div class="card-empty">Sem receitas neste período.</div>';
+    return;
+  }
+  const ordered = Object.entries(tot).sort((a, b) => b[1] - a[1]);
+  const linhas = ordered.slice(0, 5);
+  const resto = ordered.slice(5).reduce((s, [, v]) => s + v, 0);
+  if (resto > 0) linhas.push(['Outros', resto]);
+
+  $('svcList').innerHTML = linhas.map(([nome, v], i) => {
+    const pct = Math.round(v / total * 100);
+    return `
+    <div class="svc-item" title="R$ ${fmtMoney(v)}">
+      <span class="svc-name">${nome}</span>
+      <div class="svc-bg"><div class="svc-fill" style="width:${pct}%;background:${SVC_COLORS[i % SVC_COLORS.length]}"></div></div>
+      <span class="svc-pct">${pct}%</span>
+    </div>`;
+  }).join('');
 }
 
 // Rosca de receitas por forma de pagamento (SVG)
 function renderFPDonut() {
   const tot = {};
   formasPag.forEach(f => { tot[f.id] = 0; });
-  transactions.filter(isIncome).forEach(x => { if (tot[x.fp] !== undefined) tot[x.fp] += x.v; });
-  const total = Object.values(tot).reduce((a, b) => a + b, 0) || 1;
+  periodList().filter(isIncome).forEach(x => { if (tot[x.fp] !== undefined) tot[x.fp] += x.v; });
+  const soma = Object.values(tot).reduce((a, b) => a + b, 0);
+  const total = soma || 1;
 
   const R = 36, r = 20, C = 45;
   const pt = (radius, ang) => (C + radius * Math.cos(ang)).toFixed(1) + ',' + (C + radius * Math.sin(ang)).toFixed(1);
@@ -227,6 +258,10 @@ function renderFPDonut() {
   });
   $('fpDonut').innerHTML = paths;
 
+  if (!soma) {
+    $('fpLegend').innerHTML = '<div class="card-empty">Sem receitas neste período.</div>';
+    return;
+  }
   $('fpLegend').innerHTML = formasPag.map(f => `
     <div class="fp-leg-item">
       <div class="fp-leg-dot" style="background:${f.color}"></div>
@@ -238,8 +273,13 @@ function renderFPDonut() {
 function renderCCSummary() {
   const tot = {};
   centros.forEach(c => { tot[c.id] = 0; });
-  transactions.filter(x => x.t === 'despesa').forEach(x => { if (tot[x.cc] !== undefined) tot[x.cc] += x.v; });
-  const total = Object.values(tot).reduce((a, b) => a + b, 0) || 1;
+  periodList().filter(x => x.t === 'despesa').forEach(x => { if (tot[x.cc] !== undefined) tot[x.cc] += x.v; });
+  const soma = Object.values(tot).reduce((a, b) => a + b, 0);
+  const total = soma || 1;
+  if (!soma) {
+    $('ccSummary').innerHTML = '<div class="card-empty">Sem despesas neste período.</div>';
+    return;
+  }
 
   $('ccSummary').innerHTML = centros.map(cc => {
     const pct = Math.round(tot[cc.id] / total * 100);
@@ -284,8 +324,6 @@ function setTxType(t) {
 function afterTxChange() {
   setPeriod(curPeriod, document.querySelector('.ptab.active'));
   renderTxList();
-  renderCCSummary();
-  renderFPDonut();
 }
 
 function addTx() {
@@ -506,10 +544,10 @@ function undoReceipt(id) {
 }
 
 // ── Centros de custo e formas de pagamento ──
-function totalsBy(field, items) {
+function totalsBy(field, items, list) {
   const tot = {};
   items.forEach(it => { tot[it.id] = { i: 0, e: 0, count: 0 }; });
-  transactions.forEach(x => {
+  list.forEach(x => {
     const t = tot[x[field]];
     if (!t) return;
     if (isIncome(x)) t.i += x.v;
@@ -522,21 +560,24 @@ function totalsBy(field, items) {
 const statCardHead = (item, count) => `
   <div class="stat-card-head">
     <span class="pill pill-lg" style="background:${item.color};color:${item.tc}">${item.name}</span>
-    <span class="stat-card-count">${count} lançamentos</span>
+    <span class="stat-card-count">${count} ${count === 1 ? 'lançamento' : 'lançamentos'}</span>
   </div>`;
 const miniStat = (value, label, cls) =>
   `<div class="cc-mini"><div class="cc-mini-val ${cls}">${value}</div><div class="cc-mini-lbl">${label}</div></div>`;
 
 function renderCCDetail() {
-  const tot = totalsBy('cc', centros);
+  const list = periodList();
+  const tot = totalsBy('cc', centros, list);
   $('ccDetail').innerHTML = centros.map(cc => {
     const t = tot[cc.id];
     const saldo = t.i - t.e;
-    const recent = transactions.filter(x => x.cc === cc.id).slice(0, 3).map(x => `
+    const recent = list.filter(x => x.cc === cc.id)
+      .sort((a, b) => parseDt(b.dt) - parseDt(a.dt))
+      .slice(0, 3).map(x => `
       <div class="cc-hist-item">
         <span class="cc-hist-name">${x.d}</span>
-        <span class="cc-hist-val ${x.t === 'income' ? 'text-pos' : 'text-neg'}">${isIncome(x) ? '+' : '-'}R$${x.v}</span>
-      </div>`).join('');
+        <span class="cc-hist-val ${isIncome(x) ? 'text-pos' : 'text-neg'}">${isIncome(x) ? '+' : '-'}R$ ${fmtMoney(x.v)}</span>
+      </div>`).join('') || '<div class="card-empty">Sem lançamentos neste período.</div>';
     return `
       <div class="cc-stat-card">
         ${statCardHead(cc, t.count)}
@@ -551,8 +592,9 @@ function renderCCDetail() {
 }
 
 function renderFPDetail() {
-  const tot = totalsBy('fp', formasPag);
-  const totalIncome = sumValues(transactions.filter(isIncome)) || 1;
+  const list = periodList();
+  const tot = totalsBy('fp', formasPag, list);
+  const totalIncome = sumValues(list.filter(isIncome)) || 1;
   $('fpDetail').innerHTML = formasPag.map(fp => {
     const t = tot[fp.id];
     const pct = Math.round(t.i / totalIncome * 100);
