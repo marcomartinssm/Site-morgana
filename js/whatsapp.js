@@ -13,6 +13,47 @@ function postWebhook(url, payload) {
   });
 }
 
+// Telefone do cliente vinculado ao agendamento ('' quando não há)
+function apptPhone(appt) {
+  const c = appt.clientId ? clients.find(x => String(x.id) === String(appt.clientId)) : null;
+  const phone = c ? c.phone : (appt.phone || '');
+  return phone && phone !== '—' ? phone : '';
+}
+
+// Só envia com webhook configurado, telefone conhecido e sem envio anterior
+function canSendPosAtendimento(appt) {
+  return !!N8N_WEBHOOK_URL && !!apptPhone(appt) && !appt.posEnviadoEm;
+}
+
+// Mensagem de pós-atendimento: o n8n recebe na hora e aguarda o atraso antes de enviar
+function sendPosAtendimento(appt, dateKey) {
+  if (!canSendPosAtendimento(appt)) return;
+
+  postWebhook(N8N_WEBHOOK_URL, {
+    event: 'whatsapp_pos_atendimento',
+    apptId: appt.id,
+    clientName: appt.name,
+    phone: apptPhone(appt),
+    service: appt.svc,
+    date: fmtDateBR(dateKey),
+    time: appt.time,
+    delayMinutes: POS_ATENDIMENTO_DELAY_MIN,
+    sendAt: new Date(Date.now() + POS_ATENDIMENTO_DELAY_MIN * 60000).toISOString(),
+    message: MSG_POS_ATENDIMENTO.replace('{nome}', firstName(appt.name)),
+  })
+    .then(r => {
+      if (!r.ok) throw new Error('webhook respondeu ' + r.status);
+      appt.posEnviadoEm = new Date().toISOString();
+      sbUpsertAppt(dateKey, appt);
+      if (curPage === 'agenda') renderTimeline();
+      showSyncStatus('✓ Pós-atendimento programado', 3000);
+    })
+    .catch(e => {
+      console.warn('sendPosAtendimento:', e.message);
+      showSyncStatus('⚠ Falha ao programar o pós-atendimento', 4000);
+    });
+}
+
 function sendWppFromAgenda(apptId, dateKey) {
   if (!N8N_WEBHOOK_URL) {
     alert('Webhook não configurado.\nVá em ⚙ Config → cole a URL do webhook → Salvar.');

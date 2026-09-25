@@ -45,4 +45,23 @@ const SVC_SHORT_LABELS = {
 // Procedimentos que contam sessões na ficha do cliente
 const PROCS_COM_SESSAO = ['micropigmentacao', 'tatuagem', 'microagulhamento'];
 
+// Mensagem de pós-atendimento (WhatsApp) enviada ao concluir um atendimento.
+// O envio sai pelo n8n, que espera POS_ATENDIMENTO_DELAY_MIN antes de mandar.
+const POS_ATENDIMENTO_DELAY_MIN = 5;
+const MSG_POS_ATENDIMENTO = `Oi {nome} 🤍
+Quero te agradecer por ter confiado em mim e no meu trabalho hoje.
+Foi um prazer te atender ✨
+
+Para que você tenha o melhor resultado possível e uma boa recuperação da pele, seguem alguns cuidados importantes no pós-atendimento:
+
+✔️ Evite exposição ao sol na região tratada.
+✔️ Não utilize produtos ou cosméticos no local sem orientação.
+✔️ Beba muita água.
+✔️ Mantenha a pele limpa e observe a evolução nos próximos dias.
+
+Esses cuidados fazem parte da experiência do meu atendimento e ajudam a garantir uma recuperação tranquila e segura 🤍
+
+Qualquer dúvida ou se notar algo diferente, pode me chamar aqui sem receio.
+Estarei acompanhando sua evolução ✨`;
+
 const AVATAR_CLASSES = ['av-rose', 'av-gold', 'av-green', 'av-purple'];

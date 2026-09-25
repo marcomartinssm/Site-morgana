@@ -23,7 +23,7 @@ js/
   agenda.js             Calendário, agendamentos do dia e modal de agendamento
   crm.js                Clientes: lista, kanban, ficha e procedimentos
   financeiro.js         Cálculos por período, gráficos e cadastros financeiros
-  whatsapp.js           Envio de confirmação pelo webhook do n8n
+  whatsapp.js           Confirmação e mensagem de pós-atendimento pelo webhook do n8n
   configuracoes.js      Tela de configurações
   app.js                Navegação, carregamento dos dados, sincronização e inicialização
 tools/
@@ -37,12 +37,27 @@ globais; o `app.js` vem por último porque inicializa a aplicação.
 
 | Tabela             | Conteúdo                                   |
 |--------------------|--------------------------------------------|
-| `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário e `transacao_id` liga o atendimento concluído à sua receita |
+| `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário, `transacao_id` liga o atendimento concluído à sua receita e `pos_enviado_em` registra o envio da mensagem de pós-atendimento |
 | `clientes`         | CRM, com procedimentos em `procedimentos`; duplicados mesclados ficam ocultos (`mesclado_em`) |
 | `transacoes`       | Lançamentos financeiros; `data_br` é a competência, `recebido` e `data_quitacao` controlam recebimento/pagamento (fluxo de caixa); cópias de importação ficam ocultas (`duplicado_de`); ids `plan26_…` vieram da planilha "Financeiro 2026" (abr–ago) |
 | `centros_custo`    | Centros de custo                           |
 | `formas_pagamento` | Formas de pagamento                        |
 | `configuracoes`    | Configurações (ex.: URL do webhook do n8n) |
+
+## WhatsApp (n8n)
+
+O sistema não envia mensagens: ele chama o webhook do n8n (tela de Configurações) e o n8n envia.
+São dois eventos, distinguidos pelo campo `event` do corpo da requisição:
+
+| `event` | Quando | Campos próprios |
+|---------|--------|-----------------|
+| `whatsapp_confirmation` | Botão de confirmação no card do agendamento | — |
+| `whatsapp_pos_atendimento` | Ao concluir o atendimento | `delayMinutes` (5) e `sendAt` (horário calculado para o envio) |
+
+No pós-atendimento o n8n deve **esperar** `delayMinutes` (nó Wait) antes de mandar a mensagem, que
+já vem pronta no campo `message`. O texto fica em `MSG_POS_ATENDIMENTO`, em `js/config.js`.
+O envio só acontece com webhook configurado, cliente vinculado com telefone e sem envio anterior
+(`pos_enviado_em`).
 
 A agenda e o CRM são atualizados a cada 30 segundos para refletir mudanças feitas em
 outros dispositivos.

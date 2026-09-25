@@ -55,6 +55,7 @@ const apptFromRow = r => ({
   clientId: r.client_id, obs: r.obs || '',
   valor: parseFloat(r.valor) || 0, fpag: r.fpag || 'pix',
   reagendamentos: r.reagendamentos || 0, txId: r.transacao_id || null,
+  posEnviadoEm: r.pos_enviado_em || null,
 });
 const apptToRow = (dateKey, a) => ({
   id: typeof a.id === 'string' ? parseInt(a.id.replace('a', '')) || Date.now() : a.id,
@@ -64,6 +65,7 @@ const apptToRow = (dateKey, a) => ({
   client_id: a.clientId || null, obs: a.obs || '',
   valor: a.valor || 0, fpag: a.fpag || 'pix',
   reagendamentos: a.reagendamentos || 0, transacao_id: a.txId || null,
+  pos_enviado_em: a.posEnviadoEm || null,
 });
 
 // ── Leitura ──

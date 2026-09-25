@@ -99,6 +99,9 @@ function renderApptRow(a) {
   const resched = a.reagendamentos
     ? `<span class="appt-tag-resched">${icon('refresh')}Reagendado${a.reagendamentos > 1 ? ' ' + a.reagendamentos + 'x' : ''}</span>`
     : '';
+  const posChip = a.posEnviadoEm
+    ? `<span class="appt-tag-pos" title="Pós-atendimento enviado em ${fmtDateBR(a.posEnviadoEm.slice(0, 10))}">${icon('send')}Pós enviado</span>`
+    : '';
 
   const clientChip = linked
     ? `<span class="appt-client-chip" onclick="openClientFicha(${linked.id})" title="Ver ficha">${icon('arrowUpRight')}${firstName(linked.name)}</span>`
@@ -121,7 +124,7 @@ function renderApptRow(a) {
       <div class="tl-slot">
         <div class="appt-card ${isCancelled ? 'is-cancelled' : a.status}">
           <div class="appt-main">
-            <div class="appt-name">${a.name}${clientChip}${resched}</div>
+            <div class="appt-name">${a.name}${clientChip}${resched}${posChip}</div>
             <div class="appt-svc">${a.svc}${a.obs ? ' · ' + a.obs : ''}</div>
           </div>
           <div class="appt-meta">
@@ -148,15 +151,23 @@ function setApptStatus(id, status) {
 function conclusionEffects(appt) {
   const valor = parseFloat(appt.valor) || 0;
   const client = appt.clientId ? clients.find(x => x.id === appt.clientId) : null;
-  if (valor <= 0) return '\n\nSem valor informado: nada será lançado no Financeiro.';
-  const effects = ['• lançar R$ ' + fmtMoney(valor) + ' como receita a receber no Financeiro'];
-  if (client) effects.push('• somar o valor ao "investido" de ' + firstName(client.name));
+  const effects = [];
+  if (valor > 0) {
+    effects.push('• lançar R$ ' + fmtMoney(valor) + ' como receita a receber no Financeiro');
+    if (client) effects.push('• somar o valor ao "investido" de ' + firstName(client.name));
+  } else {
+    effects.push('• sem valor informado: nada será lançado no Financeiro');
+  }
+  if (canSendPosAtendimento(appt)) {
+    effects.push('• enviar a mensagem de pós-atendimento no WhatsApp em ' + POS_ATENDIMENTO_DELAY_MIN + ' minutos');
+  }
   return '\n\nIsso vai:\n' + effects.join('\n');
 }
 
 // Aplica a conclusão: soma o valor no "investido" do cliente e lança a receita no Financeiro
 function applyConclusion(appt, dateKey) {
   appt.status = 'done';
+  sendPosAtendimento(appt, dateKey);   // o n8n aguarda o atraso antes de mandar
   const valor = parseFloat(appt.valor) || 0;
   if (valor <= 0) return;
   const client = appt.clientId ? clients.find(x => x.id === appt.clientId) : null;
