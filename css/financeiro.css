@@ -1029,3 +1029,9 @@
   background: var(--card);
   cursor: pointer;
 }
+
+.card-empty {
+  padding: 10px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
