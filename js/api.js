@@ -56,6 +56,7 @@ const apptFromRow = r => ({
   valor: parseFloat(r.valor) || 0, fpag: r.fpag || 'pix',
   reagendamentos: r.reagendamentos || 0, txId: r.transacao_id || null,
   posEnviadoEm: r.pos_enviado_em || null,
+  conf3dEm: r.conf3d_enviada_em || null,   // gravado pelo n8n; o site só exibe
 });
 const apptToRow = (dateKey, a) => ({
   id: typeof a.id === 'string' ? parseInt(a.id.replace('a', '')) || Date.now() : a.id,
