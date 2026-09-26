@@ -37,7 +37,7 @@ globais; o `app.js` vem por último porque inicializa a aplicação.
 
 | Tabela             | Conteúdo                                   |
 |--------------------|--------------------------------------------|
-| `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário, `transacao_id` liga o atendimento concluído à sua receita e `pos_enviado_em` registra o envio da mensagem de pós-atendimento |
+| `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário, `transacao_id` liga o atendimento concluído à sua receita, `pos_enviado_em` registra o pós-atendimento e `conf3d_enviada_em` a confirmação automática |
 | `clientes`         | CRM, com procedimentos em `procedimentos`; duplicados mesclados ficam ocultos (`mesclado_em`) |
 | `transacoes`       | Lançamentos financeiros; `data_br` é a competência, `recebido` e `data_quitacao` controlam recebimento/pagamento (fluxo de caixa); cópias de importação ficam ocultas (`duplicado_de`); ids `plan26_…` vieram da planilha "Financeiro 2026" (abr–ago) |
 | `centros_custo`    | Centros de custo                           |
@@ -53,6 +53,11 @@ São dois eventos, distinguidos pelo campo `event` do corpo da requisição:
 |---------|--------|-----------------|
 | `whatsapp_confirmation` | Botão de confirmação no card do agendamento | — |
 | `whatsapp_pos_atendimento` | Ao concluir o atendimento | `delayMinutes` (5) e `sendAt` (horário calculado para o envio) |
+
+Há ainda uma **confirmação automática** que não sai do site: o fluxo "Confirmação 3 dias antes — Morgana",
+no n8n, roda todo dia às 9h, lê a view `v_confirmacoes_3d` (agendamentos ativos de amanhã até 3 dias à
+frente, com cliente vinculada e telefone, sem locação) e grava `agendamentos.conf3d_enviada_em` depois de
+enviar, para não repetir.
 
 No pós-atendimento o n8n deve **esperar** `delayMinutes` (nó Wait) antes de mandar a mensagem, que
 já vem pronta no campo `message`. O texto fica em `MSG_POS_ATENDIMENTO`, em `js/config.js`.
