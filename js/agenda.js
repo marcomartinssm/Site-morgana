@@ -102,6 +102,9 @@ function renderApptRow(a) {
   const posChip = a.posEnviadoEm
     ? `<span class="appt-tag-pos" title="Pós-atendimento enviado em ${fmtDateBR(a.posEnviadoEm.slice(0, 10))}">${icon('send')}Pós enviado</span>`
     : '';
+  const confChip = a.conf3dEm
+    ? `<span class="appt-tag-conf" title="Confirmação automática enviada em ${fmtDateBR(a.conf3dEm.slice(0, 10))}">${icon('send')}Confirmação enviada</span>`
+    : '';
 
   const clientChip = linked
     ? `<span class="appt-client-chip" onclick="openClientFicha(${linked.id})" title="Ver ficha">${icon('arrowUpRight')}${firstName(linked.name)}</span>`
@@ -124,7 +127,7 @@ function renderApptRow(a) {
       <div class="tl-slot">
         <div class="appt-card ${isCancelled ? 'is-cancelled' : a.status}">
           <div class="appt-main">
-            <div class="appt-name">${a.name}${clientChip}${resched}${posChip}</div>
+            <div class="appt-name">${a.name}${clientChip}${resched}${confChip}${posChip}</div>
             <div class="appt-svc">${a.svc}${a.obs ? ' · ' + a.obs : ''}</div>
           </div>
           <div class="appt-meta">
