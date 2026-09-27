@@ -64,6 +64,24 @@ já vem pronta no campo `message`. O texto fica em `MSG_POS_ATENDIMENTO`, em `js
 O envio só acontece com webhook configurado, cliente vinculado com telefone e sem envio anterior
 (`pos_enviado_em`).
 
+## Nutrição (régua de 6 meses)
+
+Quando o estágio de um cliente vira `nutricao`, um gatilho no banco cria a linha dele em
+`nutricao_fila` (início hoje, ciclo de 6 meses). O fluxo "Nutrição — régua diária (Morgana)", no n8n,
+roda às 10h, lê `v_nutricao_devidas` (no máximo 20 por dia, um envio a cada 30s) e chama
+`nutricao_marcar_enviado(cliente_id, passo)` para avançar.
+
+| Tabela / função | Papel |
+|---|---|
+| `nutricao_passos` | Catálogo dos 14 passos: 1 a 4 semanais (`dias_depois` 0, 7, 14, 21) e 5 a 14 periódicos. `mensagem` vazia = passo não envia |
+| `nutricao_fila` | Uma linha por cliente: `proximo_passo`, `proximo_em`, `enviadas`, `interagiu_em`, `optout`, `encerra_em` |
+| `v_nutricao_devidas` | O que vence hoje, já com nome, telefone e texto (`{nome}` é trocado no n8n) |
+| `nutricao_marcar_enviado` | Avança o passo: +7 dias na fase semanal, +15 para quem interagiu e +30 para quem está em silêncio; encerra no passo 14 |
+
+Regras: a régua para sozinha se o cliente sair de `nutricao` (virou ativo ou descartado), se `optout`
+estiver marcado ou ao fim dos 6 meses. Um agendamento criado para quem está em nutrição conta como
+interação (gatilho em `agendamentos`).
+
 A agenda e o CRM são atualizados a cada 30 segundos para refletir mudanças feitas em
 outros dispositivos.
 
