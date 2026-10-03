@@ -7,6 +7,7 @@ let curPeriod = 'mar';   // trocado pelo mês atual na inicialização (initPeri
 let transactions = [];     // carregado do Supabase
 let txType = 'income';     // tipo do novo lançamento: 'income' | 'expense'
 let txFilter = 'todos';    // filtro da lista de lançamentos
+let regime = 'competencia';   // 'competencia' (dia do atendimento) | 'caixa' (dia em que o dinheiro entra/sai)
 let selCC = null, selFP = null;
 
 // Padrões — substituídos pelos cadastros do Supabase quando existirem
@@ -52,16 +53,24 @@ const catalogChip = (item, cls, selected, onclick) =>
 const brl = v => 'R$ ' + fmtMoney(v);   // sempre com centavos
 
 // ── Cálculos ──
-// Receita, despesa e lançamentos de um período
-function calcPeriod(p) {
-  let list = transactions;
-  if (p !== 'ano') {
-    const { m } = PERIOD_MAP[p];
-    list = list.filter(x => {
-      const d = parseDt(x.dt);
-      return d.getMonth() === m && d.getFullYear() === ANO_BASE;
-    });
-  }
+// Dia em que o dinheiro entrou ou saiu do caixa: a data de quitação, ou a do lançamento
+const cashDate = x => parseDt(x.quit || x.dt);
+
+// Lançamentos de um período em um regime:
+// 'competencia' usa o dia do lançamento; 'caixa' usa o dia da quitação e ignora o que ainda não entrou/saiu
+function listByRegime(p, reg) {
+  let list = reg === 'caixa' ? transactions.filter(x => !isPending(x)) : transactions;
+  if (p === 'ano') return list;
+  const { m } = PERIOD_MAP[p];
+  return list.filter(x => {
+    const d = reg === 'caixa' ? cashDate(x) : parseDt(x.dt);
+    return d.getMonth() === m && d.getFullYear() === ANO_BASE;
+  });
+}
+
+// Receita, despesa e lançamentos de um período (no regime escolhido na tela)
+function calcPeriod(p, reg = regime) {
+  const list = listByRegime(p, reg);
   return {
     i: sumValues(list.filter(isIncome)),
     e: sumValues(list.filter(x => x.t === 'despesa')),
@@ -69,8 +78,23 @@ function calcPeriod(p) {
   };
 }
 
-// Dia em que o dinheiro entrou ou saiu do caixa: a data de quitação, ou a do lançamento
-const cashDate = x => parseDt(x.quit || x.dt);
+// Ponte entre os dois regimes no mês: o que saiu para outro mês e o que veio de outros meses
+function regimeBridge(p) {
+  if (p === 'ano') return null;
+  const { m } = PERIOD_MAP[p];
+  const noMes = d => d.getFullYear() === ANO_BASE && d.getMonth() === m;
+  const r = { compI: 0, compE: 0, caixaI: 0, caixaE: 0, foraI: 0, foraE: 0, veioI: 0, veioE: 0 };
+  transactions.forEach(x => {
+    const comp = noMes(parseDt(x.dt));
+    const cx = !isPending(x) && noMes(cashDate(x));
+    const inc = isIncome(x);
+    if (comp) inc ? r.compI += x.v : r.compE += x.v;
+    if (cx) inc ? r.caixaI += x.v : r.caixaE += x.v;
+    if (comp && !cx) inc ? r.foraI += x.v : r.foraE += x.v;   // competência aqui, dinheiro em outro mês (ou pendente)
+    if (!comp && cx) inc ? r.veioI += x.v : r.veioE += x.v;   // dinheiro aqui, competência de outro mês
+  });
+  return r;
+}
 
 // Saldo acumulado (fluxo de caixa) desde o saldo inicial até o final do período.
 // Pendências (a receber / a pagar) só entram no saldo projetado.
@@ -119,7 +143,7 @@ function getBarData(p) {
   }
   const weeks = [{ i: 0, e: 0 }, { i: 0, e: 0 }, { i: 0, e: 0 }, { i: 0, e: 0 }];
   calcPeriod(p).list.forEach(x => {
-    const day = parseDt(x.dt).getDate();
+    const day = (regime === 'caixa' ? cashDate(x) : parseDt(x.dt)).getDate();
     const w = day <= 7 ? 0 : day <= 14 ? 1 : day <= 21 ? 2 : 3;
     if (isIncome(x)) weeks[w].i += x.v;
     else weeks[w].e += x.v;
@@ -129,6 +153,10 @@ function getBarData(p) {
 
 // Lançamentos do período selecionado
 const periodList = () => calcPeriod(curPeriod).list;
+const REGIMES = {
+  competencia: { kpi: ['Receita (competência)', 'Despesas (competência)', 'Resultado do mês'], dica: 'Competência: conta pelo dia do atendimento ou do vencimento, mesmo que o dinheiro entre ou saia em outro mês.' },
+  caixa: { kpi: ['Entradas (caixa)', 'Saídas (caixa)', 'Resultado de caixa'], dica: 'Caixa: conta pelo dia em que o dinheiro entrou ou saiu. O que está a receber ou a pagar não aparece aqui.' },
+};
 
 // Procedimento de cada receita gerada por um atendimento concluído: { idDaReceita: 'Remoção micropig.' }
 function apptSvcByTxId() {
@@ -158,6 +186,42 @@ function renderFinanceiro() {
   renderTxList();
 }
 
+function setRegime(r, el) {
+  regime = r;
+  document.querySelectorAll('.rg-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  $('regimeHint').textContent = REGIMES[r].dica;
+  document.querySelectorAll('.regime-badge').forEach(b => {
+    b.textContent = r === 'caixa' ? 'caixa' : 'competência';
+    b.classList.toggle('is-caixa', r === 'caixa');
+  });
+  setPeriod(curPeriod, periodTab());
+}
+
+// Linha que explica a diferença entre competência e caixa no mês
+function renderRegimeBridge(p) {
+  const b = regimeBridge(p);
+  const box = $('regimeBridge');
+  if (!b || (Math.abs(b.compI - b.caixaI) < 0.01 && Math.abs(b.compE - b.caixaE) < 0.01)) {
+    box.innerHTML = '';
+    return;
+  }
+  const linha = (titulo, comp, fora, veio, caixa) => `
+    <div class="bridge-line">
+      <span class="bridge-tag">${titulo}</span>
+      <span class="bridge-step">competência <b>R$ ${fmtMoney(comp)}</b></span>
+      ${fora >= 0.01 ? `<span class="bridge-step neg">− R$ ${fmtMoney(fora)} em outro mês ou em aberto</span>` : ''}
+      ${veio >= 0.01 ? `<span class="bridge-step pos">+ R$ ${fmtMoney(veio)} de meses anteriores</span>` : ''}
+      <span class="bridge-step">caixa <b>R$ ${fmtMoney(caixa)}</b></span>
+    </div>`;
+  box.innerHTML = `
+    <div class="bridge">
+      <div class="bridge-head">${icon('refresh')} Competência x caixa em ${PERIOD_MAP[p].label}</div>
+      ${Math.abs(b.compI - b.caixaI) >= 0.01 ? linha('Entradas', b.compI, b.foraI, b.veioI, b.caixaI) : ''}
+      ${Math.abs(b.compE - b.caixaE) >= 0.01 ? linha('Saídas', b.compE, b.foraE, b.veioE, b.caixaE) : ''}
+    </div>`;
+}
+
 function setPeriod(p, el) {
   if (!el) return;
   document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
@@ -166,6 +230,10 @@ function setPeriod(p, el) {
 
   const c = calcPeriod(p);
   const lucro = c.i - c.e;
+  const rotulos = REGIMES[regime].kpi;
+  $('kILabel').textContent = rotulos[0];
+  $('kELabel').textContent = rotulos[1];
+  $('kPLabel').textContent = rotulos[2];
   $('kI').textContent = 'R$ ' + fmtMoney(c.i);
   $('kE').textContent = 'R$ ' + fmtMoney(c.e);
   $('kP').textContent = (lucro >= 0 ? '+R$ ' : '-R$ ') + fmtMoney(Math.abs(lucro));
@@ -186,6 +254,7 @@ function setPeriod(p, el) {
 
   const labels = p === 'ano' ? ['Q1', 'Q2', 'Q3', 'Q4'] : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
   renderBars(getBarData(p), labels);
+  renderRegimeBridge(p);
   renderSvcs();
   renderFPDonut();
   renderCCSummary();
@@ -429,7 +498,8 @@ function setTxFilter(f, el) {
 
 function renderTxList() {
   const periodList = calcPeriod(curPeriod).list;
-  renderTxSummary(periodList.filter(isPendingIncome), periodList.filter(isPendingExpense));
+  const pendentes = listByRegime(curPeriod, 'competencia');   // pendência é sempre vista pela competência
+  renderTxSummary(pendentes.filter(isPendingIncome), pendentes.filter(isPendingExpense));
 
   let list = periodList;
   if (txFilter === 'income') list = list.filter(isIncome);
@@ -453,12 +523,13 @@ function renderTxList() {
     let sep = '';
     if (x.t !== lastType) {
       lastType = x.t;
-      sep = `<div class="tx-sep">${income ? 'Receitas — por data' : 'Despesas — por vencimento'}</div>`;
+      const porCaixa = regime === 'caixa';
+      sep = `<div class="tx-sep">${income ? 'Receitas' : 'Despesas'} — por ${porCaixa ? 'data de quitação' : (income ? 'competência' : 'vencimento')}</div>`;
     }
     const pending = isPending(x);
     const receiptBadge = pending
       ? `<span class="mini-badge mini-badge-pending">${income ? 'A receber' : 'A pagar'}</span>`
-      : `<button class="mini-badge mini-badge-received" onclick="undoReceipt('${x.id}')" title="Quitado em ${x.quit || x.dt} — clique para desmarcar">${icon('check')}${income ? 'Recebido' : 'Pago'}${x.quit && x.quit !== x.dt ? ' ' + x.quit.slice(0, 5) : ''}</button>`;
+      : `<button class="mini-badge mini-badge-received" onclick="undoReceipt('${x.id}')" title="Quitado em ${x.quit || x.dt} — clique para desmarcar">${icon('check')}${income ? 'Recebido' : 'Pago'}</button>`;
     const confirmLabel = income ? 'Confirmar recebimento' : 'Confirmar pagamento';
     const signed = income ? x.v : -x.v;   // despesa com valor negativo na planilha vira entrada
     return sep + `
@@ -476,7 +547,8 @@ function renderTxList() {
         ${pending ? `<button class="tx-receive" onclick="openReceiptModal('${x.id}')" title="${confirmLabel}">${icon('checkCircle')}<span>${confirmLabel}</span></button>` : ''}
         <div class="tx-amount">
           <div class="${income ? 'tv-i' : 'tv-e'}">${signed >= 0 ? '+' : '-'}${brl(Math.abs(signed))}</div>
-          <div class="tx-date">${x.dt}</div>
+          <div class="tx-date">Comp. ${x.dt}</div>
+          ${x.rec && x.quit && x.quit !== x.dt ? `<div class="tx-date tx-date-cash">Caixa ${x.quit}</div>` : ''}
         </div>
         ${x.id ? `<button class="tx-del" onclick="deleteTx('${x.id}')" title="Excluir">${icon('trash')}</button>` : ''}
       </div>`;

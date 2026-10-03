@@ -1035,3 +1035,129 @@
   font-size: 13px;
   color: var(--muted);
 }
+
+/* ── Regime: competência x caixa ── */
+.regime-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.regime-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--surface-hover);
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+
+.rg-btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: background .15s, color .15s, box-shadow .15s;
+}
+
+.rg-btn:hover {
+  color: var(--text);
+}
+
+.rg-btn.active {
+  background: var(--card);
+  color: var(--brand-700);
+  box-shadow: var(--shadow-sm);
+}
+
+.regime-hint {
+  flex: 1;
+  min-width: 220px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.regime-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--brand-50);
+  color: var(--brand-700);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.regime-badge.is-caixa {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.bridge {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+}
+
+.bridge-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.bridge-head .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--muted);
+}
+
+.bridge-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.bridge-line + .bridge-line {
+  border-top: 1px solid var(--line);
+}
+
+.bridge-tag {
+  min-width: 68px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.bridge-step b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.bridge-step.neg {
+  color: var(--danger);
+}
+
+.bridge-step.pos {
+  color: var(--success);
+}
+
+.tx-date-cash {
+  color: var(--info);
+  font-weight: 600;
+}

@@ -164,17 +164,25 @@
           <div class="ptab ptab-year" onclick="setPeriod('ano',this)">2026</div>
         </div>
 
+        <div class="regime-bar">
+          <div class="regime-toggle">
+            <button class="rg-btn active" onclick="setRegime('competencia',this)">Competência</button>
+            <button class="rg-btn" onclick="setRegime('caixa',this)">Caixa</button>
+          </div>
+          <div class="regime-hint" id="regimeHint">Competência: conta pelo dia do atendimento ou do vencimento, mesmo que o dinheiro entre ou saia em outro mês.</div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi kpi-i">
-            <div class="kpi-head"><span class="kpi-label">Receita total</span><span class="kpi-icon" data-icon="trendingUp"></span></div>
+            <div class="kpi-head"><span class="kpi-label" id="kILabel">Receita (competência)</span><span class="kpi-icon" data-icon="trendingUp"></span></div>
             <div class="kpi-val" id="kI">—</div><div class="kpi-delta" id="kId">—</div>
           </div>
           <div class="kpi kpi-e">
-            <div class="kpi-head"><span class="kpi-label">Despesas</span><span class="kpi-icon" data-icon="trendingDown"></span></div>
+            <div class="kpi-head"><span class="kpi-label" id="kELabel">Despesas (competência)</span><span class="kpi-icon" data-icon="trendingDown"></span></div>
             <div class="kpi-val" id="kE">—</div><div class="kpi-delta dn" id="kEd">—</div>
           </div>
           <div class="kpi kpi-p">
-            <div class="kpi-head"><span class="kpi-label">Lucro líquido</span><span class="kpi-icon" data-icon="chart"></span></div>
+            <div class="kpi-head"><span class="kpi-label" id="kPLabel">Resultado do mês</span><span class="kpi-icon" data-icon="chart"></span></div>
             <div class="kpi-val" id="kP">—</div><div class="kpi-delta" id="kPd">—</div>
           </div>
           <div class="kpi kpi-t">
@@ -182,6 +190,8 @@
             <div class="kpi-val" id="kT">—</div><div class="kpi-delta" id="kTd">—</div>
           </div>
         </div>
+
+        <div id="regimeBridge"></div>
 
         <!-- Novo lançamento -->
         <div class="add-form" id="addForm">
@@ -224,7 +234,7 @@
         <div class="fin-section active" id="fsec-visao">
           <div class="fin-grid">
             <div class="card">
-              <div class="card-title">Receitas &amp; despesas</div>
+              <div class="card-title">Receitas &amp; despesas <span class="regime-badge">competência</span></div>
               <div class="bar-chart" id="barChart"></div>
               <div class="legend-row">
                 <span><span class="ldot legend-dot-income"></span>Receitas</span>
@@ -232,20 +242,20 @@
               </div>
             </div>
             <div class="card">
-              <div class="card-title">Receitas por serviço</div>
+              <div class="card-title">Receitas por serviço <span class="regime-badge">competência</span></div>
               <div id="svcList"></div>
             </div>
           </div>
           <div class="fin-grid-2">
             <div class="card">
-              <div class="card-title">Forma de pagamento</div>
+              <div class="card-title">Forma de pagamento <span class="regime-badge">competência</span></div>
               <div class="fp-donut-row">
                 <svg width="90" height="90" viewBox="0 0 90 90" id="fpDonut"></svg>
                 <div class="fp-legend" id="fpLegend"></div>
               </div>
             </div>
             <div class="card">
-              <div class="card-title">Despesas por centro de custo</div>
+              <div class="card-title">Despesas por centro de custo <span class="regime-badge">competência</span></div>
               <div class="cc-summary-grid" id="ccSummary"></div>
             </div>
           </div>
