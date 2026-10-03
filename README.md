@@ -39,7 +39,7 @@ globais; o `app.js` vem por último porque inicializa a aplicação.
 |--------------------|--------------------------------------------|
 | `agendamentos`     | Agenda (um registro por horário); `reagendamentos` conta mudanças de dia/horário, `transacao_id` liga o atendimento concluído à sua receita, `pos_enviado_em` registra o pós-atendimento e `conf3d_enviada_em` a confirmação automática |
 | `clientes`         | CRM, com procedimentos em `procedimentos`; duplicados mesclados ficam ocultos (`mesclado_em`) |
-| `transacoes`       | Lançamentos financeiros; `data_br` é a competência, `recebido` e `data_quitacao` controlam recebimento/pagamento (fluxo de caixa); cópias de importação ficam ocultas (`duplicado_de`); ids `plan26_…` vieram da planilha "Financeiro 2026" (abr–ago) |
+| `transacoes`       | Lançamentos financeiros; `data_br` é a competência (o Financeiro tem um seletor Competência/Caixa), `recebido` e `data_quitacao` controlam recebimento/pagamento (fluxo de caixa); cópias de importação ficam ocultas (`duplicado_de`); ids `plan26_…` vieram da planilha "Financeiro 2026" (abr–ago) |
 | `centros_custo`    | Centros de custo                           |
 | `formas_pagamento` | Formas de pagamento                        |
 | `configuracoes`    | Configurações (ex.: URL do webhook do n8n) |
