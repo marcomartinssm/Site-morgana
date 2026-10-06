@@ -153,10 +153,36 @@ function getBarData(p) {
 
 // Lançamentos do período selecionado
 const periodList = () => calcPeriod(curPeriod).list;
+const DIZIMO_PCT = 0.10;                    // 10% do resultado
+const DIZIMO_CENTROS = ['loc', 'est'];      // Locações e Estética formam a base
 const REGIMES = {
   competencia: { kpi: ['Receita (competência)', 'Despesas (competência)', 'Resultado do mês'], dica: 'Competência: conta pelo dia do atendimento ou do vencimento, mesmo que o dinheiro entre ou saia em outro mês.' },
   caixa: { kpi: ['Entradas (caixa)', 'Saídas (caixa)', 'Resultado de caixa'], dica: 'Caixa: conta pelo dia em que o dinheiro entrou ou saiu. O que está a receber ou a pagar não aparece aqui.' },
+  dizimo: { kpi: [], dica: 'Dízimo: 10% do resultado de Locações e Estética no mês escolhido, para realizar no mês seguinte. A base usa a competência.' },
 };
+
+// Base do dízimo: receitas menos despesas de Locações e Estética, pela competência
+function dizimoDoPeriodo(p) {
+  const list = listByRegime(p, 'competencia').filter(x => DIZIMO_CENTROS.includes(x.cc));
+  const receitas = sumValues(list.filter(isIncome));
+  const despesas = sumValues(list.filter(x => x.t === 'despesa'));
+  const base = receitas - despesas;
+  return { receitas, despesas, base, dizimo: Math.max(0, base * DIZIMO_PCT) };
+}
+
+// Mês seguinte ao escolhido (é quando o dízimo é realizado)
+function mesSeguinte(p) {
+  if (p === 'ano') return null;
+  const i = PERIOD_ORDER.indexOf(p);
+  return i < 11 ? { p: PERIOD_ORDER[i + 1], label: PERIOD_MAP[PERIOD_ORDER[i + 1]].label, ano: ANO_BASE }
+                : { p: 'jan', label: 'Janeiro', ano: ANO_BASE + 1 };
+}
+
+// Dízimo já lançado em um mês (centro de custo Dízimo)
+function dizimoLancado(p) {
+  if (!p) return 0;
+  return sumValues(listByRegime(p, 'competencia').filter(x => x.cc === 'diz' && x.t === 'despesa'));
+}
 
 // Procedimento de cada receita gerada por um atendimento concluído: { idDaReceita: 'Remoção micropig.' }
 function apptSvcByTxId() {
@@ -191,6 +217,19 @@ function setRegime(r, el) {
   document.querySelectorAll('.rg-btn').forEach(b => b.classList.remove('active'));
   if (el) el.classList.add('active');
   $('regimeHint').textContent = REGIMES[r].dica;
+
+  // A tela do dízimo substitui os indicadores e as seções
+  const soDizimo = r === 'dizimo';
+  document.querySelector('.kpi-grid').hidden = soDizimo;
+  document.querySelector('.stabs').hidden = soDizimo;
+  $('regimeBridge').hidden = soDizimo;
+  $('addForm').hidden = soDizimo;
+  document.querySelectorAll('.fin-section').forEach(sec => { sec.hidden = soDizimo; });
+  $('dizimoPanel').hidden = !soDizimo;
+  if (soDizimo) {
+    renderDizimo(curPeriod);
+    return;
+  }
   document.querySelectorAll('.regime-badge').forEach(b => {
     b.textContent = r === 'caixa' ? 'caixa' : 'competência';
     b.classList.toggle('is-caixa', r === 'caixa');
@@ -255,6 +294,7 @@ function setPeriod(p, el) {
   const labels = p === 'ano' ? ['Q1', 'Q2', 'Q3', 'Q4'] : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
   renderBars(getBarData(p), labels);
   renderRegimeBridge(p);
+  if (regime === 'dizimo') renderDizimo(p);
   renderSvcs();
   renderFPDonut();
   renderCCSummary();
@@ -272,6 +312,53 @@ function setFinSection(section, el) {
   if (section === 'lancamentos') { renderTxList(); renderTxFilters(); }
   if (section === 'centros') { renderCCDetail(); renderCatalogManage('cc'); }
   if (section === 'pagamentos') { renderFPDetail(); renderCatalogManage('fp'); }
+}
+
+// ── Dízimo ──
+function renderDizimo(p) {
+  const d = dizimoDoPeriodo(p);
+  const prox = mesSeguinte(p);
+  const jaLancado = prox ? dizimoLancado(prox.p) : 0;
+  const mesBase = p === 'ano' ? ANO_BASE + ' inteiro' : PERIOD_MAP[p].label;
+
+  $('dzEyebrow').textContent = prox
+    ? 'A realizar em ' + prox.label + (prox.ano !== ANO_BASE ? ' de ' + prox.ano : '')
+    : 'Dízimo do ano';
+  $('dzValor').textContent = 'R$ ' + fmtMoney(d.dizimo);
+  $('dzSub').textContent = '10% do resultado de Locações e Estética em ' + mesBase;
+
+  const linha = (rotulo, valor, cls = '') =>
+    `<div class="dz-line"><span>${rotulo}</span><b class="${cls}">R$ ${fmtMoney(valor)}</b></div>`;
+  $('dzBreak').innerHTML =
+    linha('Receitas de Locações e Estética', d.receitas, 'text-pos')
+    + linha('Despesas de Locações e Estética', d.despesas, 'text-neg')
+    + `<div class="dz-line dz-line-total"><span>Base de cálculo</span><b>R$ ${fmtMoney(d.base)}</b></div>`
+    + linha('Dízimo (10%)', d.dizimo);
+
+  $('dzStatus').innerHTML = !prox ? ''
+    : jaLancado > 0
+      ? `<div class="dz-status ok">${icon('check')} Já lançado em ${prox.label}: R$ ${fmtMoney(jaLancado)}${Math.abs(jaLancado - d.dizimo) >= 0.01 ? ' · diferença de R$ ' + fmtMoney(Math.abs(jaLancado - d.dizimo)) : ''}</div>`
+      : `<div class="dz-status pend">${icon('clock')} Ainda não lançado em ${prox.label}</div>`;
+
+  // Histórico: base de cada mês, 10% e o que foi lançado no mês seguinte
+  const linhas = PERIOD_ORDER.map(mes => {
+    const calc = dizimoDoPeriodo(mes);
+    const seg = mesSeguinte(mes);
+    return { mes, calc, lancado: dizimoLancado(seg && seg.ano === ANO_BASE ? seg.p : null), seg };
+  }).filter(l => l.calc.receitas || l.calc.despesas || l.lancado);
+
+  $('dzHist').innerHTML = `
+    <div class="dz-hist-head"><span>Mês da base</span><span>Base</span><span>Dízimo (10%)</span><span>Lançado no mês seguinte</span></div>
+    ${linhas.map(l => {
+      const dif = l.lancado - l.calc.dizimo;
+      return `
+      <div class="dz-hist-row${l.mes === p ? ' is-atual' : ''}">
+        <span>${PERIOD_MAP[l.mes].label}</span>
+        <span>R$ ${fmtMoney(l.calc.base)}</span>
+        <span>R$ ${fmtMoney(l.calc.dizimo)}</span>
+        <span>${l.lancado ? 'R$ ' + fmtMoney(l.lancado) + (Math.abs(dif) >= 0.01 ? ` <i class="${dif > 0 ? 'text-pos' : 'text-neg'}">(${dif > 0 ? '+' : '−'}R$ ${fmtMoney(Math.abs(dif))})</i>` : '') : '—'}</span>
+      </div>`;
+    }).join('')}`;
 }
 
 // ── Visão geral ──
