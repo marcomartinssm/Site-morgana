@@ -1161,3 +1161,152 @@
   color: var(--info);
   font-weight: 600;
 }
+
+/* ── Dízimo ── */
+.dizimo-card {
+  margin-bottom: 16px;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--brand-50), var(--card));
+  border: 1px solid var(--brand-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.dizimo-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--brand-600);
+}
+
+.dizimo-val {
+  margin-top: 6px;
+  font-size: clamp(30px, 4vw, 42px);
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  color: var(--brand-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.dizimo-sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.dz-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dz-status .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.dz-status.ok {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.dz-status.pend {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.dz-break {
+  max-width: 460px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--brand-200);
+}
+
+.dz-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.dz-line b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dz-line-total {
+  margin-top: 4px;
+  padding-top: 11px;
+  border-top: 1px dashed var(--brand-200);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dz-hist-head,
+.dz-hist-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1.4fr;
+  gap: 10px;
+  padding: 9px 8px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dz-hist-head {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+
+.dz-hist-row {
+  border-top: 1px solid var(--line);
+  color: var(--text-2);
+}
+
+.dz-hist-row span:first-child {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dz-hist-row.is-atual {
+  background: var(--brand-50);
+  border-radius: 8px;
+}
+
+.dz-hist-row i {
+  font-style: normal;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .dz-hist-head,
+  .dz-hist-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+  }
+
+  .dz-hist-head span:nth-child(n+3) {
+    display: none;
+  }
+
+  .dz-hist-row span:nth-child(3)::before {
+    content: 'dízimo ';
+    color: var(--muted);
+  }
+
+  .dz-hist-row span:nth-child(4)::before {
+    content: 'lançado ';
+    color: var(--muted);
+  }
+}

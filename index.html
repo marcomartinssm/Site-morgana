@@ -168,6 +168,7 @@
           <div class="regime-toggle">
             <button class="rg-btn active" onclick="setRegime('competencia',this)">Competência</button>
             <button class="rg-btn" onclick="setRegime('caixa',this)">Caixa</button>
+            <button class="rg-btn" onclick="setRegime('dizimo',this)">Dízimo</button>
           </div>
           <div class="regime-hint" id="regimeHint">Competência: conta pelo dia do atendimento ou do vencimento, mesmo que o dinheiro entre ou saia em outro mês.</div>
         </div>
@@ -192,6 +193,21 @@
         </div>
 
         <div id="regimeBridge"></div>
+
+        <!-- Dízimo -->
+        <div id="dizimoPanel" hidden>
+          <div class="dizimo-card">
+            <div class="dizimo-eyebrow" id="dzEyebrow"></div>
+            <div class="dizimo-val" id="dzValor">R$ 0,00</div>
+            <div class="dizimo-sub" id="dzSub"></div>
+            <div id="dzStatus"></div>
+            <div class="dz-break" id="dzBreak"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Histórico do dízimo</div>
+            <div id="dzHist"></div>
+          </div>
+        </div>
 
         <!-- Novo lançamento -->
         <div class="add-form" id="addForm">
