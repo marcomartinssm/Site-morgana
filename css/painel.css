@@ -1,0 +1,344 @@
+/* ==========================================================================
+   Painel de métricas — KPIs, resultado em escada, gráfico de linhas e listas
+   ========================================================================== */
+
+.pn-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pn-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pn-period {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand-700);
+}
+
+.pn-section {
+  display: none;
+}
+
+.pn-section.active {
+  display: block;
+}
+
+/* ── KPIs ── */
+.pn-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.pn-kpi {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.pn-kpi::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--line-strong);
+}
+
+.pn-brand::before { background: var(--brand-500); }
+.pn-good::before  { background: var(--success); }
+.pn-bad::before   { background: var(--danger); }
+.pn-warn::before  { background: var(--warning); }
+
+.pn-kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.pn-kpi-val {
+  font-size: clamp(19px, 1.8vw, 25px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pn-kpi-sub {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.pn-good .pn-kpi-val { color: var(--success); }
+.pn-bad .pn-kpi-val  { color: var(--danger); }
+
+/* ── Aviso em destaque ── */
+.pn-alert {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #7a5410;
+  background: var(--warning-bg);
+  border: 1px solid #f0dcb4;
+  border-radius: var(--radius);
+}
+
+.pn-alert b {
+  font-weight: 700;
+}
+
+.pn-note {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* ── Resultado em escada ── */
+.dre-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.dre-line:last-child {
+  border-bottom: none;
+}
+
+.dre-lbl {
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.dre-lbl em {
+  display: block;
+  font-size: 11.5px;
+  font-style: normal;
+  color: var(--muted);
+}
+
+.dre-val {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dre-menos .dre-lbl,
+.dre-menos .dre-val {
+  color: var(--danger);
+}
+
+.dre-sub {
+  background: var(--surface);
+  margin: 2px -12px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border-bottom: none;
+}
+
+.dre-sub .dre-lbl,
+.dre-sub .dre-val {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dre-total {
+  margin: 4px -12px;
+  padding: 12px;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  border-radius: var(--radius-sm);
+}
+
+.dre-total .dre-lbl {
+  font-weight: 700;
+  color: var(--brand-800);
+}
+
+.dre-total .dre-val {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--brand-700);
+}
+
+.dre-sep {
+  margin: 16px 0 4px;
+  padding-top: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-top: 1px solid var(--line-strong);
+}
+
+/* ── Linhas de lista ── */
+.pn-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pn-row:last-child {
+  border-bottom: none;
+}
+
+.pn-row-name {
+  font-size: 13.5px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pn-row-sub {
+  grid-column: 1;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.pn-row-val {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.pn-row-val.pos { color: var(--success); }
+.pn-row-val.neg { color: var(--danger); }
+
+/* ── Gráfico de linhas ── */
+.pn-chart svg {
+  display: block;
+  width: 100%;
+  height: 220px;
+  overflow: visible;
+}
+
+.pn-chart .pn-chart-ax {
+  height: 20px;
+  margin-top: 2px;
+}
+
+.pn-chart .pn-zero {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
+.pn-chart .pn-ax {
+  fill: var(--muted);
+  font-size: 11px;
+  font-family: var(--font);
+  text-anchor: middle;
+}
+
+.pn-chart .legend-row {
+  flex-wrap: wrap;
+}
+
+.pn-chart .ldot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* ── Celular e tablet ── */
+@media (max-width: 1000px) {
+  .pn-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .pn-kpis {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .pn-kpi {
+    padding: 13px 14px;
+  }
+
+  .pn-kpi-val {
+    font-size: 18px;
+  }
+
+  .pn-chart svg {
+    height: 180px;
+  }
+
+  .dre-total .dre-val {
+    font-size: 16px;
+  }
+
+  .pn-head {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 340px) {
+  .pn-kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Barras do painel: nome mais largo e valor em dinheiro sem quebrar ── */
+.pn-bars .svc-item {
+  grid-template-columns: minmax(0, 150px) minmax(40px, 1fr) auto;
+  margin-bottom: 12px;
+}
+
+.pn-bars .svc-item:last-child {
+  margin-bottom: 0;
+}
+
+.pn-bars .svc-pct {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .pn-bars .svc-item {
+    grid-template-columns: minmax(0, 104px) minmax(24px, 1fr) auto;
+  }
+
+  .pn-bars .svc-name,
+  .pn-bars .svc-pct {
+    font-size: 12px;
+  }
+}

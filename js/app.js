@@ -10,12 +10,14 @@ const PAGE_TITLES = {
   agenda: 'Agenda',
   crm: 'Clientes',
   fin: 'Financeiro',
+  painel: 'Painel',
   config: 'Configurações',
 };
 const TOP_BUTTONS = {
   agenda: 'Novo agendamento',
   crm: 'Novo lead',
   fin: 'Novo lançamento',
+  painel: '',
   config: '',
 };
 
@@ -48,6 +50,10 @@ function goTo(page, el) {
   if (page === 'fin') {
     renderFinanceiro();
     if (!dataLoaded) loadAllData().then(renderFinanceiro);
+  }
+  if (page === 'painel') {
+    renderPainel();
+    if (!dataLoaded) loadAllData().then(renderPainel);
   }
   if (page === 'config') loadConfigForm();
 }
@@ -112,6 +118,7 @@ async function loadAllData() {
   showSyncStatus('✓ Online', 2000);
 
   if (curPage === 'fin') renderFinanceiro();
+  if (curPage === 'painel') renderPainel();
 }
 
 // Atualiza agenda e CRM periodicamente para pegar mudanças de outros dispositivos
@@ -130,6 +137,8 @@ function startPolling() {
       clients = cli;
       if (curPage === 'crm') refreshCRM();
     }
+
+    if (curPage === 'painel') renderPainel();
   }, POLLING_MS);
 }
 
@@ -143,6 +152,7 @@ function closeClientDropOnOutsideClick(e) {
 function init() {
   hydrateIcons();
   initPeriod();
+  initPainel();
   renderTopDate();
   localStorage.removeItem('mp_appts');   // limpeza de dados de versões antigas
   renderAgenda();

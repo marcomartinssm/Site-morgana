@@ -65,3 +65,33 @@ Qualquer dúvida ou se notar algo diferente, pode me chamar aqui sem receio.
 Estarei acompanhando sua evolução ✨`;
 
 const AVATAR_CLASSES = ['av-rose', 'av-gold', 'av-green', 'av-purple'];
+
+// ── Painel de métricas ──
+// Centros de custo que formam a operação (o resto é destinação do lucro)
+const CC_OPERACAO = ['est', 'loc'];
+const CC_RETIRADAS = 'dist';
+const CC_DIZIMO = 'diz';
+
+// Classificação das despesas no resultado em escada. A primeira regra que casar
+// com a descrição vale; o que não casar entra em "Outras despesas" (nível fixo).
+// `cc` limita a regra a um centro de custo.
+const DRE_REGRAS = [
+  { grupo: 'Financiamento da máquina', nivel: 'financiamento', cc: 'loc', re: /^(m[áa]quina|seguro|suporte)/ },
+  { grupo: 'Comissões',                nivel: 'variavel',      re: /^comiss/ },
+  { grupo: 'Materiais e insumos',      nivel: 'variavel',      re: /^(material|materiais|produto|agulha|luva|lixo|espelho|m[áa]scara)/ },
+  { grupo: 'Sala e estrutura',         nivel: 'fixo',          re: /^(aluguel|ring)/ },
+  { grupo: 'Impostos',                 nivel: 'fixo',          re: /^(mei|imposto|das)/ },
+  { grupo: 'Marketing',                nivel: 'fixo',          re: /(facebook|instagram|mkt|marketing|tr[áa]fego|an[úu]ncio)/ },
+  { grupo: 'Deslocamento',             nivel: 'fixo',          re: /^(gasolina|estacionamento|ped[áa]gio|pedagio|lava|uber)/ },
+  { grupo: 'Cursos e mentoria',        nivel: 'fixo',          re: /^(curso|mentoria|workshop)/ },
+];
+const DRE_GRUPO_OUTROS = { grupo: 'Outras despesas', nivel: 'fixo' };
+
+// Dias sem atendimento a partir dos quais um cliente ativo entra na lista de reativação
+const DIAS_PARA_REATIVAR = 60;
+// Faixas de horário usadas na ocupação da agenda
+const FAIXAS_HORARIO = [
+  { label: 'Manhã (até 12h)', de: 0,  ate: 12 },
+  { label: 'Tarde (12h–18h)', de: 12, ate: 18 },
+  { label: 'Noite (18h+)',    de: 18, ate: 24 },
+];
