@@ -42,6 +42,7 @@ const clienteFromRow = r => ({
   id: r.id, name: r.name, phone: r.phone, bday: r.bday || '—', since: r.since || 'Importado',
   stage: r.stage || 'novo_lead', visits: r.visits || 0, spent: r.spent || 0, last: r.last || '—',
   procs: r.procs || [], obs: r.obs || '', procedimentos: r.procedimentos || [], av: r.av || 'av-rose',
+  createdAt: r.created_at || null,   // data do cadastro; usada no painel de métricas
 });
 const clienteToRow = c => ({
   id: c.id, name: c.name, phone: c.phone, bday: c.bday, since: c.since,

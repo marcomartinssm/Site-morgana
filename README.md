@@ -15,6 +15,7 @@ css/
   agenda.css            Calendário, linha do tempo e modal de agendamento
   crm.css               Lista, kanban e ficha do cliente
   financeiro.css        KPIs, gráficos, lançamentos, centros de custo e formas de pagamento
+  painel.css            Painel de métricas: KPIs, resultado em escada e gráfico de linhas
   responsive.css        Tablet (menu recolhido) e celular (barra de navegação inferior)
 js/
   config.js             Chaves do Supabase e constantes (meses, estágios, procedimentos…)
@@ -23,6 +24,7 @@ js/
   agenda.js             Calendário, agendamentos do dia e modal de agendamento
   crm.js                Clientes: lista, kanban, ficha e procedimentos
   financeiro.js         Cálculos por período, gráficos e cadastros financeiros
+  painel.js             Painel de métricas: resultado, agenda, clientes e qualidade dos dados
   whatsapp.js           Confirmação e mensagem de pós-atendimento pelo webhook do n8n
   configuracoes.js      Tela de configurações
   app.js                Navegação, carregamento dos dados, sincronização e inicialização
@@ -32,6 +34,45 @@ tools/
 
 Os scripts são carregados em ordem no final do `index.html` e compartilham variáveis
 globais; o `app.js` vem por último porque inicializa a aplicação.
+
+## Painel de métricas
+
+Tela própria (menu "Painel"), com seletor de mês e cinco abas. Todos os números saem dos
+dados carregados — `transacoes` para dinheiro, `agendamentos` para volume e `clientes` para
+a base — e nenhum valor é fixo no código.
+
+| Aba | O que mostra |
+|-----|--------------|
+| Visão geral | Receita, resultado da empresa, retiradas e sobra do mês, com atendimentos, ticket médio e clientes; gráfico das três linhas ao longo do ano |
+| Resultado | Resultado em escada, receita e resultado por centro de custo, despesas por grupo, recebimentos por forma e pendências |
+| Agenda | Concluídos, cancelados e reagendamentos; procedimento, dia da semana, faixa de horário e as automações de WhatsApp |
+| Clientes | Funil do CRM, atendidos no período, receita por cliente, quem mais gerou receita e a lista de reativação |
+| Qualidade dos dados | O quanto cada campo está preenchido — é o acompanhamento da virada para 2027 |
+
+**Resultado em escada.** A tela separa o desempenho da empresa da destinação do lucro:
+
+```
+Receita da operação (Estética + Locações)
+(−) Custos variáveis        = Margem de contribuição
+(−) Despesas fixas          = Resultado operacional
+(−) Financiamento da máquina = Resultado da empresa
+(+) Aportes (−) Retiradas (−) Dízimo = Sobra do mês
+```
+
+As retiradas (centro de custo "Distribuição de lucros") e o dízimo ficam **abaixo da linha**:
+são destinação do lucro, não custo de operar, e por isso não entram no resultado da empresa.
+A separação entre pró-labore e distribuição de lucros está prevista para 2027, depois de um
+ano de média medida.
+
+Em que linha da escada cada despesa entra é decidido por `DRE_REGRAS`, em `js/config.js`:
+a primeira regra cuja expressão casa com a descrição vale, e o que não casa vai para
+"Outras despesas". Mudar a classificação é mexer só nessa lista.
+
+**Limites conhecidos dos dados.** O financeiro é confiável desde janeiro de 2026. A agenda só
+passou a ter cliente vinculado, valor e conclusão em setembro de 2026 — antes disso veio de
+importação, sem cliente nem procedimento. Por isso as métricas de cliente e de ticket só
+fecham a partir de setembro, e os 182 cadastros marcados como `Importado` ficam de fora da
+contagem de novos clientes.
 
 ## Banco de dados (Supabase)
 

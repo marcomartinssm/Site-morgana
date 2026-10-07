@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/agenda.css"/>
   <link rel="stylesheet" href="css/crm.css"/>
   <link rel="stylesheet" href="css/financeiro.css"/>
+  <link rel="stylesheet" href="css/painel.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -39,6 +40,9 @@
     </button>
     <button type="button" class="nav-item" onclick="goTo('fin',this)" title="Financeiro">
       <span class="nav-icon" data-icon="wallet"></span><span class="nav-label">Financeiro</span>
+    </button>
+    <button type="button" class="nav-item" onclick="goTo('painel',this)" title="Painel de métricas">
+      <span class="nav-icon" data-icon="gauge"></span><span class="nav-label">Painel</span>
     </button>
     <div class="nav-spacer"></div>
     <button type="button" class="nav-item" onclick="goTo('config',this)" title="Configurações">
@@ -328,6 +332,46 @@
         </div>
       </section>
 
+      <!-- ═══ PAINEL DE MÉTRICAS ═══ -->
+      <section class="page" id="page-painel">
+        <div class="ptabs" id="pnTabs">
+          <div class="ptab" onclick="setPainelPeriod('jan',this)">Jan</div>
+          <div class="ptab" onclick="setPainelPeriod('fev',this)">Fev</div>
+          <div class="ptab" onclick="setPainelPeriod('mar',this)">Mar</div>
+          <div class="ptab" onclick="setPainelPeriod('abr',this)">Abr</div>
+          <div class="ptab" onclick="setPainelPeriod('mai',this)">Mai</div>
+          <div class="ptab" onclick="setPainelPeriod('jun',this)">Jun</div>
+          <div class="ptab" onclick="setPainelPeriod('jul',this)">Jul</div>
+          <div class="ptab" onclick="setPainelPeriod('ago',this)">Ago</div>
+          <div class="ptab" onclick="setPainelPeriod('set',this)">Set</div>
+          <div class="ptab" onclick="setPainelPeriod('out',this)">Out</div>
+          <div class="ptab" onclick="setPainelPeriod('nov',this)">Nov</div>
+          <div class="ptab" onclick="setPainelPeriod('dez',this)">Dez</div>
+          <div class="ptab ptab-year" onclick="setPainelPeriod('ano',this)">2026</div>
+        </div>
+
+        <div class="pn-head">
+          <div>
+            <div class="pn-eyebrow">Painel de métricas</div>
+            <div class="pn-period" id="pnPeriodLabel">—</div>
+          </div>
+        </div>
+
+        <div class="stabs" id="pnStabs">
+          <div class="stab active" onclick="setPainelSection('geral',this)">Visão geral</div>
+          <div class="stab" onclick="setPainelSection('fin',this)">Resultado</div>
+          <div class="stab" onclick="setPainelSection('agenda',this)">Agenda</div>
+          <div class="stab" onclick="setPainelSection('clientes',this)">Clientes</div>
+          <div class="stab" onclick="setPainelSection('dados',this)">Qualidade dos dados</div>
+        </div>
+
+        <div class="pn-section active" id="pn-geral"></div>
+        <div class="pn-section" id="pn-fin"></div>
+        <div class="pn-section" id="pn-agenda"></div>
+        <div class="pn-section" id="pn-clientes"></div>
+        <div class="pn-section" id="pn-dados"></div>
+      </section>
+
       <!-- ═══ CONFIGURAÇÕES ═══ -->
       <section class="page" id="page-config">
         <div class="card card-narrow">
@@ -551,6 +595,7 @@
 <script src="js/agenda.js"></script>
 <script src="js/crm.js"></script>
 <script src="js/financeiro.js"></script>
+<script src="js/painel.js"></script>
 <script src="js/whatsapp.js"></script>
 <script src="js/configuracoes.js"></script>
 <script src="js/app.js"></script>
