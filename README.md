@@ -105,6 +105,12 @@ já vem pronta no campo `message`. O texto fica em `MSG_POS_ATENDIMENTO`, em `js
 O envio só acontece com webhook configurado, cliente vinculado com telefone e sem envio anterior
 (`pos_enviado_em`).
 
+**Locação nunca recebe mensagem.** Agendamento de locação é o aluguel da máquina para outra
+profissional, não um atendimento: o botão de confirmação some do card, o pós-atendimento não é
+programado ao concluir e a view `v_confirmacoes_3d` já deixa esses registros de fora. A regra é a
+mesma nos três lugares — `svc_key = 'locacao'` ou descrição do serviço começando em "loca" (parte
+da agenda importada ficou com `svc_key` genérico e só é reconhecida pelo texto).
+
 ## Nutrição (régua de 6 meses)
 
 Quando o estágio de um cliente vira `nutricao`, um gatilho no banco cria a linha dele em
