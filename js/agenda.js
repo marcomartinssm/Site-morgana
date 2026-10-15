@@ -110,13 +110,17 @@ function renderApptRow(a) {
     ? `<span class="appt-client-chip" onclick="openClientFicha(${linked.id})" title="Ver ficha">${icon('arrowUpRight')}${firstName(linked.name)}</span>`
     : '';
   const editBtn = `<button class="appt-btn appt-btn-edit" onclick="editAppt('${a.id}')" title="Editar">${icon('pencil')}</button>`;
+  // Locação não recebe mensagem, então nem mostra o botão de confirmação
+  const wppBtn = isLocacao(a)
+    ? ''
+    : `<button class="appt-btn appt-btn-wpp" data-wpp="${a.id}" onclick="sendWppFromAgenda('${a.id}','${agendaSelDate}')" title="Enviar confirmação WhatsApp">${icon('send')}</button>`;
   // Concluídos e cancelados só têm o editar: a situação é trocada dentro da edição
   const actions = isCancelled || isDone ? `<div class="appt-actions">${editBtn}</div>` : `
     <div class="appt-actions">
       <button class="appt-btn appt-btn-done" onclick="concludeAppt('${a.id}')" title="Concluir atendimento">${icon('checkCheck')}<span>Concluir</span></button>
       ${editBtn}
       <button class="appt-btn appt-btn-confirm" onclick="setApptStatus('${a.id}','confirmed')" title="Confirmar">${icon('check')}</button>
-      <button class="appt-btn appt-btn-wpp" data-wpp="${a.id}" onclick="sendWppFromAgenda('${a.id}','${agendaSelDate}')" title="Enviar confirmação WhatsApp">${icon('send')}</button>
+      ${wppBtn}
       <button class="appt-btn appt-btn-cancel" onclick="setApptStatus('${a.id}','cancelled')" title="Cancelar">${icon('x')}</button>
     </div>`;
   const valor = a.valor ? `<span class="appt-valor">R$ ${fmtMoney(parseFloat(a.valor))}</span>` : '';

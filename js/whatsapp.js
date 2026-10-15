@@ -13,6 +13,11 @@ function postWebhook(url, payload) {
   });
 }
 
+// Locação é o aluguel da máquina para outra profissional, não um atendimento:
+// nenhuma mensagem sai para esses agendamentos. É a mesma regra da view
+// v_confirmacoes_3d, que alimenta a confirmação automática no n8n.
+const isLocacao = appt => appt.svc_key === 'locacao' || /^loca/i.test((appt.svc || '').trim());
+
 // Telefone do cliente vinculado ao agendamento ('' quando não há)
 function apptPhone(appt) {
   const c = appt.clientId ? clients.find(x => String(x.id) === String(appt.clientId)) : null;
@@ -20,9 +25,9 @@ function apptPhone(appt) {
   return phone && phone !== '—' ? phone : '';
 }
 
-// Só envia com webhook configurado, telefone conhecido e sem envio anterior
+// Só envia com webhook configurado, telefone conhecido, fora locação e sem envio anterior
 function canSendPosAtendimento(appt) {
-  return !!N8N_WEBHOOK_URL && !!apptPhone(appt) && !appt.posEnviadoEm;
+  return !!N8N_WEBHOOK_URL && !!apptPhone(appt) && !isLocacao(appt) && !appt.posEnviadoEm;
 }
 
 // Mensagem de pós-atendimento: o n8n recebe na hora e aguarda o atraso antes de enviar
@@ -63,6 +68,11 @@ function sendWppFromAgenda(apptId, dateKey) {
   const a = arr.find(x => String(x.id) === String(apptId));
   if (!a) {
     alert('Agendamento não encontrado.');
+    return;
+  }
+
+  if (isLocacao(a)) {
+    alert('Locação não recebe mensagem de confirmação.');
     return;
   }
 
